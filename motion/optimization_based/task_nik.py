@@ -9,7 +9,7 @@ class NIK(object):
     def __init__(self, robot, component_name, wln_ratio=.05):
         self.rbt = robot
         self.component_name = component_name
-        self.jlc_object = self.rbt.manipulator_dict[component_name].jlc
+        self.jlc_object = self.rbt.manipulator_dict[component_name].fr5
         self.wln_ratio = wln_ratio
         # workspace bound
         self.max_rng = 2.0 # meter

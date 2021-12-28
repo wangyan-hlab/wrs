@@ -106,12 +106,12 @@ if __name__ == '__main__':
     import visualization.panda.world as wd
     import modeling.geometric_model as gm
 
-    base = wd.World(cam_pos=[2, 0, 1], lookat_pos=[0, 0, 0])
+    base = wd.World(cam_pos=[2, 0, 1], lookat_pos=[0, 0, 0], w=960, h=720)
     gm.gen_frame().attach_to(base)
     manipulator_instance = UR5E(enable_cc=True)
     manipulator_meshmodel = manipulator_instance.gen_meshmodel()
     manipulator_meshmodel.attach_to(base)
-    manipulator_meshmodel.show_cdprimit()
+    # manipulator_meshmodel.show_cdprimit()   # show the collision model
     manipulator_instance.gen_stickmodel(toggle_jntscs=True).attach_to(base)
     tic = time.time()
     print(manipulator_instance.is_collided())
