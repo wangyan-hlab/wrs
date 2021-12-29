@@ -10,7 +10,7 @@ import basis.robot_math as rm
 base = wd.World(cam_pos=[2, 1, 3], lookat_pos=[0, 0, 1.1])
 gm.gen_frame().attach_to(base)
 # object
-object = cm.CollisionModel("objects/Coffee_cup.stl")
+object = cm.CollisionModel("coffee_cup.stl")
 object.set_pos(np.array([0.28, -0.5, 1.18]))
 object.set_rgba([.5, .7, .3, 1])
 object.attach_to(base)

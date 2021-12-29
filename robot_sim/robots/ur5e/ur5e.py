@@ -4,16 +4,16 @@ import numpy as np
 import basis.robot_math as rm
 import modeling.model_collection as mc
 import robot_sim._kinematics.jlchain as jl
-import robot_sim.manipulators.fr5.fr5 as fr
+import robot_sim.manipulators.ur5e.ur5e as ur5e
 import robot_sim.end_effectors.grippers.robotiq85.robotiq85 as rtq
 import robot_sim.robots.robot_interface as ri
 
-class FR5_robot(ri.RobotInterface):
-    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name='fr5', enable_cc=True):
+class UR5E_robot(ri.RobotInterface):
+    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name='ur5e', enable_cc=True):
         super().__init__(pos=pos, rotmat=rotmat, name=name)
         this_dir, this_filename = os.path.split(__file__)
         arm_homeconf = np.zeros(6)
-        self.arm = fr.FR5(pos=np.zeros(3),rotmat=np.eye(3),homeconf=arm_homeconf,enable_cc=False)
+        self.arm = ur5e.UR5E(pos=np.zeros(3),rotmat=np.eye(3),homeconf=arm_homeconf,enable_cc=False)
         if enable_cc:
             self.enable_cc()
         self.manipulator_dict['arm'] = self.arm
@@ -83,7 +83,7 @@ class FR5_robot(ri.RobotInterface):
                       toggle_tcpcs=False,
                       toggle_jntscs=False,
                       rgba=None,
-                      name='fr5_meshmodel'):
+                      name='ur5e_meshmodel'):
         meshmodel = mc.ModelCollection(name=name)
         self.arm.gen_meshmodel(tcp_jntid=tcp_jntid,
                                tcp_loc_pos=tcp_loc_pos,
@@ -100,7 +100,7 @@ class FR5_robot(ri.RobotInterface):
                        toggle_tcpcs=False,
                        toggle_jntscs=False,
                        toggle_connjnt=False,
-                       name='fr5_stickmodel'):
+                       name='ur5e_stickmodel'):
         stickmodel = mc.ModelCollection(name=name)
         self.arm.gen_stickmodel(tcp_jntid=tcp_jntid,
                                 tcp_loc_pos=tcp_loc_pos,
@@ -118,7 +118,7 @@ if __name__ == '__main__':
 
     base = wd.World(cam_pos=[-2, -2, 1], lookat_pos=[0, 0, 0], w=960, h=720)
     gm.gen_frame().attach_to(base)
-    fr5 = FR5_robot(enable_cc=True)
+    ur5e = UR5E_robot(enable_cc=True)
     # fk test
     # gl_conf = np.zeros(6)
     # gl_conf[0] = math.pi * 2.0 / 3.0
@@ -135,16 +135,16 @@ if __name__ == '__main__':
     rotmat1 = np.array([[0,  0.866, -0.5],
                         [0,  0.5,   0.866],
                         [1,  0,     0]])
-    conf1 = fr5.ik(component_name="arm", tgt_pos=pos1, tgt_rotmat=rotmat1)
-    fr5.fk(component_name="arm", jnt_values=conf1)
-    fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
+    conf1 = ur5e.ik(component_name="arm", tgt_pos=pos1, tgt_rotmat=rotmat1)
+    ur5e.fk(component_name="arm", jnt_values=conf1)
+    ur5e.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
     pos2 = np.array([-0.03, 0.51, 0.42])
     rotmat2 = np.array([[0, 0.866, -0.5],
                         [0, 0.5, 0.866],
                         [1, 0, 0]])
-    conf2 = fr5.ik(component_name="arm", tgt_pos=pos2, tgt_rotmat=rotmat2)
-    fr5.fk(component_name="arm", jnt_values=conf2)
-    fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
+    conf2 = ur5e.ik(component_name="arm", tgt_pos=pos2, tgt_rotmat=rotmat2)
+    ur5e.fk(component_name="arm", jnt_values=conf2)
+    ur5e.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
 
     # fr5.fix_to(np.ones(3), np.eye(3))
     # fr5.gen_meshmodel().attach_to(base)
