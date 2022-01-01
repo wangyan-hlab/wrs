@@ -35,14 +35,32 @@ path = rrtc_planner.plan(component_name=component_name,
                          start_conf=start_conf,
                          goal_conf=goal_conf,
                          obstacle_list=[object],
-                         ext_dist=.2,
+                         ext_dist=0.2,
                          max_time=300)
-# print(path)
-for pose in path:
-    # print(pose)
-    robot_s.fk(component_name, pose)
-    robot_meshmodel = robot_s.gen_meshmodel()
-    robot_meshmodel.attach_to(base)
-    robot_s.gen_stickmodel().attach_to(base)
+# print(len(path), path)
+# for pose in path:
+#     # print(pose)
+#     robot_s.fk(component_name, pose)
+#     robot_meshmodel = robot_s.gen_meshmodel()
+#     robot_meshmodel.attach_to(base)
+#     robot_stickmodel = robot_s.gen_stickmodel()
+#     robot_stickmodel.attach_to(base)
 
+def update(rbtmnp, motioncounter, robot, path, armname, task):
+    if motioncounter[0] < len(path):
+        if rbtmnp[0] is not None:
+            rbtmnp[0].detach()
+        pose = path[motioncounter[0]]
+        robot.fk(armname, pose)
+        rbtmnp[0] = robot.gen_meshmodel()
+        rbtmnp[0].attach_to(base)
+        motioncounter[0] += 1
+    else:
+        motioncounter[0] = 0
+    return task.again
+rbtmnp = [None]
+motioncounter = [0]
+taskMgr.doMethodLater(0.05, update, "update",
+                      extraArgs=[rbtmnp, motioncounter, robot_s, path, component_name], appendTask=True)
+base.setFrameRateMeter(True)
 base.run()

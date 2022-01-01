@@ -34,43 +34,43 @@ class FR5(mi.ManipulatorInterface):
         self.jlc.lnks[0]['name'] = "base"
         self.jlc.lnks[0]['loc_pos'] = np.zeros(3)
         self.jlc.lnks[0]['mass'] = 2.0
-        self.jlc.lnks[0]['meshfile'] = os.path.join(this_dir, "meshes", "base.dae")
+        self.jlc.lnks[0]['meshfile'] = os.path.join(this_dir, "meshes", "base.stl")
         self.jlc.lnks[0]['rgba'] = [.5,.5,.5, 1.0]
         self.jlc.lnks[1]['name'] = "shoulder"
         self.jlc.lnks[1]['loc_pos'] = np.zeros(3)
         self.jlc.lnks[1]['com'] = np.array([.0, -.02, .0])
         self.jlc.lnks[1]['mass'] = 1.95
-        self.jlc.lnks[1]['meshfile'] = os.path.join(this_dir, "meshes", "shoulder.dae")
+        self.jlc.lnks[1]['meshfile'] = os.path.join(this_dir, "meshes", "shoulder.stl")
         self.jlc.lnks[1]['rgba'] = [1.0, .65, 0, 1.0]
         self.jlc.lnks[2]['name'] = "upperarm"
         self.jlc.lnks[2]['loc_pos'] = np.array([.0, .0, .0])
         self.jlc.lnks[2]['com'] = np.array([.13, 0, .1157])
         self.jlc.lnks[2]['mass'] = 3.42
-        self.jlc.lnks[2]['meshfile'] = os.path.join(this_dir, "meshes", "upperarm.dae")
+        self.jlc.lnks[2]['meshfile'] = os.path.join(this_dir, "meshes", "upperarm.stl")
         self.jlc.lnks[2]['rgba'] = [.5,.5,.5, 1.0]
         self.jlc.lnks[3]['name'] = "forearm"
         self.jlc.lnks[3]['loc_pos'] = np.array([.0, .0, .0])
         self.jlc.lnks[3]['com'] = np.array([.05, .0, .0238])
         self.jlc.lnks[3]['mass'] = 1.437
-        self.jlc.lnks[3]['meshfile'] = os.path.join(this_dir, "meshes", "forearm.dae")
+        self.jlc.lnks[3]['meshfile'] = os.path.join(this_dir, "meshes", "forearm.stl")
         self.jlc.lnks[3]['rgba'] = [1.0, .65, 0, 1.0]
         self.jlc.lnks[4]['name'] = "wrist1"
         self.jlc.lnks[4]['loc_pos'] = np.array([.0, .0, .0])
         self.jlc.lnks[4]['com'] = np.array([.0, .0, 0.01])
         self.jlc.lnks[4]['mass'] = 0.871
-        self.jlc.lnks[4]['meshfile'] = os.path.join(this_dir, "meshes", "wrist1.dae")
+        self.jlc.lnks[4]['meshfile'] = os.path.join(this_dir, "meshes", "wrist1.stl")
         self.jlc.lnks[4]['rgba'] = [.5,.5,.5, 1.0]
         self.jlc.lnks[5]['name'] = "wrist2"
         self.jlc.lnks[5]['loc_pos'] = np.array([.0, .0, .0])
         self.jlc.lnks[5]['com'] = np.array([.0, .0, 0.01])
         self.jlc.lnks[5]['mass'] = 0.8
-        self.jlc.lnks[5]['meshfile'] = os.path.join(this_dir, "meshes", "wrist2.dae")
+        self.jlc.lnks[5]['meshfile'] = os.path.join(this_dir, "meshes", "wrist2.stl")
         self.jlc.lnks[5]['rgba'] = [1.0, .65, 0, 1.0]
         self.jlc.lnks[6]['name'] = "wrist3"
         self.jlc.lnks[6]['loc_pos'] = np.array([.0, .0, .0])
         self.jlc.lnks[6]['com'] = np.array([.0, .0, -0.02])
         self.jlc.lnks[6]['mass'] = 0.8
-        self.jlc.lnks[6]['meshfile'] = os.path.join(this_dir, "meshes", "wrist3.dae")
+        self.jlc.lnks[6]['meshfile'] = os.path.join(this_dir, "meshes", "wrist3.stl")
         self.jlc.lnks[6]['rgba'] = [.5,.5,.5, 1.0]
         self.jlc.reinitialize()
         # collision checker
@@ -122,6 +122,6 @@ if __name__ == '__main__':
     print(toc - tic)
 
     # base = wd.World(cam_pos=[1, 1, 1], lookat_pos=[0,0,0])
-    # gm.GeometricModel("./meshes/base.dae").attach_to(base)
+    # gm.GeometricModel("./meshes/base.stl").attach_to(base)
     # gm.gen_frame().attach_to(base)
     base.run()

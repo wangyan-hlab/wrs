@@ -30,23 +30,38 @@ class FR5_robot(ri.RobotInterface):
                           rotmat=self.table.jnts[-1]['gl_rotmatq'],
                           homeconf=arm_homeconf,
                           enable_cc=False)
+        self.hnd = rtq.Robotiq85(pos=self.arm.jnts[-1]['gl_posq'],
+                                 rotmat=self.arm.jnts[-1]['gl_rotmatq'],
+                                 enable_cc=False)
         if enable_cc:
             self.enable_cc()
         self.manipulator_dict['arm'] = self.arm
+        self.hnd_dict['arm'] = self.hnd
 
     def enable_cc(self):
         super().enable_cc()
         self.cc.add_cdlnks(self.table, [0])
         self.cc.add_cdlnks(self.arm, [0, 1, 2, 3, 4, 5, 6])
+        self.cc.add_cdlnks(self.hnd.lft_outer, [0, 1, 2, 3, 4])
+        self.cc.add_cdlnks(self.hnd.rgt_outer, [1, 2, 3, 4])
         # lnks used for cd with external stationary objects
-        activelist = [
-                      self.arm.lnks[0],
+        activelist = [self.arm.lnks[0],
                       self.arm.lnks[1],
                       self.arm.lnks[2],
                       self.arm.lnks[3],
                       self.arm.lnks[4],
                       self.arm.lnks[5],
-                      self.arm.lnks[6]]
+                      self.arm.lnks[6],
+                      self.hnd.lft_outer.lnks[0],
+                      self.hnd.lft_outer.lnks[1],
+                      self.hnd.lft_outer.lnks[2],
+                      self.hnd.lft_outer.lnks[3],
+                      self.hnd.lft_outer.lnks[4],
+                      self.hnd.rgt_outer.lnks[1],
+                      self.hnd.rgt_outer.lnks[2],
+                      self.hnd.rgt_outer.lnks[3],
+                      self.hnd.rgt_outer.lnks[4]
+                      ]
         self.cc.set_active_cdlnks(activelist)
         # lnks used for arm-body collision detection
         fromlist = [self.table.lnks[0]]
@@ -54,22 +69,64 @@ class FR5_robot(ri.RobotInterface):
                     self.arm.lnks[3],
                     self.arm.lnks[4],
                     self.arm.lnks[5],
-                    self.arm.lnks[6]]
+                    self.arm.lnks[6],
+                    self.hnd.lft_outer.lnks[0],
+                    self.hnd.lft_outer.lnks[1],
+                    self.hnd.lft_outer.lnks[2],
+                    self.hnd.lft_outer.lnks[3],
+                    self.hnd.lft_outer.lnks[4],
+                    self.hnd.rgt_outer.lnks[1],
+                    self.hnd.rgt_outer.lnks[2],
+                    self.hnd.rgt_outer.lnks[3],
+                    self.hnd.rgt_outer.lnks[4]]
         self.cc.set_cdpair(fromlist, intolist)
         fromlist = [self.arm.lnks[0],
                     self.arm.lnks[1]]
         intolist = [self.arm.lnks[3],
                     self.arm.lnks[5],
-                    self.arm.lnks[6]]
+                    self.arm.lnks[6],
+                    self.hnd.lft_outer.lnks[0],
+                    self.hnd.lft_outer.lnks[1],
+                    self.hnd.lft_outer.lnks[2],
+                    self.hnd.lft_outer.lnks[3],
+                    self.hnd.lft_outer.lnks[4],
+                    self.hnd.rgt_outer.lnks[1],
+                    self.hnd.rgt_outer.lnks[2],
+                    self.hnd.rgt_outer.lnks[3],
+                    self.hnd.rgt_outer.lnks[4]]
         self.cc.set_cdpair(fromlist, intolist)
         fromlist = [self.arm.lnks[2]]
         intolist = [self.arm.lnks[4],
                     self.arm.lnks[5],
-                    self.arm.lnks[6]]
+                    self.arm.lnks[6],
+                    self.hnd.lft_outer.lnks[0],
+                    self.hnd.lft_outer.lnks[1],
+                    self.hnd.lft_outer.lnks[2],
+                    self.hnd.lft_outer.lnks[3],
+                    self.hnd.lft_outer.lnks[4],
+                    self.hnd.rgt_outer.lnks[1],
+                    self.hnd.rgt_outer.lnks[2],
+                    self.hnd.rgt_outer.lnks[3],
+                    self.hnd.rgt_outer.lnks[4]]
         self.cc.set_cdpair(fromlist, intolist)
         fromlist = [self.arm.lnks[3]]
-        intolist = [self.arm.lnks[6]]
+        intolist = [self.arm.lnks[6],
+                    self.hnd.lft_outer.lnks[0],
+                    self.hnd.lft_outer.lnks[1],
+                    self.hnd.lft_outer.lnks[2],
+                    self.hnd.lft_outer.lnks[3],
+                    self.hnd.lft_outer.lnks[4],
+                    self.hnd.rgt_outer.lnks[1],
+                    self.hnd.rgt_outer.lnks[2],
+                    self.hnd.rgt_outer.lnks[3],
+                    self.hnd.rgt_outer.lnks[4]]
         self.cc.set_cdpair(fromlist, intolist)
+
+    def get_hnd_on_manipulator(self, manipulator_name):
+        if manipulator_name == 'arm':
+            return self.hnd
+        else:
+            raise ValueError("The given jlc does not have a hand!")
 
     def get_gl_tcp(self, manipulator_name="arm"):
         return super().get_gl_tcp(manipulator_name=manipulator_name)
@@ -84,6 +141,8 @@ class FR5_robot(ri.RobotInterface):
         self.table.fix_to(self.pos, self.rotmat)
         self.arm.fix_to(pos=self.table.jnts[-1]['gl_posq']+self.offset,
                         rotmat=self.table.jnts[-1]['gl_rotmatq'])
+        self.hnd.fix_to(pos=self.arm.jnts[-1]['gl_posq'],
+                        rotmat=self.arm.jnts[-1]['gl_rotmatq'])
 
     def fk(self, component_name, jnt_values):
         """
@@ -96,6 +155,10 @@ class FR5_robot(ri.RobotInterface):
 
         def update_component(component_name='arm', jnt_values=np.zeros(6)):
             self.manipulator_dict[component_name].fk(jnt_values=jnt_values)
+            self.get_hnd_on_manipulator(component_name).fix_to(
+                pos=self.manipulator_dict[component_name].jnts[-1]['gl_posq'],
+                rotmat=self.manipulator_dict[component_name].jnts[-1]['gl_rotmatq'])
+
         super().fk(component_name, jnt_values)
         # examine length
         if component_name in self.manipulator_dict:
@@ -129,6 +192,9 @@ class FR5_robot(ri.RobotInterface):
                                toggle_tcpcs=toggle_tcpcs,
                                toggle_jntscs=toggle_jntscs,
                                rgba=rgba).attach_to(meshmodel)
+        self.hnd.gen_meshmodel(toggle_tcpcs=False,
+                               toggle_jntscs=toggle_jntscs,
+                               rgba=rgba).attach_to(meshmodel)
         return meshmodel
 
     def gen_stickmodel(self,
@@ -148,6 +214,9 @@ class FR5_robot(ri.RobotInterface):
                                 tcp_loc_pos=tcp_loc_pos,
                                 tcp_loc_rotmat=tcp_loc_rotmat,
                                 toggle_tcpcs=toggle_tcpcs,
+                                toggle_jntscs=toggle_jntscs,
+                                toggle_connjnt=toggle_connjnt).attach_to(stickmodel)
+        self.hnd.gen_stickmodel(toggle_tcpcs=False,
                                 toggle_jntscs=toggle_jntscs,
                                 toggle_connjnt=toggle_connjnt).attach_to(stickmodel)
         return stickmodel
@@ -179,7 +248,7 @@ if __name__ == '__main__':
                         [1,  0,     0]])
     # conf1 = fr5.ik(component_name="arm", tgt_pos=pos1, tgt_rotmat=rotmat1)
     # fr5.fk(component_name="fr5_to_table", jnt_values=np.array([math.pi/3.0]))
-    conf1 = np.array([0, 45/180*math.pi, 0, 0, 0, 0])
+    conf1 = np.array([0, -45/180*math.pi, 0, 0, 0, 0])
     fr5.fk(component_name="arm", jnt_values=conf1)
     fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
 
