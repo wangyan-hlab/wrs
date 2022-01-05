@@ -11,7 +11,7 @@ from panda3d.core import CollisionNode, CollisionBox, Point3
 import robot_sim.robots.robot_interface as ri
 
 class FR5_robot(ri.RobotInterface):
-    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name='fr5', enable_cc=True):
+    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name='fr5', enable_cc=True, showhnd=True):
         super().__init__(pos=pos, rotmat=rotmat, name=name)
         this_dir, this_filename = os.path.split(__file__)
         self.table = jl.JLChain(pos=pos, rotmat=rotmat, homeconf=np.zeros(1), name="fr5_to_table")
@@ -37,6 +37,7 @@ class FR5_robot(ri.RobotInterface):
             self.enable_cc()
         self.manipulator_dict['arm'] = self.arm
         self.hnd_dict['arm'] = self.hnd
+        self.showhnd = showhnd
 
     def enable_cc(self):
         super().enable_cc()
@@ -192,9 +193,10 @@ class FR5_robot(ri.RobotInterface):
                                toggle_tcpcs=toggle_tcpcs,
                                toggle_jntscs=toggle_jntscs,
                                rgba=rgba).attach_to(meshmodel)
-        self.hnd.gen_meshmodel(toggle_tcpcs=False,
-                               toggle_jntscs=toggle_jntscs,
-                               rgba=rgba).attach_to(meshmodel)
+        if self.showhnd:
+            self.hnd.gen_meshmodel(toggle_tcpcs=False,
+                                   toggle_jntscs=toggle_jntscs,
+                                   rgba=rgba).attach_to(meshmodel)
         return meshmodel
 
     def gen_stickmodel(self,
@@ -216,9 +218,10 @@ class FR5_robot(ri.RobotInterface):
                                 toggle_tcpcs=toggle_tcpcs,
                                 toggle_jntscs=toggle_jntscs,
                                 toggle_connjnt=toggle_connjnt).attach_to(stickmodel)
-        self.hnd.gen_stickmodel(toggle_tcpcs=False,
-                                toggle_jntscs=toggle_jntscs,
-                                toggle_connjnt=toggle_connjnt).attach_to(stickmodel)
+        if self.showhnd:
+            self.hnd.gen_stickmodel(toggle_tcpcs=False,
+                                    toggle_jntscs=toggle_jntscs,
+                                    toggle_connjnt=toggle_connjnt).attach_to(stickmodel)
         return stickmodel
 
 
@@ -227,7 +230,7 @@ if __name__ == '__main__':
     import visualization.panda.world as wd
     import modeling.geometric_model as gm
 
-    base = wd.World(cam_pos=[-2, -2, 1], lookat_pos=[0, 0, 0], w=960, h=720)
+    base = wd.World(cam_pos=[2, 2, 1], lookat_pos=[0, 0, 0], w=960, h=720)
     gm.gen_frame().attach_to(base)
     fr5 = FR5_robot()
     # fk test
@@ -242,24 +245,26 @@ if __name__ == '__main__':
     # fr5.gen_meshmodel().attach_to(base)
     # tcp = fr5.get_gl_tcp(manipulator_name="arm")
     # print(tcp)
-    pos1 = np.array([-0.03,  0.31,  0.42])
-    rotmat1 = np.array([[0,  0.866, -0.5],
-                        [0,  0.5,   0.866],
-                        [1,  0,     0]])
+    # pos1 = np.array([-0.03,  0.31,  0.42])
+    # rotmat1 = np.array([[0,  0.866, -0.5],
+    #                     [0,  0.5,   0.866],
+    #                     [1,  0,     0]])
     # conf1 = fr5.ik(component_name="arm", tgt_pos=pos1, tgt_rotmat=rotmat1)
     # fr5.fk(component_name="fr5_to_table", jnt_values=np.array([math.pi/3.0]))
     conf1 = np.array([0, -45/180*math.pi, 0, 0, 0, 0])
     fr5.fk(component_name="arm", jnt_values=conf1)
     fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
+    print(fr5.get_gl_tcp())
 
     # pos2 = np.array([-0.03, 0.51, 0.42])
     # rotmat2 = np.array([[0, 0.866, -0.5],
     #                     [0, 0.5, 0.866],
     #                     [1, 0, 0]])
     # # conf2 = fr5.ik(component_name="arm", tgt_pos=pos2, tgt_rotmat=rotmat2)
-    # conf2 = np.array([90/180*math.pi, -90/180*math.pi, -90/180*math.pi, -90/180*math.pi, 90/180*math.pi, 0/180*math.pi])
-    # fr5.fk(component_name="arm", jnt_values=conf2)
-    # fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
+    conf2 = np.array([90/180*math.pi, -90/180*math.pi, -90/180*math.pi, -90/180*math.pi, 90/180*math.pi, 0/180*math.pi])
+    fr5.fk(component_name="arm", jnt_values=conf2)
+    fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
+    print(fr5.get_gl_tcp())
 
     # fr5.fix_to(np.ones(3), np.eye(3))
     # fr5.gen_meshmodel().attach_to(base)
@@ -269,10 +274,10 @@ if __name__ == '__main__':
     # print(tcp)
     # gm.gen_sphere(tcp[0], radius=.02, rgba=[0.0, 0.0, 1.0, 1.0]).attach_to(base)
 
-    fr5.show_cdprimit()   # show the collision model
+    # fr5.show_cdprimit()   # show the collision model
     # fr5.gen_stickmodel().attach_to(base)
     # tic = time.time()
-    print(fr5.is_collided())
+    # print(fr5.is_collided())
     # toc = time.time()
     # print(toc - tic)
 
