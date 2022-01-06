@@ -20,8 +20,7 @@ class FR5_robot(ri.RobotInterface):
         self.table.lnks[0]['name'] = "table"
         self.table.lnks[0]['loc_pos'] = np.array([0, 0, 0])
         self.table.lnks[0]['collisionmodel'] = cm.CollisionModel(
-            os.path.join(this_dir, "meshes/table1820x54x800.stl"), expand_radius=.005
-        )
+            os.path.join(this_dir, "meshes/table1820x54x800.stl"), expand_radius=.005)
         self.table.lnks[0]['rgba'] = [.3, .3, .3, 1.0]
         self.table.reinitialize()
         arm_homeconf = np.zeros(6)
@@ -33,6 +32,13 @@ class FR5_robot(ri.RobotInterface):
         self.hnd = rtq.Robotiq85(pos=self.arm.jnts[-1]['gl_posq'],
                                  rotmat=self.arm.jnts[-1]['gl_rotmatq'],
                                  enable_cc=False)
+        # tool center point
+        self.arm.tcp_jntid = -1
+        self.arm.tcp_loc_pos = self.hnd.jaw_center_pos
+        self.arm.tcp_loc_rotmat = self.hnd.jaw_center_rotmat
+        # a list of detailed information about objects in hand, see CollisionChecker.add_objinhnd
+        self.oih_infos = []
+        # collision detection
         if enable_cc:
             self.enable_cc()
         self.manipulator_dict['arm'] = self.arm
@@ -137,6 +143,7 @@ class FR5_robot(ri.RobotInterface):
             return self.manipulator_dict[component_name].get_jnt_values()
 
     def fix_to(self, pos, rotmat):
+        super().fix_to(pos, rotmat)
         self.pos = pos
         self.rotmat = rotmat
         self.table.fix_to(self.pos, self.rotmat)
