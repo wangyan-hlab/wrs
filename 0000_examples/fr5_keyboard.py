@@ -86,7 +86,6 @@ def move(task):
             rel_gripper_distance = np.array([0, -gripper_speed * .5])
         new_arm_tcp_pos = current_arm_tcp_pos + rel_pos
         new_arm_tcp_rotmat = rel_rotmat.dot(current_arm_tcp_rotmat)
-        # last_jnt_values = robot_s.get_jnt_values()
         new_jnt_values = robot_s.ik(tgt_pos=new_arm_tcp_pos, tgt_rotmat=new_arm_tcp_rotmat,
                                     seed_jnt_values=current_jnt_values)
         if new_jnt_values is not None:
@@ -106,7 +105,6 @@ def move(task):
 
     onscreen.append(robot_s.gen_meshmodel())
     onscreen[-1].attach_to(base)
-
     operation_count += 1
     # time.sleep(1/30)
     return task.cont

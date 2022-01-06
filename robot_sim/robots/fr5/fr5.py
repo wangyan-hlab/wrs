@@ -239,46 +239,14 @@ if __name__ == '__main__':
     base = wd.World(cam_pos=[2, 2, 1], lookat_pos=[0, 0, 0], w=960, h=720)
     gm.gen_frame().attach_to(base)
     fr5 = FR5_robot()
-    # fk test
-    # gl_conf = np.zeros(6)
-    # gl_conf[0] = math.pi * 2.0 / 3.0
-    # gl_conf[1] = -math.pi * 1.0 / 3.0
-    # gl_conf[2] = -math.pi * 2.0 / 3.0
-    # gl_conf[3] = math.pi
-    # gl_conf[4] = -math.pi / 2.0
-    # gl_conf[5] = math.pi / 2.0
-    # fr5.fk(component_name="arm", jnt_values=gl_conf)
-    # fr5.gen_meshmodel().attach_to(base)
-    # tcp = fr5.get_gl_tcp(manipulator_name="arm")
-    # print(tcp)
-    # pos1 = np.array([-0.03,  0.31,  0.42])
-    # rotmat1 = np.array([[0,  0.866, -0.5],
-    #                     [0,  0.5,   0.866],
-    #                     [1,  0,     0]])
-    # conf1 = fr5.ik(component_name="arm", tgt_pos=pos1, tgt_rotmat=rotmat1)
-    # fr5.fk(component_name="fr5_to_table", jnt_values=np.array([math.pi/3.0]))
     conf1 = np.array([0, -45/180*math.pi, 0, 0, 0, 0])
     fr5.fk(component_name="arm", jnt_values=conf1)
     fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
     print(fr5.get_gl_tcp())
-
-    # pos2 = np.array([-0.03, 0.51, 0.42])
-    # rotmat2 = np.array([[0, 0.866, -0.5],
-    #                     [0, 0.5, 0.866],
-    #                     [1, 0, 0]])
-    # # conf2 = fr5.ik(component_name="arm", tgt_pos=pos2, tgt_rotmat=rotmat2)
     conf2 = np.array([90/180*math.pi, -90/180*math.pi, -90/180*math.pi, -90/180*math.pi, 90/180*math.pi, 0/180*math.pi])
     fr5.fk(component_name="arm", jnt_values=conf2)
     fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
     print(fr5.get_gl_tcp())
-
-    # fr5.fix_to(np.ones(3), np.eye(3))
-    # fr5.gen_meshmodel().attach_to(base)
-    # jnt_val = fr5.get_jnt_values()
-    # print(jnt_val)
-    # tcp = fr5.get_gl_tcp(manipulator_name="arm")
-    # print(tcp)
-    # gm.gen_sphere(tcp[0], radius=.02, rgba=[0.0, 0.0, 1.0, 1.0]).attach_to(base)
 
     # fr5.show_cdprimit()   # show the collision model
     # fr5.gen_stickmodel().attach_to(base)
