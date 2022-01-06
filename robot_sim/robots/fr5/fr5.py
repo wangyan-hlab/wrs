@@ -11,7 +11,7 @@ from panda3d.core import CollisionNode, CollisionBox, Point3
 import robot_sim.robots.robot_interface as ri
 
 class FR5_robot(ri.RobotInterface):
-    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name='fr5', enable_cc=True, showhnd=True):
+    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name='fr5', homeconf=np.zeros(6), enable_cc=True, showhnd=True):
         super().__init__(pos=pos, rotmat=rotmat, name=name)
         this_dir, this_filename = os.path.split(__file__)
         self.table = jl.JLChain(pos=pos, rotmat=rotmat, homeconf=np.zeros(1), name="fr5_to_table")
@@ -23,11 +23,10 @@ class FR5_robot(ri.RobotInterface):
             os.path.join(this_dir, "meshes/table1820x54x800.stl"), expand_radius=.005)
         self.table.lnks[0]['rgba'] = [.3, .3, .3, 1.0]
         self.table.reinitialize()
-        arm_homeconf = np.zeros(6)
         self.offset = np.array([0, 0, 0.054])
         self.arm = fr.FR5(pos=self.table.jnts[-1]['gl_posq']+self.offset,
                           rotmat=self.table.jnts[-1]['gl_rotmatq'],
-                          homeconf=arm_homeconf,
+                          homeconf=homeconf,
                           enable_cc=False)
         self.hnd = rtq.Robotiq85(pos=self.arm.jnts[-1]['gl_posq'],
                                  rotmat=self.arm.jnts[-1]['gl_rotmatq'],

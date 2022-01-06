@@ -31,47 +31,48 @@ class FR5(mi.ManipulatorInterface):
         self.jlc.jnts[7]['loc_pos'] = np.array([0, 0, .102])
         self.jlc.jnts[7]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, 0)
         # links
+        darkseagreen = [.41, .55, .41, 1.0]
         self.jlc.lnks[0]['name'] = "base"
         self.jlc.lnks[0]['loc_pos'] = np.zeros(3)
         self.jlc.lnks[0]['mass'] = 2.0
         self.jlc.lnks[0]['meshfile'] = os.path.join(this_dir, "meshes", "base.stl")
-        self.jlc.lnks[0]['rgba'] = [.5,.5,.5, 1.0]
+        self.jlc.lnks[0]['rgba'] = [.7,.7,.7, 1.0]
         self.jlc.lnks[1]['name'] = "shoulder"
         self.jlc.lnks[1]['loc_pos'] = np.zeros(3)
         self.jlc.lnks[1]['com'] = np.array([.0, -.02, .0])
         self.jlc.lnks[1]['mass'] = 1.95
         self.jlc.lnks[1]['meshfile'] = os.path.join(this_dir, "meshes", "shoulder.stl")
-        self.jlc.lnks[1]['rgba'] = [1.0, .65, 0, 1.0]
+        self.jlc.lnks[1]['rgba'] = darkseagreen
         self.jlc.lnks[2]['name'] = "upperarm"
         self.jlc.lnks[2]['loc_pos'] = np.array([.0, .0, .0])
         self.jlc.lnks[2]['com'] = np.array([.13, 0, .1157])
         self.jlc.lnks[2]['mass'] = 3.42
         self.jlc.lnks[2]['meshfile'] = os.path.join(this_dir, "meshes", "upperarm.stl")
-        self.jlc.lnks[2]['rgba'] = [.5,.5,.5, 1.0]
+        self.jlc.lnks[2]['rgba'] = [.7,.7,.7, 1.0]
         self.jlc.lnks[3]['name'] = "forearm"
         self.jlc.lnks[3]['loc_pos'] = np.array([.0, .0, .0])
         self.jlc.lnks[3]['com'] = np.array([.05, .0, .0238])
         self.jlc.lnks[3]['mass'] = 1.437
         self.jlc.lnks[3]['meshfile'] = os.path.join(this_dir, "meshes", "forearm.stl")
-        self.jlc.lnks[3]['rgba'] = [1.0, .65, 0, 1.0]
+        self.jlc.lnks[3]['rgba'] = darkseagreen
         self.jlc.lnks[4]['name'] = "wrist1"
         self.jlc.lnks[4]['loc_pos'] = np.array([.0, .0, .0])
         self.jlc.lnks[4]['com'] = np.array([.0, .0, 0.01])
         self.jlc.lnks[4]['mass'] = 0.871
         self.jlc.lnks[4]['meshfile'] = os.path.join(this_dir, "meshes", "wrist1.stl")
-        self.jlc.lnks[4]['rgba'] = [.5,.5,.5, 1.0]
+        self.jlc.lnks[4]['rgba'] = [.7,.7,.7, 1.0]
         self.jlc.lnks[5]['name'] = "wrist2"
         self.jlc.lnks[5]['loc_pos'] = np.array([.0, .0, .0])
         self.jlc.lnks[5]['com'] = np.array([.0, .0, 0.01])
         self.jlc.lnks[5]['mass'] = 0.8
         self.jlc.lnks[5]['meshfile'] = os.path.join(this_dir, "meshes", "wrist2.stl")
-        self.jlc.lnks[5]['rgba'] = [1.0, .65, 0, 1.0]
+        self.jlc.lnks[5]['rgba'] = darkseagreen
         self.jlc.lnks[6]['name'] = "wrist3"
         self.jlc.lnks[6]['loc_pos'] = np.array([.0, .0, .0])
         self.jlc.lnks[6]['com'] = np.array([.0, .0, -0.02])
         self.jlc.lnks[6]['mass'] = 0.8
         self.jlc.lnks[6]['meshfile'] = os.path.join(this_dir, "meshes", "wrist3.stl")
-        self.jlc.lnks[6]['rgba'] = [.5,.5,.5, 1.0]
+        self.jlc.lnks[6]['rgba'] = [.7,.7,.7, 1.0]
         self.jlc.reinitialize()
         # collision checker
         if enable_cc:
@@ -114,7 +115,7 @@ if __name__ == '__main__':
     manipulator_instance = FR5(enable_cc=True)
     manipulator_meshmodel = manipulator_instance.gen_meshmodel()
     manipulator_meshmodel.attach_to(base)
-    manipulator_meshmodel.show_cdprimit()
+    # manipulator_meshmodel.show_cdprimit()
     manipulator_instance.gen_stickmodel(toggle_jntscs=True).attach_to(base)
     tic = time.time()
     print(manipulator_instance.is_collided())
