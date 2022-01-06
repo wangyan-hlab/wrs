@@ -1,7 +1,6 @@
 import math
 import numpy as np
 import sys
-from robot_sim.manipulators.manipulator_interface import ManipulatorInterface
 sys.path.append(".")
 from visualization.panda import world as wd
 from modeling import geometric_model as gm
@@ -38,5 +37,5 @@ if __name__ == '__main__':
     genSphere(robot_s.get_gl_tcp(component_name)[0])
     robot_meshmodel = robot_s.gen_meshmodel(toggle_tcpcs=True)
     robot_meshmodel.attach_to(base)
-
+    
     base.run()

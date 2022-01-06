@@ -92,7 +92,7 @@ def move(task):
             robot_s.fk(component_name=component_name, jnt_values=new_jnt_values)
             print("current_jnt_values =", new_jnt_values)
         else:
-            raise NotImplementedError
+            raise NotImplementedError("IK is unsolved!")
 
         current_gripper_width = current_gripper_width + rel_gripper_distance
         print("current_gripper_width =", current_gripper_width)
