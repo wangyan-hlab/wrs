@@ -8,7 +8,7 @@ import basis.robot_math as rm
 import robot_sim.end_effectors.grippers.gripper_interface as gp
 
 
-class Robotiq85(gp.GripperInterface):
+class Robotiq85Gelsight(gp.GripperInterface):
 
     def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), cdmesh_type='box', name='robotiq85', enable_cc=True):
         super().__init__(pos=pos, rotmat=rotmat, cdmesh_type=cdmesh_type, name=name)
@@ -72,13 +72,14 @@ class Robotiq85(gp.GripperInterface):
         self.lft_outer.lnks[3]['loc_pos'] = np.zeros(3)
         self.lft_outer.lnks[3]['com'] = np.array([0.000299999999999317, 0.0160078233491243, -0.0136945669206257])
         self.lft_outer.lnks[3]['mass'] = 0.0104003125914103
-        self.lft_outer.lnks[3]['meshfile'] = os.path.join(this_dir, "meshes", "robotiq_arg2f_85_inner_finger_cvt2.stl")
-        self.lft_outer.lnks[3]['rgba'] = [.2, .2, .2, 1]
+        self.lft_outer.lnks[3]['meshfile'] = os.path.join(this_dir, "meshes",
+                                                          "robotiq_85_inner_finger_gelsight_cvt.stl")
+        self.lft_outer.lnks[3]['rgba'] = [0.57, 0.57, 0.57, 1]
         self.lft_outer.lnks[4]['name'] = "left_inner_finger_pad"
         self.lft_outer.lnks[4]['loc_pos'] = np.zeros(3)
-        self.lft_outer.lnks[4]['meshfile'] = os.path.join(this_dir, "meshes", "robotiq_arg2f_85_pad.dae")
-        self.lft_outer.lnks[4]['scale'] = [1e-3, 1e-3, 1e-3]
-        self.lft_outer.lnks[4]['rgba'] = [0.792156862745098, 0.819607843137255, 0.933333333333333, 1]
+        # self.lft_outer.lnks[4]['meshfile'] = os.path.join(this_dir, "meshes", "robotiq_arg2f_85_pad.dae")
+        # self.lft_outer.lnks[4]['scale'] = [1e-3, 1e-3, 1e-3]
+        # self.lft_outer.lnks[4]['rgba'] = [0.792156862745098, 0.819607843137255, 0.933333333333333, 1]
         # - lft_inner
         self.lft_inner.lnks[1]['name'] = "left_inner_knuckle"
         self.lft_inner.lnks[1]['loc_pos'] = np.zeros(3)
@@ -103,13 +104,14 @@ class Robotiq85(gp.GripperInterface):
         self.rgt_outer.lnks[3]['loc_pos'] = np.zeros(3)
         self.rgt_outer.lnks[3]['com'] = np.array([0.000299999999999317, 0.0160078233491243, -0.0136945669206257])
         self.rgt_outer.lnks[3]['mass'] = 0.0104003125914103
-        self.rgt_outer.lnks[3]['meshfile'] = os.path.join(this_dir, "meshes", "robotiq_arg2f_85_inner_finger_cvt2.stl")
-        self.rgt_outer.lnks[3]['rgba'] = [.2, .2, .2, 1]
+        self.rgt_outer.lnks[3]['meshfile'] = os.path.join(this_dir, "meshes",
+                                                          "robotiq_85_inner_finger_gelsight_cvt.stl")
+        self.rgt_outer.lnks[3]['rgba'] = [0.57, 0.57, 0.57, 1]
         self.rgt_outer.lnks[4]['name'] = "left_inner_finger_pad"
         self.rgt_outer.lnks[4]['loc_pos'] = np.zeros(3)
-        self.rgt_outer.lnks[4]['meshfile'] = os.path.join(this_dir, "meshes", "robotiq_arg2f_85_pad.dae")
-        self.rgt_outer.lnks[4]['scale'] = [1e-3, 1e-3, 1e-3]
-        self.rgt_outer.lnks[4]['rgba'] = [0.792156862745098, 0.819607843137255, 0.933333333333333, 1]
+        # self.rgt_outer.lnks[4]['meshfile'] = os.path.join(this_dir, "meshes", "robotiq_arg2f_85_pad.dae")
+        # self.rgt_outer.lnks[4]['scale'] = [1e-3, 1e-3, 1e-3]
+        # self.rgt_outer.lnks[4]['rgba'] = [0.792156862745098, 0.819607843137255, 0.933333333333333, 1]
         # - rgt_inner
         self.rgt_inner.lnks[1]['name'] = "left_inner_knuckle"
         self.rgt_inner.lnks[1]['loc_pos'] = np.zeros(3)
@@ -125,29 +127,27 @@ class Robotiq85(gp.GripperInterface):
         # jaw width
         self.jawwidth_rng = [0.0, .085]
         # jaw center
-        self.jaw_center_pos = np.array([0, 0, .145])
+        self.jaw_center_pos = np.array([0, 0, .180])
         # collision detection
-        self.all_cdelements=[]
+        self.all_cdelements = []
         self.enable_cc(toggle_cdprimit=enable_cc)
 
     def enable_cc(self, toggle_cdprimit):
         if toggle_cdprimit:
             super().enable_cc()
             # cdprimit
-            self.cc.add_cdlnks(self.lft_outer, [0, 1, 2, 3, 4])
+            self.cc.add_cdlnks(self.lft_outer, [0, 1, 2, 3])
             self.cc.add_cdlnks(self.lft_inner, [1])
-            self.cc.add_cdlnks(self.rgt_outer, [1, 2, 3, 4])
+            self.cc.add_cdlnks(self.rgt_outer, [1, 2, 3])
             self.cc.add_cdlnks(self.rgt_inner, [1])
             activelist = [self.lft_outer.lnks[0],
                           self.lft_outer.lnks[1],
                           self.lft_outer.lnks[2],
                           self.lft_outer.lnks[3],
-                          self.lft_outer.lnks[4],
                           self.lft_inner.lnks[1],
                           self.rgt_outer.lnks[1],
                           self.rgt_outer.lnks[2],
                           self.rgt_outer.lnks[3],
-                          self.rgt_outer.lnks[4],
                           self.rgt_inner.lnks[1]]
             self.cc.set_active_cdlnks(activelist)
             self.all_cdelements = self.cc.all_cdelements
@@ -194,9 +194,13 @@ class Robotiq85(gp.GripperInterface):
             raise ValueError("The angle parameter is out of range!")
 
     def jaw_to(self, jaw_width):
+        jaw_width = jaw_width + .028
+        if jaw_width > 0.085:
+            jaw_width = 0.085
         if jaw_width > self.jawwidth_rng[1]:
             raise ValueError(f"Jawwidth must be {self.jawwidth_rng[0]}mm~{self.jawwidth_rng[1]}mm!")
-        motion_val = math.asin((self.jawwidth_rng[1] / 2.0 + .0064 - .0306011) / 0.055) - math.asin((jaw_width / 2.0 + .0064 - .0306011) / 0.055)
+        motion_val = math.asin((self.jawwidth_rng[1] / 2.0 + .0064 - .0306011) / 0.055) - math.asin(
+            (jaw_width / 2.0 + .0064 - .0306011) / 0.055)
         self.fk(motion_val)
 
     def gen_stickmodel(self,
@@ -228,7 +232,7 @@ class Robotiq85(gp.GripperInterface):
             gm.gen_dashstick(spos=self.pos,
                              epos=jaw_center_gl_pos,
                              thickness=.0062,
-                             rgba=[.5,0,1,1],
+                             rgba=[.5, 0, 1, 1],
                              type="round").attach_to(sm_collection)
             gm.gen_mycframe(pos=jaw_center_gl_pos, rotmat=jaw_center_gl_rotmat).attach_to(sm_collection)
         return sm_collection
@@ -260,7 +264,7 @@ class Robotiq85(gp.GripperInterface):
             gm.gen_dashstick(spos=self.pos,
                              epos=jaw_center_gl_pos,
                              thickness=.0062,
-                             rgba=[.5,0,1,1],
+                             rgba=[.5, 0, 1, 1],
                              type="round").attach_to(mm_collection)
             gm.gen_mycframe(pos=jaw_center_gl_pos, rotmat=jaw_center_gl_rotmat).attach_to(mm_collection)
         return mm_collection
@@ -272,16 +276,16 @@ if __name__ == '__main__':
 
     base = wd.World(cam_pos=[1, 1, 1], lookat_pos=[0, 0, 0])
     gm.gen_frame().attach_to(base)
-    grpr = Robotiq85(enable_cc=True)
-    grpr.cdmesh_type='convexhull'
+    grpr = Robotiq85Gelsight(enable_cc=True)
+    grpr.cdmesh_type = 'convexhull'
     # grpr.fk(.0)
     grpr.jaw_to(.0)
     grpr.gen_meshmodel(toggle_tcpcs=True, rgba=[.3, .3, .0, .5]).attach_to(base)
     # grpr.gen_stickmodel(togglejntscs=False).attach_to(base)
     # grpr.fix_to(pos=np.array([0, .3, .2]), rotmat=rm.rotmat_from_axangle([1, 0, 0], math.pi / 6))
     # grpr.gen_meshmodel().attach_to(base)
-    # grpr.show_cdprimit()
-    grpr.show_cdmesh()
+    grpr.show_cdprimit()
+    # grpr.show_cdmesh()
     base.run()
 
     # base = wd.World(cam_pos=[.5, .5, .5], lookat_pos=[0, 0, 0])
