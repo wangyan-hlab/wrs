@@ -106,7 +106,6 @@ def move(task):
     onscreen.append(robot_s.gen_meshmodel())
     onscreen[-1].attach_to(base)
     operation_count += 1
-    # time.sleep(1/30)
     return task.cont
 
 if __name__ == '__main__':

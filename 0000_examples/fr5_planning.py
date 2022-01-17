@@ -10,18 +10,18 @@ import basis.robot_math as rm
 base = wd.World(cam_pos=[-2, -3, 1], lookat_pos=[0, 0, 0.5], w=960, h=720)
 gm.gen_frame().attach_to(base)
 # object
-object = cm.CollisionModel("objects/mug.stl")
-object.set_pos(np.array([0.3, -0.3, 0.554]))
-object.set_rgba([.1, .2, .8, 1])
-object.attach_to(base)
-object1 = cm.CollisionModel("objects/mug.stl")
-object1.set_pos(np.array([-0.3, -0.35, 0.554]))
-object1.set_rgba([.5, .9, .1, 1])
-object1.attach_to(base)
+obj = cm.CollisionModel("objects/mug.stl")
+obj.set_pos(np.array([0.3, -0.3, 0.554]))
+obj.set_rgba([.1, .2, .8, 1])
+obj.attach_to(base)
+obj1 = cm.CollisionModel("objects/mug.stl")
+obj1.set_pos(np.array([-0.3, -0.35, 0.554]))
+obj1.set_rgba([.5, .9, .1, 1])
+obj1.attach_to(base)
 # robot_s
 component_name = 'arm'
 robot_s = fr5.FR5_robot(enable_cc=True)
-robot_s.hnd.jaw_to(0.07)
+robot_s.hnd.jaw_to(0.01)
 start_conf = np.array([math.pi*120/180,-math.pi*120/180,math.pi*120/180,0,0,0])
 goal_conf = np.array([math.pi*0/180,-math.pi*110/180,math.pi*80/180,-math.pi*80/180,-math.pi*70/180,math.pi*20/180])
 robot_s.fk(component_name, start_conf)
@@ -33,7 +33,7 @@ rrtc_planner = rrtc.RRTConnect(robot_s)
 path = rrtc_planner.plan(component_name=component_name,
                          start_conf=start_conf,
                          goal_conf=goal_conf,
-                         obstacle_list=[object, object1],
+                         obstacle_list=[obj, obj1],
                          ext_dist=0.1,
                          max_time=300)
 print(path)

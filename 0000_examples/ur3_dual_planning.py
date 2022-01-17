@@ -28,35 +28,28 @@ path = rrtc_planner.plan(component_name=component_name,
                          ext_dist=.1,
                          max_time=300)
 print(path)
-for pose in path:
-    print(pose)
-    robot_s.fk(component_name, pose)
-    robot_meshmodel = robot_s.gen_meshmodel()
-    robot_meshmodel.attach_to(base)
-    robot_s.gen_stickmodel().attach_to(base)
-base.run()
+# for pose in path:
+#     print(pose)
+#     robot_s.fk(component_name, pose)
+#     robot_meshmodel = robot_s.gen_meshmodel()
+#     robot_meshmodel.attach_to(base)
+#     robot_s.gen_stickmodel().attach_to(base)
 
-# def update(rbtmnp, motioncounter, robot, path, armname, task):
-# rbtmnp = [None, None]
-# motioncounter = [0]
-# def update(task):
-#     if motioncounter[0] < len(path):
-#         if rbtmnp[0] is not None:
-#             rbtmnp[0].detach()
-#         if rbtmnp[1] is not None:
-#             rbtmnp[1].detach()
-#         pose = path[motioncounter[0]]
-#         robot_s.fk(component_name=component_name, jnt_values=pose)
-#         rbtmnp[0] = robot_s.gen_meshmodel()
-#         rbtmnp[0].attach_to(base)
-#         # rbtmnp[1] = robot.gen_stickmodel()
-#         # rbtmnp[1].attach_to(base)
-#         motioncounter[0] += 1
-#     else:
-#         motioncounter[0] = 0
-#     return task.again
-# taskMgr.doMethodLater(.05, update, "t")
-# # taskMgr.doMethodLater(0.01, update, 'update',
-# #             extraArgs=[rbtmnp, motioncounter, robot_s, path, component_name], appendTask=True)
-# base.setFrameRateMeter(True)
+def update(rbtmnp, motioncounter, robot, path, armname, task):
+    if motioncounter[0] < len(path):
+        if rbtmnp[0] is not None:
+            rbtmnp[0].detach()
+        pose = path[motioncounter[0]]
+        robot.fk(component_name=armname, jnt_values=pose)
+        rbtmnp[0] = robot.gen_meshmodel()
+        rbtmnp[0].attach_to(base)
+        motioncounter[0] += 1
+    else:
+        motioncounter[0] = 0
+    return task.again
+rbtmnp = [None]
+motioncounter = [0]
+taskMgr.doMethodLater(.07, update, 'update',
+                      extraArgs=[rbtmnp, motioncounter, robot_s, path, component_name], appendTask=True)
+base.setFrameRateMeter(True)
 base.run()

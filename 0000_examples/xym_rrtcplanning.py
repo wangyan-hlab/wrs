@@ -44,9 +44,7 @@ def update(rbtmnp, motioncounter, robot, path, armname, task):
     return task.cont
 rbtmnp = [None, None]
 motioncounter = [0]
-# taskMgr.add(update, "update",
-#                       extraArgs=[rbtmnp, motioncounter, robot_instance, path, component_name], appendTask=True)
-taskMgr.doMethodLater(0.02, update, "update",
+taskMgr.doMethodLater(0.07, update, "update",
                       extraArgs=[rbtmnp, motioncounter, robot_instance, path, component_name], appendTask=True)
 
 # print(path)
