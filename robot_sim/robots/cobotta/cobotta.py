@@ -5,7 +5,7 @@ import modeling.collision_model as cm
 import modeling.model_collection as mc
 import robot_sim._kinematics.jlchain as jl
 import robot_sim.manipulators.cobotta_arm.cobotta_arm as cbta
-import robot_sim.end_effectors.grippers.cobotta_gripper.cobotta_gripper as cbtg
+import robot_sim.end_effectors.gripper.cobotta_gripper.cobotta_gripper as cbtg
 import robot_sim.robots.robot_interface as ri
 
 
@@ -80,6 +80,7 @@ class Cobotta(ri.RobotInterface):
                     self.hnd.jlc.lnks[1],
                     self.hnd.jlc.lnks[2]]
         self.cc.set_cdpair(fromlist, intolist)
+        # TODO is the following update needed?
         for oih_info in self.oih_infos:
             objcm = oih_info['collisionmodel']
             self.hold(objcm)

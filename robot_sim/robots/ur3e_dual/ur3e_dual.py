@@ -6,7 +6,7 @@ import modeling.model_collection as mc
 import modeling.collision_model as cm
 import robot_sim._kinematics.jlchain as jl
 import robot_sim.manipulators.ur3e.ur3e as ur
-import robot_sim.end_effectors.grippers.robotiqhe.robotiqhe as rtq
+import robot_sim.end_effectors.gripper.robotiqhe.robotiqhe as rtq
 from panda3d.core import CollisionNode, CollisionBox, Point3
 import robot_sim.robots.robot_interface as ri
 
@@ -125,6 +125,86 @@ class UR3EDual(ri.RobotInterface):
     def enable_cc(self):
         super().enable_cc()
         # raise NotImplementedError
+        self.cc.add_cdlnks(self.lft_body, [0])
+        self.cc.add_cdlnks(self.lft_arm, [1, 2, 3, 4, 5, 6])
+        self.cc.add_cdlnks(self.lft_hnd.lft, [0, 1])
+        self.cc.add_cdlnks(self.lft_hnd.rgt, [1])
+        self.cc.add_cdlnks(self.rgt_arm, [1, 2, 3, 4, 5, 6])
+        self.cc.add_cdlnks(self.rgt_hnd.lft, [0, 1])
+        self.cc.add_cdlnks(self.rgt_hnd.rgt, [1])
+        # lnks used for cd with external stationary objects
+        activelist = [self.lft_arm.lnks[2],
+                      self.lft_arm.lnks[3],
+                      self.lft_arm.lnks[4],
+                      self.lft_arm.lnks[5],
+                      self.lft_arm.lnks[6],
+                      self.lft_hnd.lft.lnks[0],
+                      self.lft_hnd.lft.lnks[1],
+                      self.lft_hnd.rgt.lnks[1],
+                      self.rgt_arm.lnks[2],
+                      self.rgt_arm.lnks[3],
+                      self.rgt_arm.lnks[4],
+                      self.rgt_arm.lnks[5],
+                      self.rgt_arm.lnks[6],
+                      self.rgt_hnd.lft.lnks[0],
+                      self.rgt_hnd.lft.lnks[1],
+                      self.rgt_hnd.rgt.lnks[1]]
+        self.cc.set_active_cdlnks(activelist)
+        # lnks used for arm-body collision detection
+        fromlist = [self.lft_body.lnks[0],
+                    self.lft_arm.lnks[1],
+                    self.rgt_arm.lnks[1]]
+        intolist = [self.lft_arm.lnks[3],
+                    self.lft_arm.lnks[4],
+                    self.lft_arm.lnks[5],
+                    self.lft_arm.lnks[6],
+                    self.lft_hnd.lft.lnks[0],
+                    self.lft_hnd.lft.lnks[1],
+                    self.lft_hnd.rgt.lnks[1],
+                    self.rgt_arm.lnks[3],
+                    self.rgt_arm.lnks[4],
+                    self.rgt_arm.lnks[5],
+                    self.rgt_arm.lnks[6],
+                    self.rgt_hnd.lft.lnks[0],
+                    self.rgt_hnd.lft.lnks[1],
+                    self.rgt_hnd.rgt.lnks[1]]
+        self.cc.set_cdpair(fromlist, intolist)
+        # lnks used for arm-body collision detection -- extra
+        fromlist = [self.lft_body.lnks[0]]  # body
+        intolist = [self.lft_arm.lnks[2],
+                    self.rgt_arm.lnks[2]]
+        self.cc.set_cdpair(fromlist, intolist)
+        # lnks used for in-arm collision detection
+        fromlist = [self.lft_arm.lnks[2]]
+        intolist = [self.lft_arm.lnks[4],
+                    self.lft_arm.lnks[5],
+                    self.lft_hnd.lft.lnks[0],
+                    self.lft_hnd.lft.lnks[1],
+                    self.lft_hnd.rgt.lnks[1]]
+        self.cc.set_cdpair(fromlist, intolist)
+        fromlist = [self.rgt_arm.lnks[2]]
+        intolist = [self.rgt_arm.lnks[4],
+                    self.rgt_arm.lnks[5],
+                    self.rgt_hnd.lft.lnks[0],
+                    self.rgt_hnd.lft.lnks[1],
+                    self.rgt_hnd.rgt.lnks[1]]
+        self.cc.set_cdpair(fromlist, intolist)
+        # arm-arm collision
+        fromlist = [self.lft_arm.lnks[3],
+                    self.lft_arm.lnks[4],
+                    self.lft_arm.lnks[5],
+                    self.lft_arm.lnks[6],
+                    self.lft_hnd.lft.lnks[0],
+                    self.lft_hnd.lft.lnks[1],
+                    self.lft_hnd.rgt.lnks[1]]
+        intolist = [self.rgt_arm.lnks[3],
+                    self.rgt_arm.lnks[4],
+                    self.rgt_arm.lnks[5],
+                    self.rgt_arm.lnks[6],
+                    self.rgt_hnd.lft.lnks[0],
+                    self.rgt_hnd.lft.lnks[1],
+                    self.rgt_hnd.rgt.lnks[1]]
+        self.cc.set_cdpair(fromlist, intolist)
 
     def move_to(self, pos, rotmat):
         self.pos = pos
@@ -298,5 +378,5 @@ if __name__ == '__main__':
     u3ed_meshmodel = u3ed.gen_meshmodel(toggle_tcpcs=True)
     u3ed_meshmodel.attach_to(base)
     # u3ed_meshmodel.show_cdprimit()
-    u3ed.gen_stickmodel().attach_to(base)
+    # u3ed.gen_stickmodel().attach_to(base)
     base.run()
