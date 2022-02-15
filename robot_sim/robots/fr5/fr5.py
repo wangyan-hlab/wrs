@@ -6,7 +6,7 @@ import modeling.model_collection as mc
 import modeling.collision_model as cm
 import robot_sim._kinematics.jlchain as jl
 import robot_sim.manipulators.fr5.fr5 as fr
-import robot_sim.end_effectors.grippers.robotiq85.robotiq85 as rtq
+import robot_sim.end_effectors.gripper.robotiq85.robotiq85 as rtq
 from panda3d.core import CollisionNode, CollisionBox, Point3
 import robot_sim.robots.robot_interface as ri
 
@@ -251,7 +251,7 @@ if __name__ == '__main__':
     # fr5.show_cdprimit()   # show the collision model
     # fr5.gen_stickmodel().attach_to(base)
     # tic = time.time()
-    # print(fr5.is_collided())
+    print(fr5.is_collided())
     # toc = time.time()
     # print(toc - tic)
 
