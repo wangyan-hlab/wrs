@@ -16,21 +16,22 @@ class DobotMagician(mi.ManipulatorInterface):
         self.jlc = jl.JLChain(pos=pos, rotmat=rotmat, homeconf=new_homeconf, name=name)
         # six joints, n_jnts = 6+2 (tgt ranges from 1-6), nlinks = 6+1
         self.jlc.jnts[1]['loc_pos'] = np.array([0, 0, 0.024])
+        self.jlc.jnts[1]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, -1.570796325)
         self.jlc.jnts[1]['loc_motionax'] = np.array([0, 0, 1])
         self.jlc.jnts[1]['motion_rng'] = [-3.14159265, 3.14159265]
         self.jlc.jnts[2]['loc_pos'] = np.array([-0.01175, 0, 0.114])
-        self.jlc.jnts[2]['loc_rotmat'] = rm.rotmat_from_euler(1.570796325, 0, -1.570796325)
+        self.jlc.jnts[2]['loc_rotmat'] = rm.rotmat_from_euler(1.570796325,-0.20128231967888244, -1.570796325)
         self.jlc.jnts[2]['loc_motionax'] = np.array([0, 0, 1])
         self.jlc.jnts[2]['motion_rng'] = [0, 1.570796325]
         self.jlc.jnts[3]['loc_pos'] = np.array([0.02699, 0.13228, -0.01175])
-        self.jlc.jnts[3]['loc_rotmat'] = rm.rotmat_from_euler(0, 3.14159265, 0)
-        self.jlc.jnts[3]['loc_motionax'] = np.array([0, 0, 1])
+        self.jlc.jnts[3]['loc_rotmat'] = rm.rotmat_from_euler(0, 3.14159265, -1.24211575528)
+        self.jlc.jnts[3]['loc_motionax'] = np.array([0, 0, -1])
         self.jlc.jnts[3]['motion_rng'] = [0, 1.570796325]
         self.jlc.jnts[4]['loc_pos'] = np.array([0.07431, -0.12684, 0.0])
         self.jlc.jnts[4]['loc_rotmat'] = rm.rotmat_from_euler(0, 3.14159265, 0)
         self.jlc.jnts[4]['loc_motionax'] = np.array([0, 0, 1])
-        self.jlc.jnts[5]['loc_pos'] = np.array([-0.0328, 0.02871, 0])
-        self.jlc.jnts[5]['loc_rotmat'] = rm.rotmat_from_euler(0, 3.14159265, 0)
+        # self.jlc.jnts[5]['loc_pos'] = np.array([-0.0328, 0.02871, 0])
+        self.jlc.jnts[5]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, 3.14159265)
         # links
         self.jlc.lnks[0]['name'] = "base"
         self.jlc.lnks[0]['loc_pos'] = np.zeros(3)
@@ -53,6 +54,12 @@ class DobotMagician(mi.ManipulatorInterface):
         self.jlc.lnks[4]['meshfile'] = os.path.join(this_dir, "meshes", "link_6.stl")
         self.jlc.lnks[4]['rgba'] = [.35, .35, .35, 1.0]
         self.jlc.reinitialize()
+        # prepare parameters for analytical ik
+        upper_arm_vec = self.jlc.jnts[3]['gl_posq']-np.array([0,0,0.138])
+        lower_arm_vec = self.jlc.jnts[4]['gl_posq']-self.jlc.jnts[3]['gl_posq']
+        self._init_j2_angle = math.asin(np.sqrt(upper_arm_vec[0]**2+upper_arm_vec[1]**2)/0.135)
+        self._init_j3_angle = rm.angle_between_vectors(lower_arm_vec, -upper_arm_vec)
+        print(self._init_j3_angle, self._init_j2_angle)
         # collision detection
         if enable_cc:
             self.enable_cc()
@@ -69,7 +76,7 @@ class DobotMagician(mi.ManipulatorInterface):
 
     def _mimic_jnt_values(self, jnt_values):
         """
-        always set j4 to be -j2+j3
+        always set j4 to be j2+j3
         :param jnt_values:
         :return:
         author: weiwei
@@ -77,7 +84,7 @@ class DobotMagician(mi.ManipulatorInterface):
         """
         new_jnt_values = np.zeros(4)
         new_jnt_values[:3] = jnt_values
-        new_jnt_values[3] = -jnt_values[1] + jnt_values[2]
+        new_jnt_values[3] = jnt_values[1] + jnt_values[2]
         return new_jnt_values
 
     def fk(self, jnt_values=None):
@@ -86,23 +93,26 @@ class DobotMagician(mi.ManipulatorInterface):
 
     def ik(self,
            tgt_pos,
-           tgt_theta,
+           tgt_theta=None,
            tcp_loc_pos=None,
            tcp_loc_rotmat=None):
         """
         analytical ik, override the numerical one
         :param tgt_pos:
-        :param tgt_theta: radian single angle
+        :param tgt_theta: radian single angle, TODO
         :param tcp_loc_pos:
         :param tcp_loc_rotmat:
         :return:
         """
         j1_angle = math.atan(tgt_pos[0] / tgt_pos[1])
         j2_to_j4_distance = math.sqrt((tgt_pos[2] - 0.138) ** 2 + tgt_pos[0] ** 2 + tgt_pos[1] ** 2)
-        j3_angle = math.acos((0.147 ** 2 + 0.135 ** 2 - j2_to_j4_distance ** 2) / (2 * 0.147 * 0.135))
-        j2_angle = math.acos(
+        print(math.acos((0.147 ** 2 + 0.135 ** 2 - j2_to_j4_distance ** 2) / (2 * 0.147 * 0.135)))
+        j3_angle = math.pi/2-math.acos((0.147 ** 2 + 0.135 ** 2 - j2_to_j4_distance ** 2) / (2 * 0.147 * 0.135))
+        print(j3_angle)
+        j2_angle = math.pi/2-(math.acos(
             (0.135 ** 2 + j2_to_j4_distance ** 2 - 0.147 ** 2) / (2 * 0.135 * j2_to_j4_distance)) + math.atan(
-            (tgt_pos[2] - 0.138) / math.sqrt(tgt_pos[0] ** 2 + tgt_pos[1] ** 2))
+            (tgt_pos[2] - 0.138) / math.sqrt(tgt_pos[0] ** 2 + tgt_pos[1] ** 2)))
+        # j2_angle = math.pi/2+self._init_j2_angle-j2_angle
         return np.array([j1_angle, j2_angle, j3_angle])
 
 
@@ -114,20 +124,21 @@ if __name__ == '__main__':
     base = wd.World(cam_pos=[2, 0, 1], lookat_pos=[0, 0, .3])
     gm.gen_frame().attach_to(base)
     robot_s = DobotMagician(enable_cc=True)
-    # robot_s.fk(jnt_values=np.array([math.radians(40), math.radians(30), math.radians(70)]))
-    manipulator_meshmodel = robot_s.gen_meshmodel()
-    manipulator_meshmodel.attach_to(base)
-    manipulator_meshmodel.show_cdprimit()
+    robot_s.fk(jnt_values=np.array([math.radians(0), math.radians(0), math.radians(0)]))
+    # manipulator_meshmodel = robot_s.gen_meshmodel()
+    # manipulator_meshmodel.attach_to(base)
+    # manipulator_meshmodel.show_cdprimit()
     robot_s.gen_stickmodel(toggle_jntscs=True).attach_to(base)
-    goal_pos = np.array([.1,.1,.1])
+    goal_pos = np.array([.1,-.1,.15])
     goal_theta = .1
     goal_rotmat = rm.rotmat_from_axangle([0,0,1], goal_theta)
-    solved_jnt_values = np.degrees(robot_s.ik(np.array([.1, .1, .1]), tgt_theta = goal_theta))
+    solved_jnt_values = robot_s.ik(tgt_pos=goal_pos, tcp_loc_pos=np.array([0,0.1,0]))
     gm.gen_frame(pos=goal_pos, rotmat=goal_rotmat).attach_to(base)
     robot_s.fk(jnt_values=solved_jnt_values)
     print(solved_jnt_values)
-    manipulator_meshmodel = robot_s.gen_meshmodel()
-    manipulator_meshmodel.attach_to(base)
+    robot_s.gen_stickmodel(toggle_jntscs=True).attach_to(base)
+    # manipulator_meshmodel = robot_s.gen_meshmodel()
+    # manipulator_meshmodel.attach_to(base)
     # tic = time.time()
     # print(manipulator_instance.is_collided())
     # toc = time.time()
