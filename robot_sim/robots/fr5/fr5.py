@@ -14,18 +14,32 @@ class FR5_robot(ri.RobotInterface):
     def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name='fr5', homeconf=np.zeros(6), enable_cc=True, showhnd=True):
         super().__init__(pos=pos, rotmat=rotmat, name=name)
         this_dir, this_filename = os.path.split(__file__)
-        self.table = jl.JLChain(pos=pos, rotmat=rotmat, homeconf=np.zeros(1), name="fr5_to_table")
+        self.table = jl.JLChain(pos=pos, rotmat=rotmat, homeconf=np.zeros(2), name="fr5_to_table")
         self.table.jnts[0]['loc_pos'] = np.array([0, 0, 0])
         self.table.jnts[1]['loc_pos'] = np.array([0, 0, 0])
+        self.table.jnts[2]['loc_pos'] = np.array([1820/2-54, 0, -1820/2])*0.001
+        self.table.jnts[2]['loc_rotmat'] = rm.rotmat_from_euler(0, math.pi/2, 0)
         self.table.lnks[0]['name'] = "table"
         self.table.lnks[0]['loc_pos'] = np.array([0, 0, 0])
         self.table.lnks[0]['collisionmodel'] = cm.CollisionModel(
             os.path.join(this_dir, "meshes/table1820x54x800.stl"), expand_radius=.005)
-        self.table.lnks[0]['rgba'] = [.3, .3, .3, 1.0]
+        self.table.lnks[0]['rgba'] = [.5, .5, .5, 1.0]
+        self.table.lnks[1]['name'] = "column_1"
+        self.table.lnks[1]['loc_pos'] = np.array([1820/2-54, 0, -1820/2])*0.001
+        self.table.lnks[1]['loc_rotmat'] = rm.rotmat_from_euler(0, math.pi/2, 0)
+        self.table.lnks[1]['collisionmodel'] = cm.CollisionModel(
+            os.path.join(this_dir, "meshes/table1820x54x800.stl"), expand_radius=.005)
+        self.table.lnks[1]['rgba'] = [.3, .3, .3, 1.0]
+        self.table.lnks[2]['name'] = "column_2"
+        self.table.lnks[2]['loc_pos'] = np.array([0, 0, -1820+54])*0.001
+        self.table.lnks[2]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, 0)
+        self.table.lnks[2]['collisionmodel'] = cm.CollisionModel(
+            os.path.join(this_dir, "meshes/table1820x54x800.stl"), expand_radius=.005)
+        self.table.lnks[2]['rgba'] = [.3, .3, .3, 1.0]
         self.table.reinitialize()
         self.offset = np.array([0, 0, 0.054])
-        self.arm = fr.FR5(pos=self.table.jnts[-1]['gl_posq']+self.offset,
-                          rotmat=self.table.jnts[-1]['gl_rotmatq'],
+        self.arm = fr.FR5(pos=self.table.jnts[0]['gl_posq']+self.offset,
+                          rotmat=self.table.jnts[0]['gl_rotmatq'],
                           homeconf=homeconf,
                           enable_cc=False)
         self.hnd = rtq.Robotiq85(pos=self.arm.jnts[-1]['gl_posq'],
@@ -146,8 +160,8 @@ class FR5_robot(ri.RobotInterface):
         self.pos = pos
         self.rotmat = rotmat
         self.table.fix_to(self.pos, self.rotmat)
-        self.arm.fix_to(pos=self.table.jnts[-1]['gl_posq']+self.offset,
-                        rotmat=self.table.jnts[-1]['gl_rotmatq'])
+        self.arm.fix_to(pos=self.table.jnts[0]['gl_posq']+self.offset,
+                        rotmat=self.table.jnts[0]['gl_rotmatq'])
         self.hnd.fix_to(pos=self.arm.jnts[-1]['gl_posq'],
                         rotmat=self.arm.jnts[-1]['gl_rotmatq'])
 
@@ -174,8 +188,8 @@ class FR5_robot(ri.RobotInterface):
             update_component(component_name, jnt_values)
         elif component_name == "fr5_to_table":
             self.table.fk(jnt_values)
-            self.arm.fix_to(pos=self.table.jnts[-1]['gl_posq']+self.offset,
-                            rotmat=self.table.jnts[-1]['gl_rotmatq'])
+            self.arm.fix_to(pos=self.table.jnts[0]['gl_posq']+self.offset,
+                            rotmat=self.table.jnts[0]['gl_rotmatq'])
         else:
             raise ValueError("The given component name is not available!")
 

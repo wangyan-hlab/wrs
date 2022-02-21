@@ -10,12 +10,16 @@ import basis.robot_math as rm
 base = wd.World(cam_pos=[-2, -3, 1], lookat_pos=[0, 0, 0.5], w=960, h=720)
 gm.gen_frame().attach_to(base)
 # object
-obj = cm.CollisionModel("objects/mug.stl")
+obj = cm.CollisionModel("objects/venom.stl")
 obj.set_pos(np.array([0.3, -0.3, 0.554]))
+obj.set_rpy(math.pi/2, 0, 0)
+obj.set_scale([4, 4, 4])
 obj.set_rgba([.1, .2, .8, 1])
 obj.attach_to(base)
-obj1 = cm.CollisionModel("objects/mug.stl")
+obj1 = cm.CollisionModel("objects/bunnysim.stl")
 obj1.set_pos(np.array([-0.3, -0.35, 0.554]))
+obj1.set_rpy(0, 0, math.pi)
+obj1.set_scale([2, 2, 2])
 obj1.set_rgba([.5, .9, .1, 1])
 obj1.attach_to(base)
 # robot_s

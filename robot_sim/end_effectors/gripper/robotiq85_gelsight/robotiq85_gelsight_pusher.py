@@ -122,7 +122,7 @@ class Robotiq85GelsightPusher(gp.GripperInterface):
         # - middle toggle on to turn on structed fixed to the hand center
         self.middle = jl.JLChain(pos=cpl_end_pos, rotmat=cpl_end_rotmat, homeconf=np.zeros(1), name='middle')
         self.middle.jnts[1]['loc_pos'] = np.array([0, 0, .086])
-        self.middle.lnks[1]['meshfile'] = os.path.join(this_dir, "meshes", "pushing_stick.stl")
+        # self.middle.lnks[1]['meshfile'] = os.path.join(this_dir, "meshes", "pushing_stick.stl")
         self.middle.lnks[1]['rgba'] = [.2, .2, .2, 1]
         # reinitialize
         self.lft_outer.reinitialize()
