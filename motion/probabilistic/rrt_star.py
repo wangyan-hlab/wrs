@@ -5,7 +5,7 @@ import numpy as np
 import basis.robot_math as rm
 import networkx as nx
 import matplotlib.pyplot as plt
-import rrt
+import motion.probabilistic.rrt as rrt
 from operator import itemgetter
 
 
