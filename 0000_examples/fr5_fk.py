@@ -4,10 +4,7 @@ import sys
 sys.path.append(".")
 from visualization.panda import world as wd
 from modeling import geometric_model as gm
-from modeling import collision_model as cm
 from robot_sim.robots.fr5 import fr5 as fr5
-from motion.probabilistic import rrt_connect as rrtc
-from basis import robot_math as rm
 
 def genSphere(pos, radius=0.02, rgba=None):
     if rgba is None:
@@ -17,12 +14,11 @@ def genSphere(pos, radius=0.02, rgba=None):
 if __name__ == '__main__':
 
     base = wd.World(cam_pos=[2, 2, 1], lookat_pos=[0, 0, 0.5], w=960, h=720)
-    gm.gen_frame().attach_to(base)
+    # gm.gen_frame().attach_to(base)
     component_name = 'arm'
-    robot_s = fr5.FR5_robot(enable_cc=True, showhnd=False)
-    count = 0
+    robot_s = fr5.FR5_robot(enable_cc=True, hnd_attached=True)
 
-    for index, goal_conf in enumerate([np.array([0, -1, -1, 0, -1, 0])*math.pi/2, np.array([0, -1, 1, 0, -1, 0])*math.pi/2]):
+    for index, goal_conf in enumerate([np.array([1.45, -1.38, -1.802, -3.0, -0.77, -0.05])]):
         # goal_pos = np.array([0.232, 0.395, 0.532])
         # goal_rotmat = rm.rotmat_from_euler(0, math.pi/2.0, math.pi/180*0)
         # goal_conf = robot_s.ik(component_name=component_name, tgt_pos=goal_pos, tgt_rotmat=goal_rotmat)
@@ -36,11 +32,9 @@ if __name__ == '__main__':
         # goal_conf = robot_s.ik(component_name=component_name, tgt_pos=goal_pos, tgt_rotmat=goal_rotmat)
         robot_s.fk(component_name, goal_conf)
         if not robot_s.is_collided():
-            # genSphere(robot_s.get_gl_tcp(component_name)[0])
+            genSphere(robot_s.get_gl_tcp(component_name)[0])
             print(goal_conf)
-            count += 1
-            rgba = [1,0,0,0.7] if index == 0 else [0,1,0,0.7]
-            robot_meshmodel = robot_s.gen_meshmodel(toggle_tcpcs=True, rgba=rgba)
+            robot_meshmodel = robot_s.gen_meshmodel(toggle_tcpcs=False)
             robot_meshmodel.attach_to(base)
     
     base.run()
