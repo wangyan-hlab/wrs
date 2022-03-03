@@ -43,7 +43,8 @@ class Net(nn.Module):
         # self.fc5 = nn.Linear(n_hidden//8, n_jnts)
         self.fc1 = nn.Linear(6, n_hidden)
         self.fc2 = nn.Linear(n_hidden, n_hidden//2)
-        self.fc3 = nn.Linear(n_hidden//2, n_jnts)
+        self.fc3 = nn.Linear(n_hidden//2, 256)
+        self.fc4 = nn.Linear(256, n_jnts)
 
 
     def forward(self, x):
@@ -64,7 +65,9 @@ class Net(nn.Module):
         x = F.leaky_relu(x, 0.01)
         x = self.fc2(x)
         x = F.leaky_relu(x, 0.01)
-        out = self.fc3(x)
+        x = self.fc3(x)
+        x = F.leaky_relu(x, 0.01)
+        out = self.fc4(x)
         return out
 
 
@@ -110,16 +113,21 @@ if __name__ == '__main__':
     # device = (torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu'))
     # torch.set_default_tensor_type('torch.cuda.FloatTensor')
 
-
-    model = Net(n_hidden=1000, n_jnts=6).to(device=device)
+    model = Net(n_hidden=1024, n_jnts=6).to(device=device)
     learning_rate = 1e-3
     batch_size = 64
-    epochs = 200
+    epochs = 100
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-
-    train_data = IKDataSet('data_gen/cobotta_ik')
-    test_data = IKDataSet('data_gen/cobotta_ik_test')
+    # optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+    # decay_rate = 0.96
+    # my_lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer=optimizer, gamma=decay_rate)
+    dataset = IKDataSet('data_gen/cobotta_ik')
+    train_set_size = int(dataset.__len__()*0.8)
+    test_set_size = int(dataset.__len__()*0.2)
+    train_data, test_data = torch.utils.data.random_split(dataset, [train_set_size, test_set_size])
+    # train_data = IKDataSet('data_gen/cobotta_ik')
+    # test_data = IKDataSet('data_gen/cobotta_ik_test')
     train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
     test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=True)
 

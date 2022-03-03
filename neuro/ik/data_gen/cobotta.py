@@ -54,29 +54,30 @@ if __name__ == '__main__':
     # gen_data(rbt_s, num=0, granularity=math.pi / 8, save_name='cobotta_ik')
     # gen_data(rbt_s, num=0, granularity=math.pi / 8, save_name='cobotta_ik_test')
 
+    granularity = math.pi/6
     thread_01 = Thread(target=gen_data,
-                       args=(rbt_s, 0, 'arm', math.pi/8, 'cobotta_ik_jnt1'))
+                       args=(rbt_s, 0, 'arm', granularity, 'cobotta_ik_jnt1'))
     thread_01.start()
     thread_02 = Thread(target=gen_data,
-                       args=(rbt_s, 1, 'arm', math.pi/8, 'cobotta_ik_jnt2'))
+                       args=(rbt_s, 1, 'arm', granularity, 'cobotta_ik_jnt2'))
     thread_02.start()
     thread_03 = Thread(target=gen_data,
-                       args=(rbt_s, 2, 'arm', math.pi / 8, 'cobotta_ik_jnt3'))
+                       args=(rbt_s, 2, 'arm', granularity, 'cobotta_ik_jnt3'))
     thread_03.start()
     thread_04 = Thread(target=gen_data,
-                       args=(rbt_s, 3, 'arm', math.pi / 8, 'cobotta_ik_jnt4'))
+                       args=(rbt_s, 3, 'arm', granularity, 'cobotta_ik_jnt4'))
     thread_04.start()
     thread_05 = Thread(target=gen_data,
-                       args=(rbt_s, 4, 'arm', math.pi / 8, 'cobotta_ik_jnt5'))
+                       args=(rbt_s, 4, 'arm', granularity, 'cobotta_ik_jnt5'))
     thread_05.start()
     thread_06 = Thread(target=gen_data,
-                       args=(rbt_s, 5, 'arm', math.pi / 8, 'cobotta_ik_jnt6'))
+                       args=(rbt_s, 5, 'arm', granularity, 'cobotta_ik_jnt6'))
     thread_06.start()
     thread_07 = Thread(target=gen_data,
-                       args=(rbt_s, 6, 'arm', math.pi / 8, 'cobotta_ik_jnt7'))
+                       args=(rbt_s, 6, 'arm', granularity, 'cobotta_ik_jnt7'))
     thread_07.start()
     thread_08 = Thread(target=gen_data,
-                       args=(rbt_s, 7, 'arm', math.pi / 8, 'cobotta_ik_jnt8'))
+                       args=(rbt_s, 7, 'arm', granularity, 'cobotta_ik_jnt8'))
     thread_08.start()
 
     base.run()

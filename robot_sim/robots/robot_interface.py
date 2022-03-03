@@ -16,6 +16,7 @@ class RobotInterface(object):
         self.manipulator_dict = {}
         self.ft_sensor_dict = {}
         self.hnd_dict = {}
+        self.extl_dict = {}
 
     def change_name(self, name):
         self.name = name

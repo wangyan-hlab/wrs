@@ -26,7 +26,7 @@ if __name__ == '__main__':
     rbt_s.gen_meshmodel(toggle_tcpcs=True, rgba=[.5,.5,.5,.3]).attach_to(base)
 
     # neural ik
-    model = cbf.Net(n_hidden=100, n_jnts=6)
+    model = cbf.Net(n_hidden=1024, n_jnts=6)
     model.load_state_dict(torch.load("cobotta_model.pth"))
     tgt_rpy = rm.rotmat_to_euler(tgt_rotmat)
     xyzrpy = torch.from_numpy(np.hstack((tgt_pos,tgt_rpy)))

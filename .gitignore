@@ -2,5 +2,8 @@
 /.idea/
 /.vscode
 *.pyc
-*_test.py
+/0000_examples/wangyan
 /wrs架构与函数功能
+*.npy
+*.pth
+/neuro/ik/runs
