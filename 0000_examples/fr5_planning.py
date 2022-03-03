@@ -7,13 +7,18 @@ import robot_sim.robots.fr5.fr5 as fr5
 import motion.probabilistic.rrt_connect as rrtc
 import basis.robot_math as rm
 
+def genSphere(pos, radius=0.02, rgba=None):
+    if rgba is None:
+        rgba = [1, 0, 0, 1]
+    gm.gen_sphere(pos=pos, radius=radius, rgba=rgba).attach_to(base)
+
 base = wd.World(cam_pos=[-2, -3, 1], lookat_pos=[0, 0, 0.5], w=960, h=720)
 gm.gen_frame().attach_to(base)
 # object
-obj = cm.CollisionModel("objects/venom.stl")
+obj = cm.CollisionModel("objects/bunnysim.stl")
 obj.set_pos(np.array([0.3, -0.3, 0.554]))
-obj.set_rpy(math.pi/2, 0, 0)
-obj.set_scale([4, 4, 4])
+obj.set_rpy(0, 0, math.pi)
+obj.set_scale([2, 2, 2])
 obj.set_rgba([.1, .2, .8, 1])
 obj.attach_to(base)
 obj1 = cm.CollisionModel("objects/bunnysim.stl")
@@ -24,8 +29,8 @@ obj1.set_rgba([.5, .9, .1, 1])
 obj1.attach_to(base)
 # robot_s
 component_name = 'arm'
-robot_s = fr5.FR5_robot(enable_cc=True)
-robot_s.hnd.jaw_to(0.01)
+robot_s = fr5.FR5_robot(enable_cc=True, hnd_attached=True)
+robot_s.hnd.jaw_to(0.085)
 start_conf = np.array([math.pi*120/180,-math.pi*120/180,math.pi*120/180,0,0,0])
 goal_conf = np.array([math.pi*0/180,-math.pi*110/180,math.pi*80/180,-math.pi*80/180,-math.pi*70/180,math.pi*20/180])
 robot_s.fk(component_name, start_conf)
@@ -57,6 +62,7 @@ def update(rbtmnp, motioncounter, robot, path, armname, task):
         robot.fk(armname, pose)
         rbtmnp[0] = robot.gen_meshmodel(toggle_tcpcs=True)
         rbtmnp[0].attach_to(base)
+        genSphere(robot.get_gl_tcp(component_name)[0], radius=0.01, rgba=[1,1,0,1])
         motioncounter[0] += 1
     else:
         motioncounter[0] = 0

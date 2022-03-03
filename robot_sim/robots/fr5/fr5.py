@@ -20,25 +20,25 @@ class FR5_robot(ri.RobotInterface):
         self.table.jnts[2]['loc_pos'] = np.array([1820/2-54, 0, -1820/2])*0.001
         self.table.jnts[2]['loc_rotmat'] = rm.rotmat_from_euler(0, math.pi/2, 0)
         self.table.lnks[0]['name'] = "table"
-        self.table.lnks[0]['loc_pos'] = np.array([0, 0, 0])
+        self.table.lnks[0]['loc_pos'] = np.array([0, 0, -0.054])
         self.table.lnks[0]['collisionmodel'] = cm.CollisionModel(
             os.path.join(this_dir, "meshes/table1820x54x800.stl"), expand_radius=.005)
         self.table.lnks[0]['rgba'] = [.5, .5, .5, 1.0]
         self.table.lnks[1]['name'] = "column_1"
-        self.table.lnks[1]['loc_pos'] = np.array([1820/2-54, 0, -1820/2])*0.001
+        self.table.lnks[1]['loc_pos'] = np.array([1820/2-54, 0, -1820/2-54])*0.001
         self.table.lnks[1]['loc_rotmat'] = rm.rotmat_from_euler(0, math.pi/2, 0)
         self.table.lnks[1]['collisionmodel'] = cm.CollisionModel(
             os.path.join(this_dir, "meshes/table1820x54x800.stl"), expand_radius=.005)
         self.table.lnks[1]['rgba'] = [.3, .3, .3, 1.0]
         self.table.lnks[2]['name'] = "column_2"
-        self.table.lnks[2]['loc_pos'] = np.array([0, 0, -1820+54])*0.001
+        self.table.lnks[2]['loc_pos'] = np.array([54, 0, -1820+54])*0.001
         self.table.lnks[2]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, 0)
         self.table.lnks[2]['collisionmodel'] = cm.CollisionModel(
             os.path.join(this_dir, "meshes/table1820x54x800.stl"), expand_radius=.005)
         self.table.lnks[2]['rgba'] = [.3, .3, .3, 1.0]
         self.table.reinitialize()
-        self.offset = np.array([0, 0, 0.054])
-        self.arm = fr.FR5(pos=self.table.jnts[0]['gl_posq']+self.offset,
+
+        self.arm = fr.FR5(pos=self.table.jnts[0]['gl_posq'],
                           rotmat=self.table.jnts[0]['gl_rotmatq'],
                           homeconf=homeconf,
                           enable_cc=False)
@@ -181,7 +181,7 @@ class FR5_robot(ri.RobotInterface):
         self.pos = pos
         self.rotmat = rotmat
         self.table.fix_to(self.pos, self.rotmat)
-        self.arm.fix_to(pos=self.table.jnts[0]['gl_posq']+self.offset,
+        self.arm.fix_to(pos=self.table.jnts[0]['gl_posq'],
                         rotmat=self.table.jnts[0]['gl_rotmatq'])
         if self.hnd_attached:
             self.hnd.fix_to(pos=self.arm.jnts[-1]['gl_posq'],
@@ -211,7 +211,7 @@ class FR5_robot(ri.RobotInterface):
             update_component(component_name, jnt_values)
         elif component_name == "fr5_to_table":
             self.table.fk(jnt_values)
-            self.arm.fix_to(pos=self.table.jnts[0]['gl_posq']+self.offset,
+            self.arm.fix_to(pos=self.table.jnts[0]['gl_posq'],
                             rotmat=self.table.jnts[0]['gl_rotmatq'])
         else:
             raise ValueError("The given component name is not available!")
@@ -275,21 +275,22 @@ if __name__ == '__main__':
 
     base = wd.World(cam_pos=[2, 2, 1], lookat_pos=[0, 0, 0], w=960, h=720)
     gm.gen_frame().attach_to(base)
-    fr5 = FR5_robot(hnd_attached=False)
+    fr5 = FR5_robot(hnd_attached=True)
     conf1 = np.array([0, 0, 0, 0, 0, 0])
     fr5.fk(component_name="arm", jnt_values=conf1)
     fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
     print(fr5.get_gl_tcp())
-    conf2 = np.array([90/180*math.pi, -90/180*math.pi, -90/180*math.pi, -90/180*math.pi, 90/180*math.pi, 0/180*math.pi])
+    conf2 = np.array([0/180*math.pi, -90/180*math.pi, 90/180*math.pi, 0/180*math.pi, -90/180*math.pi, 0/180*math.pi])
     fr5.fk(component_name="arm", jnt_values=conf2)
-    fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
+    fr5.gen_meshmodel(toggle_tcpcs=True, rgba=[1,1,1,0.5]).attach_to(base)
     print(fr5.get_gl_tcp())
 
     # fr5.show_cdprimit()   # show the collision model
-    # fr5.gen_stickmodel().attach_to(base)
+    fr5.gen_stickmodel().attach_to(base)
     # tic = time.time()
     print(fr5.is_collided())
     # toc = time.time()
     # print(toc - tic)
+    print(fr5.jacobian())
 
     base.run()

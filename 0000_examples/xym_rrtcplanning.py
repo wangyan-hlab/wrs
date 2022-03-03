@@ -12,7 +12,7 @@ base = wd.World(cam_pos=[3, 1, 2], lookat_pos=[0, 0, 0])
 gm.gen_frame().attach_to(base)
 # object
 object = cm.CollisionModel("./objects/bunnysim.stl")
-object.set_pos(np.array([.85, 0, .37]))
+object.set_pos(np.array([1.0, 0, .37]))
 object.set_rgba([.5,.7,.3,1])
 object.attach_to(base)
 # robot_s
@@ -37,7 +37,7 @@ def update(rbtmnp, motioncounter, robot, path, armname, task):
         rbtmnp[0] = robot.gen_meshmodel()
         rbtmnp[0].attach_to(base)
         rbtmnp[1] = robot.gen_stickmodel()
-        rbtmnp[1].attach_to(base)
+        # rbtmnp[1].attach_to(base)
         motioncounter[0] += 1
     else:
         motioncounter[0] = 0

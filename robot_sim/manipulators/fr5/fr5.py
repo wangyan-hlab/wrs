@@ -7,7 +7,7 @@ import robot_sim.manipulators.manipulator_interface as mi
 
 class FR5(mi.ManipulatorInterface):
 
-    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), homeconf=np.zeros(6), name='ur5e', enable_cc=True):
+    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), homeconf=np.zeros(6), name='fr5', enable_cc=True):
         super().__init__(pos=pos, rotmat=rotmat, name=name)
         this_dir, this_filename = os.path.split(__file__)
         self.jlc = jl.JLChain(pos=pos, rotmat=rotmat, homeconf=homeconf, name=name)
@@ -114,7 +114,7 @@ if __name__ == '__main__':
     base = wd.World(cam_pos=[2, 0, 1], lookat_pos=[0, 0, 0])
     gm.gen_frame().attach_to(base)
     manipulator_instance = FR5(enable_cc=True)
-    manipulator_meshmodel = manipulator_instance.gen_meshmodel()
+    manipulator_meshmodel = manipulator_instance.gen_meshmodel(rgba=[1,1,1,0.3])
     manipulator_meshmodel.attach_to(base)
     # manipulator_meshmodel.show_cdprimit()
     manipulator_instance.gen_stickmodel(toggle_jntscs=True).attach_to(base)
