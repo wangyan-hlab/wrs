@@ -13,65 +13,67 @@ def genSphere(pos, radius=0.02, rgba=None):
         rgba = [1, 0, 0, 1]
     gm.gen_sphere(pos=pos, radius=radius, rgba=rgba).attach_to(base)
 
-base = wd.World(cam_pos=[-2, -3, 1], lookat_pos=[0, 0, 0.5], w=960, h=720)
-gm.gen_frame().attach_to(base)
-# object
-obj = cm.CollisionModel("objects/bunnysim.stl")
-obj.set_pos(np.array([0.3, -0.3, 0.554]))
-obj.set_rpy(0, 0, math.pi)
-obj.set_scale([2, 2, 2])
-obj.set_rgba([.1, .2, .8, 1])
-obj.attach_to(base)
-obj1 = cm.CollisionModel("objects/bunnysim.stl")
-obj1.set_pos(np.array([-0.3, -0.45, 0.554]))
-obj1.set_rpy(0, 0, math.pi)
-obj1.set_scale([2, 2, 2])
-obj1.set_rgba([.5, .9, .1, 1])
-obj1.attach_to(base)
-# robot_s
-component_name = 'arm'
-robot_s = fr5.FR5_robot(enable_cc=True)
-robot_s.hnd.jaw_to(0.085)
-start_conf = np.array([math.pi*120/180,-math.pi*120/180,math.pi*120/180,0,0,0])
-goal_conf = np.array([math.pi*0/180,-math.pi*110/180,math.pi*80/180,-math.pi*80/180,-math.pi*70/180,math.pi*20/180])
-robot_s.fk(component_name, start_conf)
-robot_s.gen_meshmodel(toggle_tcpcs=True, rgba=[1,0,0,0.5]).attach_to(base)
-robot_s.fk(component_name, goal_conf)
-robot_s.gen_meshmodel(toggle_tcpcs=True, rgba=[0,1,0,0.5]).attach_to(base)
-# planner
-rrtc_planner = rrtc.RRTConnect(robot_s)
-path = rrtc_planner.plan(component_name=component_name,
-                         start_conf=start_conf,
-                         goal_conf=goal_conf,
-                         obstacle_list=[obj, obj1],
-                         ext_dist=0.1,
-                         max_time=300)
-print(path)
-# for pose in path:
-#     # print(pose)
-#     robot_s.fk(component_name, pose)
-#     robot_meshmodel = robot_s.gen_meshmodel(toggle_tcpcs=False)
-#     robot_meshmodel.attach_to(base)
-#     robot_stickmodel = robot_s.gen_stickmodel()
-#     robot_stickmodel.attach_to(base)
+if __name__ == '__main__':
 
-def update(rbtmnp, motioncounter, robot, path, armname, task):
-    if motioncounter[0] < len(path):
-        if rbtmnp[0] is not None:
-            rbtmnp[0].detach()
-        pose = path[motioncounter[0]]
-        robot.fk(armname, pose)
-        rbtmnp[0] = robot.gen_meshmodel(toggle_tcpcs=True)
-        rbtmnp[0].attach_to(base)
-        genSphere(robot.get_gl_tcp(component_name)[0], radius=0.01, rgba=[1,1,0,1])
-        motioncounter[0] += 1
-    else:
-        motioncounter[0] = 0
-    return task.again
-rbtmnp = [None]
-motioncounter = [0]
-taskMgr.doMethodLater(0.07, update, "update",
-                      extraArgs=[rbtmnp, motioncounter, robot_s, path, component_name],
-                      appendTask=True)
-base.setFrameRateMeter(True)
-base.run()
+    base = wd.World(cam_pos=[-2, -3, 1], lookat_pos=[0, 0, 0.5], w=960, h=720, backgroundcolor=[0.5,0.5,0.5,0.5])
+    gm.gen_frame().attach_to(base)
+    # object
+    obj = cm.CollisionModel("objects/bunnysim.stl")
+    obj.set_pos(np.array([0.3, -0.3, 0.554]))
+    obj.set_rpy(0, 0, math.pi)
+    obj.set_scale([2, 2, 2])
+    obj.set_rgba([.1, .2, .8, 1])
+    obj.attach_to(base)
+    obj1 = cm.CollisionModel("objects/bunnysim.stl")
+    obj1.set_pos(np.array([-0.3, -0.45, 0.554]))
+    obj1.set_rpy(0, 0, math.pi)
+    obj1.set_scale([2, 2, 2])
+    obj1.set_rgba([.5, .9, .1, 1])
+    obj1.attach_to(base)
+    # robot_s
+    component_name = 'arm'
+    robot_s = fr5.FR5_robot(enable_cc=True)
+    robot_s.hnd.jaw_to(0.085)
+    start_conf = np.array([math.pi*120/180,-math.pi*120/180,math.pi*120/180,0,0,0])
+    goal_conf = np.array([math.pi*0/180,-math.pi*110/180,math.pi*80/180,-math.pi*80/180,-math.pi*70/180,math.pi*20/180])
+    robot_s.fk(component_name, start_conf)
+    robot_s.gen_meshmodel(toggle_tcpcs=True, rgba=[1,0,0,0.5]).attach_to(base)
+    robot_s.fk(component_name, goal_conf)
+    robot_s.gen_meshmodel(toggle_tcpcs=True, rgba=[0,1,0,0.5]).attach_to(base)
+    # planner
+    rrtc_planner = rrtc.RRTConnect(robot_s)
+    path = rrtc_planner.plan(component_name=component_name,
+                             start_conf=start_conf,
+                             goal_conf=goal_conf,
+                             obstacle_list=[obj, obj1],
+                             ext_dist=0.1,
+                             max_time=300)
+    print(path)
+    # for pose in path:
+    #     # print(pose)
+    #     robot_s.fk(component_name, pose)
+    #     robot_meshmodel = robot_s.gen_meshmodel(toggle_tcpcs=False)
+    #     robot_meshmodel.attach_to(base)
+    #     robot_stickmodel = robot_s.gen_stickmodel()
+    #     robot_stickmodel.attach_to(base)
+
+    def update(rbtmnp, motioncounter, robot, path, armname, task):
+        if motioncounter[0] < len(path):
+            if rbtmnp[0] is not None:
+                rbtmnp[0].detach()
+            pose = path[motioncounter[0]]
+            robot.fk(armname, pose)
+            rbtmnp[0] = robot.gen_meshmodel(toggle_tcpcs=True)
+            rbtmnp[0].attach_to(base)
+            genSphere(robot.get_gl_tcp(component_name)[0], radius=0.01, rgba=[1,1,0,1])
+            motioncounter[0] += 1
+        else:
+            motioncounter[0] = 0
+        return task.again
+    rbtmnp = [None]
+    motioncounter = [0]
+    taskMgr.doMethodLater(0.07, update, "update",
+                          extraArgs=[rbtmnp, motioncounter, robot_s, path, component_name],
+                          appendTask=True)
+    base.setFrameRateMeter(True)
+    base.run()

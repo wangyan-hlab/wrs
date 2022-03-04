@@ -26,7 +26,8 @@ class World(ShowBase, object):
                  h=1080,
                  lens_type="perspective",
                  toggle_debug=False,
-                 auto_cam_rotate=False):
+                 auto_cam_rotate=False,
+                 backgroundcolor=None):
         """
         :param cam_pos:
         :param lookat_pos:
@@ -43,7 +44,11 @@ class World(ShowBase, object):
         winprops.setTitle("WRS Robot Planning and Control System")
         base.win.requestProperties(winprops)
         self.disableAllAudio()
-        self.setBackgroundColor(1, 1, 1)
+        if backgroundcolor is not None:
+            [r, g, b, a] = backgroundcolor
+            self.setBackgroundColor(r, g, b, a)
+        else:
+            self.setBackgroundColor(1, 1, 1)
         # set up lens
         lens = PerspectiveLens()
         lens.setFov(fov)
