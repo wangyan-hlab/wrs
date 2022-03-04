@@ -25,7 +25,7 @@ if __name__ == '__main__':
     gm.gen_frame().attach_to(base)
     component_name = 'arm'
     robot_s = fr5.FR5_robot(enable_cc=True)
-    seed_jnt_values = np.array([120,-90,60,80,10,0])*math.pi/180
+    seed_jnt_values = np.array([120, -90, 80, 30, 10, 0])*math.pi/180
     # seed_jnt_values = robot_s.get_jnt_values(component_name=component_name)
     print("seed_jnt_values = ", seed_jnt_values)
     robot_s.fk(component_name=component_name, jnt_values=seed_jnt_values)

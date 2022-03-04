@@ -6,7 +6,7 @@ import modeling.model_collection as mc
 import modeling.collision_model as cm
 import robot_sim._kinematics.jlchain as jl
 import robot_sim.manipulators.fr5.fr5 as fr
-import robot_sim.end_effectors.external_link.link_test.link_test as extl
+import robot_sim.end_effectors.external_link.ext_link.ext_link as extl
 from panda3d.core import CollisionNode, CollisionBox, Point3
 import robot_sim.robots.robot_interface as ri
 
@@ -45,7 +45,7 @@ class FR5_robot(ri.RobotInterface):
         self.manipulator_dict['arm'] = self.arm
         self.extl_attached = extl_attached
         if extl_attached:
-            self.extl = extl.LinkTest(pos=self.arm.jnts[-1]['gl_posq'],
+            self.extl = extl.ExtLink(pos=self.arm.jnts[-1]['gl_posq'],
                                       rotmat=self.arm.jnts[-1]['gl_rotmatq'],
                                       enable_cc=False)
             # tool center point
@@ -249,7 +249,7 @@ if __name__ == '__main__':
     print(fr5.is_collided())
     conf2 = np.array([0/180*math.pi, -90/180*math.pi, 90/180*math.pi, 0/180*math.pi, -90/180*math.pi, 0/180*math.pi])
     fr5.fk(component_name="arm", jnt_values=conf2)
-    fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
+    fr5.gen_meshmodel(toggle_tcpcs=True, rgba=[1,1,1,0.6]).attach_to(base)
     print(fr5.get_gl_tcp())
 
     # fr5.show_cdprimit()   # show the collision model
