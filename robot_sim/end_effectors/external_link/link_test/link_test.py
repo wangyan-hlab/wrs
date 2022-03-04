@@ -26,7 +26,7 @@ class LinkTest(extl.ExtlinkInterface):
         # extlink origin pose relative to the arm end
         self.extlink_origin_pos = np.array([0, 0, 0.136])
         self.extlink_origin_rotmat = np.array([[0, 0, -1], [0, -1, 0], [-1, 0, 0]])
-        # extlink center
+        # extlink center relative to the origin
         self.extlink_center_pos = np.array([.0, .0, .148])
         # collision detection
         self.all_cdelements = []
