@@ -7,7 +7,6 @@ import modeling.collision_model as cm
 import robot_sim._kinematics.jlchain as jl
 import robot_sim.manipulators.fr5.fr5 as fr
 import robot_sim.end_effectors.external_link.link_test.link_test as extl
-import robot_sim.end_effectors.gripper.robotiq85.robotiq85 as rtq
 from panda3d.core import CollisionNode, CollisionBox, Point3
 import robot_sim.robots.robot_interface as ri
 
@@ -51,13 +50,8 @@ class FR5_robot(ri.RobotInterface):
                                      enable_cc=False)
             # tool center point
             self.arm.tcp_jntid = -1
-            t_eel = rm.homomat_from_posrot(pos=np.array([0, 0, 0.136]),
-                                           rot=np.array([[0, 0, -1], [0, -1, 0], [-1, 0, 0]]))
-            t_eltcp = rm.homomat_from_posrot(pos=self.extl.extlink_center_pos,
-                                             rot=self.extl.extlink_center_rotmat)
-            t_etcp = np.dot(t_eel, t_eltcp)
-            self.arm.tcp_loc_pos = t_etcp[:3, 3]
-            self.arm.tcp_loc_rotmat = t_etcp[:3, :3]
+            self.arm.tcp_loc_pos = self.extl.extlink_origin_rotmat.dot(self.extl.extlink_center_pos) + self.extl.extlink_origin_pos
+            self.arm.tcp_loc_rotmat = self.extl.extlink_origin_rotmat.dot(self.extl.extlink_center_rotmat)
             self.extl_dict['arm'] = self.extl
         # collision detection
         if enable_cc:
