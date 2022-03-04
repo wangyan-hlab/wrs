@@ -53,15 +53,11 @@ class FR5_robot(ri.RobotInterface):
             self.arm.tcp_jntid = -1
             t_eel = rm.homomat_from_posrot(pos=np.array([0, 0, 0.136]),
                                            rot=np.array([[0, 0, -1], [0, -1, 0], [-1, 0, 0]]))
-            t_oe = rm.homomat_from_posrot(pos=self.arm.jnts[-1]['gl_posq'],
-                                          rot=self.arm.jnts[-1]['gl_rotmatq'])
-            t_oel = np.dot(t_oe, t_eel)
-            cpl_end_pos = t_oel[:3, 3]
-            print(",,,,,,,,,,,", cpl_end_pos)
-            print("..........",self.extl.extlink_center_pos)
-            cpl_end_rotmat = t_oel[:3, :3]
-            self.arm.tcp_loc_pos = np.dot(cpl_end_pos, self.extl.extlink_center_pos)
-            self.arm.tcp_loc_rotmat = np.dot(cpl_end_rotmat, self.extl.extlink_center_rotmat)
+            t_eltcp = rm.homomat_from_posrot(pos=self.extl.extlink_center_pos,
+                                             rot=self.extl.extlink_center_rotmat)
+            t_etcp = np.dot(t_eel, t_eltcp)
+            self.arm.tcp_loc_pos = t_etcp[:3, 3]
+            self.arm.tcp_loc_rotmat = t_etcp[:3, :3]
             self.extl_dict['arm'] = self.extl
         # collision detection
         if enable_cc:
