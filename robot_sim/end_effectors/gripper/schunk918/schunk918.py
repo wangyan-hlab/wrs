@@ -1,4 +1,5 @@
 import os
+import math
 import numpy as np
 import modeling.model_collection as mc
 import robot_sim._kinematics.jlchain as jl
@@ -19,22 +20,26 @@ class SchunkRH918(gp.GripperInterface):
         self.lft.jnts[1]['loc_pos'] = np.array([-.01, .04, .073])
         self.lft.jnts[1]['type'] = 'prismatic'
         self.lft.jnts[1]['motion_rng'] = [0, .025]
-        self.lft.jnts[1]['loc_motionax'] = np.array([0, 1, 0])
+        self.lft.jnts[1]['loc_motionax'] = np.array([0, -1, 0])
         self.lft.lnks[0]['name'] = "base"
-        self.lft.lnks[0]['loc_pos'] = np.zeros(3)
+        self.lft.lnks[0]['loc_pos'] = np.array([0, 0, 0])
         self.lft.lnks[0]['meshfile'] = os.path.join(this_dir, "meshes", "base.stl")
         self.lft.lnks[0]['rgba'] = [.2, .2, .2, 1]
-        self.lft.lnks[1]['name'] = "finger1"
-        self.lft.lnks[1]['meshfile'] = os.path.join(this_dir, "meshes", "finger1_cvt.stl")
+        self.lft.lnks[1]['name'] = "slider1"
+        self.lft.lnks[1]['meshfile'] = os.path.join(this_dir, "meshes", "slider.stl")
         self.lft.lnks[1]['rgba'] = [.5, .5, .5, 1]
+        self.lft.lnks[1]['loc_pos'] = np.zeros(3)
+        self.lft.lnks[1]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, -math.pi/2)
         # - rgt
         self.rgt = jl.JLChain(pos=cpl_end_pos, rotmat=cpl_end_rotmat, homeconf=np.zeros(1), name='rgt_finger')
-        self.rgt.jnts[1]['loc_pos'] = np.array([.025, .0, .11])
+        self.rgt.jnts[1]['loc_pos'] = np.array([.01, -.04, .073])
         self.rgt.jnts[1]['type'] = 'prismatic'
-        self.rgt.jnts[1]['loc_motionax'] = np.array([-1, 0, 0])
+        self.rgt.jnts[1]['loc_motionax'] = np.array([0, 1, 0])
         self.rgt.lnks[1]['name'] = "finger2"
-        self.rgt.lnks[1]['meshfile'] = os.path.join(this_dir, "meshes", "finger2_cvt.stl")
+        self.rgt.lnks[1]['meshfile'] = os.path.join(this_dir, "meshes", "slider.stl")
         self.rgt.lnks[1]['rgba'] = [.5, .5, .5, 1]
+        self.rgt.lnks[1]['loc_pos'] = np.zeros(3)
+        self.rgt.lnks[1]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, math.pi / 2)
         # jaw center
         self.jaw_center_pos = np.array([0,0,.14])
         # reinitialize
@@ -159,9 +164,9 @@ if __name__ == '__main__':
     #     grpr.fk(angle)
     #     grpr.gen_meshmodel().attach_to(base)
     grpr = SchunkRH918(enable_cc=True)
-    grpr.jaw_to(.05)
+    grpr.jaw_to(.02)
     grpr.gen_meshmodel().attach_to(base)
-    # grpr.gen_stickmodel(togglejntscs=False).attach_to(base)
+    grpr.gen_stickmodel().attach_to(base)
     grpr.fix_to(pos=np.array([0, .3, .2]), rotmat=rm.rotmat_from_axangle([1, 0, 0], .05))
     grpr.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
     grpr.show_cdmesh()
