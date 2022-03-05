@@ -16,20 +16,26 @@ class FR5(mi.ManipulatorInterface):
         self.jlc.jnts[2]['loc_pos'] = np.array([0, 0, 0.155])
         self.jlc.jnts[2]['loc_rotmat'] = rm.rotmat_from_euler(math.pi/2.0, -math.pi / 2.0, .0)
         self.jlc.jnts[2]['loc_motionax'] = np.array([0, 0, 1])
+        self.jlc.jnts[2]['motion_rng'] = np.array([-175, 175])*math.pi/180
         self.jlc.jnts[3]['loc_pos'] = np.array([0, .425, 0])
         self.jlc.jnts[3]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, -math.pi / 2.0)
         self.jlc.jnts[3]['loc_motionax'] = np.array([0, 0, 1])
+        self.jlc.jnts[3]['motion_rng'] = np.array([-265, 85]) * math.pi / 180
         self.jlc.jnts[4]['loc_pos'] = np.array([-0.395, .0, .0])
         self.jlc.jnts[4]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, math.pi/2.0)
         self.jlc.jnts[4]['loc_motionax'] = np.array([0, 0, 1])
+        self.jlc.jnts[4]['motion_rng'] = np.array([-160, 160]) * math.pi / 180
         self.jlc.jnts[5]['loc_pos'] = np.array([0, 0, 0.130])
         self.jlc.jnts[5]['loc_rotmat'] = rm.rotmat_from_euler(math.pi / 2.0, 0, -math.pi / 2.0)
         self.jlc.jnts[5]['loc_motionax'] = np.array([0, 0, 1])
+        self.jlc.jnts[5]['motion_rng'] = np.array([-265, 85]) * math.pi / 180
         self.jlc.jnts[6]['loc_pos'] = np.array([0, 0, .102])
         self.jlc.jnts[6]['loc_rotmat'] = rm.rotmat_from_euler(-math.pi / 2.0, 0, 0)
         self.jlc.jnts[6]['loc_motionax'] = np.array([0, 0, 1])
+        self.jlc.jnts[6]['motion_rng'] = np.array([-175, 175]) * math.pi / 180
         self.jlc.jnts[7]['loc_pos'] = np.array([0, 0, .102])
         self.jlc.jnts[7]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, 0)
+        self.jlc.jnts[7]['motion_rng'] = np.array([-175, 175]) * math.pi / 180
         # links
         arm_color1 = [.6, .6, .6, 1.0]
         arm_color2 = [.55, .27, .07, 1.0]

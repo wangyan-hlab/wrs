@@ -14,27 +14,16 @@ def genSphere(pos, radius=0.02, rgba=None):
 if __name__ == '__main__':
 
     base = wd.World(cam_pos=[2, 2, 1], lookat_pos=[0, 0, 0.5], w=960, h=720)
-    # gm.gen_frame().attach_to(base)
+    gm.gen_frame().attach_to(base)
     component_name = 'arm'
     robot_s = fr5.FR5_robot(enable_cc=True, hnd_attached=True)
 
-    for index, goal_conf in enumerate([np.array([1.45, -1.38, -1.802, -3.0, -0.77, -0.05])]):
-        # goal_pos = np.array([0.232, 0.395, 0.532])
-        # goal_rotmat = rm.rotmat_from_euler(0, math.pi/2.0, math.pi/180*0)
-        # goal_conf = robot_s.ik(component_name=component_name, tgt_pos=goal_pos, tgt_rotmat=goal_rotmat)
-        # robot_s.fk(component_name, goal_conf)
-        # genSphere(robot_s.get_gl_tcp(component_name)[0])
-        # robot_meshmodel = robot_s.gen_meshmodel(toggle_tcpcs=True)
-        # robot_meshmodel.attach_to(base)
-        #
-        # goal_pos = np.array([0.232, 0.395, 0.432])
-        # goal_rotmat = rm.rotmat_from_euler(0, math.pi/2.0, math.pi/180*20)
-        # goal_conf = robot_s.ik(component_name=component_name, tgt_pos=goal_pos, tgt_rotmat=goal_rotmat)
-        robot_s.fk(component_name, goal_conf)
-        if not robot_s.is_collided():
-            genSphere(robot_s.get_gl_tcp(component_name)[0])
-            print(goal_conf)
-            robot_meshmodel = robot_s.gen_meshmodel(toggle_tcpcs=False)
-            robot_meshmodel.attach_to(base)
-    
+    goal_conf = np.array([0,-60,-160,0,0,90])*math.pi/180
+    robot_s.fk(component_name, goal_conf)
+    if not robot_s.is_collided():
+        genSphere(robot_s.get_gl_tcp(component_name)[0])
+        print(goal_conf)
+        robot_s.gen_meshmodel(toggle_tcpcs=False).attach_to(base)
+    else:
+        print("Collided!")
     base.run()

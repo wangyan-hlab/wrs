@@ -6,8 +6,7 @@ import modeling.model_collection as mc
 import modeling.collision_model as cm
 import robot_sim._kinematics.jlchain as jl
 import robot_sim.manipulators.fr5.fr5 as fr
-import robot_sim.end_effectors.external_link.link_test.link_test as extl
-import robot_sim.end_effectors.gripper.robotiq85.robotiq85 as rtq
+import robot_sim.end_effectors.external_link.ext_link.ext_link as extl
 from panda3d.core import CollisionNode, CollisionBox, Point3
 import robot_sim.robots.robot_interface as ri
 
@@ -46,18 +45,13 @@ class FR5_robot(ri.RobotInterface):
         self.manipulator_dict['arm'] = self.arm
         self.extl_attached = extl_attached
         if extl_attached:
-            self.extl = extl.LinkTest(pos=self.arm.jnts[-1]['gl_posq'],
-                                     rotmat=self.arm.jnts[-1]['gl_rotmatq'],
-                                     enable_cc=False)
+            self.extl = extl.ExtLink(pos=self.arm.jnts[-1]['gl_posq'],
+                                      rotmat=self.arm.jnts[-1]['gl_rotmatq'],
+                                      enable_cc=False)
             # tool center point
             self.arm.tcp_jntid = -1
-            t_eel = rm.homomat_from_posrot(pos=np.array([0, 0, 0.136]),
-                                           rot=np.array([[0, 0, -1], [0, -1, 0], [-1, 0, 0]]))
-            t_eltcp = rm.homomat_from_posrot(pos=self.extl.extlink_center_pos,
-                                             rot=self.extl.extlink_center_rotmat)
-            t_etcp = np.dot(t_eel, t_eltcp)
-            self.arm.tcp_loc_pos = t_etcp[:3, 3]
-            self.arm.tcp_loc_rotmat = t_etcp[:3, :3]
+            self.arm.tcp_loc_pos = self.extl.extlink_origin_rotmat.dot(self.extl.extlink_center_pos) + self.extl.extlink_origin_pos
+            self.arm.tcp_loc_rotmat = self.extl.extlink_origin_rotmat.dot(self.extl.extlink_center_rotmat)
             self.extl_dict['arm'] = self.extl
         # collision detection
         if enable_cc:
@@ -155,14 +149,9 @@ class FR5_robot(ri.RobotInterface):
         self.arm.fix_to(pos=self.table.jnts[0]['gl_posq'],
                         rotmat=self.table.jnts[0]['gl_rotmatq'])
         if self.extl_attached:
-            t_eel = rm.homomat_from_posrot(pos=np.array([0, 0, 0.136]),
-                                           rot=np.array([[0, 0, -1], [0, -1, 0], [-1, 0, 0]]))
-            t_oe = rm.homomat_from_posrot(pos=self.arm.jnts[-1]['gl_posq'],
-                                          rot=self.arm.jnts[-1]['gl_rotmatq'])
-            t_oel = np.dot(t_oe, t_eel)
-            cpl_end_pos = t_oel[:3, 3]
-            cpl_end_rotmat = t_oel[:3, :3]
-            self.extl.fix_to(pos=cpl_end_pos, rotmat=cpl_end_rotmat)
+            el_pos = np.dot(self.arm.jnts[-1]['gl_rotmatq'], self.extl.extlink_origin_pos)+self.arm.jnts[-1]['gl_posq']
+            el_rotmat = np.dot(self.arm.jnts[-1]['gl_rotmatq'], self.extl.extlink_center_rotmat)
+            self.extl.fix_to(pos=el_pos, rotmat=el_rotmat)
 
     def fk(self, component_name, jnt_values):
         """
@@ -176,15 +165,9 @@ class FR5_robot(ri.RobotInterface):
         def update_component(component_name='arm', jnt_values=np.zeros(6)):
             self.manipulator_dict[component_name].fk(jnt_values=jnt_values)
             if self.extl_attached:
-                t_eel = rm.homomat_from_posrot(pos=np.array([0, 0, 0.136]),
-                                               rot=np.array([[0, 0, -1], [0, -1, 0], [-1, 0, 0]]))
-                t_oe = rm.homomat_from_posrot(pos=self.arm.jnts[-1]['gl_posq'],
-                                              rot=self.arm.jnts[-1]['gl_rotmatq'])
-                t_oel = np.dot(t_oe, t_eel)
-                cpl_end_pos = t_oel[:3, 3]
-                cpl_end_rotmat = t_oel[:3, :3]
-                self.get_extlink_on_manipulator(component_name).fix_to(
-                    pos=cpl_end_pos, rotmat=cpl_end_rotmat)
+                el_pos = np.dot(self.arm.jnts[-1]['gl_rotmatq'], self.extl.extlink_origin_pos) + self.arm.jnts[-1]['gl_posq']
+                el_rotmat = np.dot(self.arm.jnts[-1]['gl_rotmatq'], self.extl.extlink_origin_rotmat)
+                self.get_extlink_on_manipulator(component_name).fix_to(pos=el_pos, rotmat=el_rotmat)
 
         super().fk(component_name, jnt_values)
         # examine length
@@ -266,7 +249,7 @@ if __name__ == '__main__':
     print(fr5.is_collided())
     conf2 = np.array([0/180*math.pi, -90/180*math.pi, 90/180*math.pi, 0/180*math.pi, -90/180*math.pi, 0/180*math.pi])
     fr5.fk(component_name="arm", jnt_values=conf2)
-    fr5.gen_meshmodel(toggle_tcpcs=True, rgba=[1,1,1,0.5]).attach_to(base)
+    fr5.gen_meshmodel(toggle_tcpcs=True, rgba=[1,1,1,0.6]).attach_to(base)
     print(fr5.get_gl_tcp())
 
     # fr5.show_cdprimit()   # show the collision model
