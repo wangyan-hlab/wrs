@@ -50,8 +50,8 @@ class FR5_robot(ri.RobotInterface):
                                       enable_cc=False)
             # tool center point
             self.arm.tcp_jntid = -1
-            self.arm.tcp_loc_pos = self.extl.extlink_origin_rotmat.dot(self.extl.extlink_center_pos) + self.extl.extlink_origin_pos
-            self.arm.tcp_loc_rotmat = self.extl.extlink_origin_rotmat.dot(self.extl.extlink_center_rotmat)
+            self.arm.tcp_loc_pos = self.extl.origin_rotmat.dot(self.extl.center_pos) + self.extl.origin_pos
+            self.arm.tcp_loc_rotmat = self.extl.origin_rotmat.dot(self.extl.center_rotmat)
             self.extl_dict['arm'] = self.extl
         # collision detection
         if enable_cc:
@@ -149,8 +149,8 @@ class FR5_robot(ri.RobotInterface):
         self.arm.fix_to(pos=self.table.jnts[0]['gl_posq'],
                         rotmat=self.table.jnts[0]['gl_rotmatq'])
         if self.extl_attached:
-            el_pos = np.dot(self.arm.jnts[-1]['gl_rotmatq'], self.extl.extlink_origin_pos)+self.arm.jnts[-1]['gl_posq']
-            el_rotmat = np.dot(self.arm.jnts[-1]['gl_rotmatq'], self.extl.extlink_center_rotmat)
+            el_pos = np.dot(self.arm.jnts[-1]['gl_rotmatq'], self.extl.origin_pos)+self.arm.jnts[-1]['gl_posq']
+            el_rotmat = np.dot(self.arm.jnts[-1]['gl_rotmatq'], self.extl.center_rotmat)
             self.extl.fix_to(pos=el_pos, rotmat=el_rotmat)
 
     def fk(self, component_name, jnt_values):
@@ -165,8 +165,8 @@ class FR5_robot(ri.RobotInterface):
         def update_component(component_name='arm', jnt_values=np.zeros(6)):
             self.manipulator_dict[component_name].fk(jnt_values=jnt_values)
             if self.extl_attached:
-                el_pos = np.dot(self.arm.jnts[-1]['gl_rotmatq'], self.extl.extlink_origin_pos) + self.arm.jnts[-1]['gl_posq']
-                el_rotmat = np.dot(self.arm.jnts[-1]['gl_rotmatq'], self.extl.extlink_origin_rotmat)
+                el_pos = np.dot(self.arm.jnts[-1]['gl_rotmatq'], self.extl.origin_pos) + self.arm.jnts[-1]['gl_posq']
+                el_rotmat = np.dot(self.arm.jnts[-1]['gl_rotmatq'], self.extl.origin_rotmat)
                 self.get_extlink_on_manipulator(component_name).fix_to(pos=el_pos, rotmat=el_rotmat)
 
         super().fk(component_name, jnt_values)

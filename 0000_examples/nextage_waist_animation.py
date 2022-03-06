@@ -19,7 +19,7 @@ component_name = 'lft_arm_waist'
 robot_s = nxt.Nextage()
 
 start_pos = np.array([.4, 0, .2])
-start_rotmat = rm.rotmat_from_euler(0, math.pi * 2 / 3, -math.pi / 4)
+start_rotmat = rm.rotmat_from_axangle([0, 1, 0], math.pi)
 start_conf = robot_s.ik(component_name, start_pos, start_rotmat)
 goal_pos = np.array([.3, .5, .7])
 goal_rotmat = rm.rotmat_from_axangle([0, 1, 0], math.pi)
@@ -56,7 +56,7 @@ def update(robot_s, path, robot_attached_list, counter, task):
     counter[0]+=1
     return task.again
 
-taskMgr.doMethodLater(0.01, update, "update",
+taskMgr.doMethodLater(0.07, update, "update",
                       extraArgs=[robot_s, path[1:-1:3], robot_attached_list, counter],
                       appendTask=True)
 

@@ -30,6 +30,7 @@ adp_s = adp.ADPlanner(robot_s)
 
 grasp_info_list = gpa.load_pickle_file('box', './', 'xarm_long_box.pickle')
 component_name = "arm"
+hnd_name = "hnd"
 
 gripper_s = xag.XArmGripper()
 for grasp_info in grasp_info_list:
@@ -46,7 +47,7 @@ for grasp_info in grasp_info_list:
         continue
     else:
         robot_s.fk(component_name, conf_path[-1])
-        rel_obj_pos, rel_obj_rotmat = robot_s.hold(object_box, jawwidth=jaw_width)
+        rel_obj_pos, rel_obj_rotmat = robot_s.hold("hnd", objcm=object_box, jawwidth=jaw_width)
         # robot_s.gen_meshmodel().attach_to(base)
         # base.run()
         goal_jaw_center_pos = gl_jaw_center_pos+np.array([-.3,-.2,.3])
@@ -61,10 +62,32 @@ for grasp_info in grasp_info_list:
                            start_conf=conf_path[-1],
                            goal_conf=jvs,
                            obstacle_list=[],
-                           ext_dist=.1, rand_rate=70, max_time=300)
-        for jvp in path:
-            robot_s.fk(component_name, jvp)
-            gl_obj_pos, gl_obj_rotmat = robot_s.cvt_loc_tcp_to_gl(component_name, rel_obj_pos, rel_obj_rotmat)
-            robot_s.gen_meshmodel().attach_to(base)
+                           ext_dist=.1,
+                           max_time=300)
         break
+        # for jvp in path:
+        #     robot_s.fk(component_name, jvp)
+        #     gl_obj_pos, gl_obj_rotmat = robot_s.cvt_loc_tcp_to_gl(component_name, rel_obj_pos, rel_obj_rotmat)
+        #     robot_s.gen_meshmodel().attach_to(base)
+        # break
+
+def update(rbtmnp, motioncounter, robot, path, armname, task):
+    if motioncounter[0] < len(path):
+        if rbtmnp[0] is not None:
+            rbtmnp[0].detach()
+        pose = path[motioncounter[0]]
+        robot.fk(armname, pose)
+        rbtmnp[0] = robot.gen_meshmodel(toggle_tcpcs=True)
+        rbtmnp[0].attach_to(base)
+        # genSphere(robot.get_gl_tcp(component_name)[0], radius=0.01, rgba=[1,1,0,1])
+        motioncounter[0] += 1
+    else:
+        motioncounter[0] = 0
+    return task.again
+rbtmnp = [None]
+motioncounter = [0]
+taskMgr.doMethodLater(0.07, update, "update",
+                      extraArgs=[rbtmnp, motioncounter, robot_s, path, component_name],
+                      appendTask=True)
+base.setFrameRateMeter(True)
 base.run()

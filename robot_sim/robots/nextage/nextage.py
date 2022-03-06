@@ -441,9 +441,9 @@ class Nextage(ri.RobotInterface):
         author: weiwei
         date: 20210302
         """
-        if component_name is 'lft_arm':
+        if component_name == 'lft_arm':
             arm = self.lft_arm
-        elif component_name is 'rgt_arm':
+        elif component_name == 'rgt_arm':
             arm = self.rgt_arm
         hnd_pos = arm.jnts[-1]['gl_posq']
         hnd_rotmat = arm.jnts[-1]['gl_rotmatq']
@@ -462,9 +462,9 @@ class Nextage(ri.RobotInterface):
         author: weiwei
         date: 20210302
         """
-        if component_name is 'lft_arm':
+        if component_name == 'lft_arm':
             arm = self.lft_arm
-        elif component_name is 'rgt_arm':
+        elif component_name == 'rgt_arm':
             arm = self.rgt_arm
         hnd_pos = arm.jnts[-1]['gl_posq']
         hnd_rotmat = arm.jnts[-1]['gl_rotmatq']
@@ -663,6 +663,9 @@ if __name__ == '__main__':
     base = wd.World(cam_pos=[3, 1, 2], lookat_pos=[0, 0, 0])
     gm.gen_frame().attach_to(base)
     nxt_instance = Nextage(enable_cc=True)
+    jnt_values = np.array([-30,0,-60,-120,0,0,0])*math.pi/180
+    component_name = 'lft_arm_waist'
+    nxt_instance.fk(component_name, jnt_values)
     nxt_meshmodel = nxt_instance.gen_meshmodel(toggle_tcpcs=True)
     nxt_meshmodel.attach_to(base)
     # nxt_instance.show_cdprimit()

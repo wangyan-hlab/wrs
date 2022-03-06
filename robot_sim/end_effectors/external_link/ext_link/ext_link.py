@@ -24,11 +24,11 @@ class ExtLink(extl.ExtlinkInterface):
         # reinitialize
         self.jlc.reinitialize()
         # extlink origin pose relative to the arm end
-        self.extlink_origin_pos = np.array([0, 0, 0])
-        self.extlink_origin_rotmat = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+        self.origin_pos = np.array([0, 0, 0])
+        self.origin_rotmat = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
         # extlink center relative to the origin
-        self.extlink_center_pos = np.array([.0, .06, .04])
-        self.extlink_center_rotmat = np.array([[1, 0, 0], [0, 0, 1], [0, -1, 0]])
+        self.center_pos = np.array([.0, .06, .04])
+        self.center_rotmat = np.array([[1, 0, 0], [0, 0, 1], [0, -1, 0]])
         # collision detection
         self.all_cdelements = []
         self.enable_cc(toggle_cdprimit=enable_cc)
@@ -66,21 +66,21 @@ class ExtLink(extl.ExtlinkInterface):
                                 toggle_jntscs=toggle_jntscs,
                                 toggle_connjnt=toggle_connjnt).attach_to(mm_collection)
         if toggle_tcpcs:
-            extlink_center_gl_pos = self.rotmat.dot(self.extlink_center_pos) + self.pos
-            extlink_center_gl_rotmat = self.rotmat.dot(self.extlink_center_rotmat)
+            center_gl_pos = self.rotmat.dot(self.center_pos) + self.pos
+            center_gl_rotmat = self.rotmat.dot(self.center_rotmat)
             gm.gen_dashstick(spos=self.pos,
-                             epos=extlink_center_gl_pos,
+                             epos=center_gl_pos,
                              thickness=.0062,
                              rgba=[.5, 0, 1, 1],
                              type="round").attach_to(mm_collection)
-            gm.gen_mycframe(pos=extlink_center_gl_pos, rotmat=extlink_center_gl_rotmat).attach_to(mm_collection)
+            gm.gen_mycframe(pos=center_gl_pos, rotmat=center_gl_rotmat).attach_to(mm_collection)
         return mm_collection
 
     def gen_meshmodel(self,
                       toggle_tcpcs=False,
                       toggle_jntscs=False,
                       rgba=None,
-                      name='xarm_gripper_meshmodel'):
+                      name='extlink_meshmodel'):
         mm_collection = mc.ModelCollection(name=name)
         self.coupling.gen_meshmodel(toggle_tcpcs=False,
                                     toggle_jntscs=toggle_jntscs,
@@ -89,14 +89,14 @@ class ExtLink(extl.ExtlinkInterface):
                                toggle_jntscs=toggle_jntscs,
                                rgba=rgba).attach_to(mm_collection)
         if toggle_tcpcs:
-            extlink_center_gl_pos = self.rotmat.dot(self.extlink_center_pos) + self.pos
-            extlink_center_gl_rotmat = self.rotmat.dot(self.extlink_center_rotmat)
+            center_gl_pos = self.rotmat.dot(self.center_pos) + self.pos
+            center_gl_rotmat = self.rotmat.dot(self.center_rotmat)
             gm.gen_dashstick(spos=self.pos,
-                             epos=extlink_center_gl_pos,
+                             epos=center_gl_pos,
                              thickness=.0062,
                              rgba=[.5, 0, 1, 1],
                              type="round").attach_to(mm_collection)
-            gm.gen_mycframe(pos=extlink_center_gl_pos, rotmat=extlink_center_gl_rotmat).attach_to(mm_collection)
+            gm.gen_mycframe(pos=center_gl_pos, rotmat=center_gl_rotmat).attach_to(mm_collection)
         return mm_collection
 
 if __name__ == '__main__':
