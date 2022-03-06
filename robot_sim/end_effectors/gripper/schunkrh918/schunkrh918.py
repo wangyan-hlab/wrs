@@ -16,13 +16,13 @@ class SchunkRH918(gp.GripperInterface):
         cpl_end_pos = self.coupling.jnts[-1]['gl_posq']
         cpl_end_rotmat = self.coupling.jnts[-1]['gl_rotmatq']
         # - lft
-        self.lft = jl.JLChain(pos=cpl_end_pos, rotmat=cpl_end_rotmat, homeconf=np.zeros(1), name='base_lft_slider_finger')
+        self.lft = jl.JLChain(pos=cpl_end_pos, rotmat=cpl_end_rotmat, homeconf=np.zeros(2), name='base_lft_slider_finger')
         self.lft.jnts[1]['loc_pos'] = np.array([-.01, .04, .073])
         self.lft.jnts[1]['type'] = 'prismatic'
         self.lft.jnts[1]['motion_rng'] = [0, .025]
         self.lft.jnts[1]['loc_motionax'] = np.array([0, -1, 0])
         self.lft.lnks[0]['name'] = "base"
-        self.lft.lnks[0]['loc_pos'] = np.array([0, 0, 0])
+        self.lft.lnks[0]['loc_pos'] = np.zeros(3)
         self.lft.lnks[0]['meshfile'] = os.path.join(this_dir, "meshes", "base.stl")
         self.lft.lnks[0]['rgba'] = [.2, .2, .2, 1]
         self.lft.lnks[1]['name'] = "slider1"
@@ -30,18 +30,30 @@ class SchunkRH918(gp.GripperInterface):
         self.lft.lnks[1]['rgba'] = [.5, .5, .5, 1]
         self.lft.lnks[1]['loc_pos'] = np.zeros(3)
         self.lft.lnks[1]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, -math.pi/2)
+        self.lft.jnts[2]['loc_pos'] = np.array([.02, .008, 0])
+        self.lft.lnks[2]['name'] = "finger1"
+        self.lft.lnks[2]['meshfile'] = os.path.join(this_dir, "meshes", "finger.stl")
+        self.lft.lnks[2]['rgba'] = [.8, .8, .8, 1]
+        self.lft.lnks[2]['loc_pos'] = np.zeros(3)
+        self.lft.lnks[2]['loc_rotmat'] = rm.rotmat_from_euler(0, math.pi, math.pi/2)
         # - rgt
-        self.rgt = jl.JLChain(pos=cpl_end_pos, rotmat=cpl_end_rotmat, homeconf=np.zeros(1), name='rgt_finger')
+        self.rgt = jl.JLChain(pos=cpl_end_pos, rotmat=cpl_end_rotmat, homeconf=np.zeros(2), name='rgt_finger')
         self.rgt.jnts[1]['loc_pos'] = np.array([.01, -.04, .073])
         self.rgt.jnts[1]['type'] = 'prismatic'
         self.rgt.jnts[1]['loc_motionax'] = np.array([0, 1, 0])
-        self.rgt.lnks[1]['name'] = "finger2"
+        self.rgt.lnks[1]['name'] = "slider2"
         self.rgt.lnks[1]['meshfile'] = os.path.join(this_dir, "meshes", "slider.stl")
         self.rgt.lnks[1]['rgba'] = [.5, .5, .5, 1]
         self.rgt.lnks[1]['loc_pos'] = np.zeros(3)
         self.rgt.lnks[1]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, math.pi / 2)
+        self.rgt.jnts[2]['loc_pos'] = np.array([-.02, -.008, 0])
+        self.rgt.lnks[2]['name'] = "finger2"
+        self.rgt.lnks[2]['meshfile'] = os.path.join(this_dir, "meshes", "finger.stl")
+        self.rgt.lnks[2]['rgba'] = [.8, .8, .8, 1]
+        self.rgt.lnks[2]['loc_pos'] = np.zeros(3)
+        self.rgt.lnks[2]['loc_rotmat'] = rm.rotmat_from_euler(0, math.pi, -math.pi / 2)
         # jaw center
-        self.jaw_center_pos = np.array([0,0,.14])
+        self.jaw_center_pos = np.array([0, 0, .145])
         # reinitialize
         self.lft.reinitialize()
         self.rgt.reinitialize()
@@ -53,11 +65,13 @@ class SchunkRH918(gp.GripperInterface):
         if toggle_cdprimit:
             super().enable_cc()
             # cdprimit
-            self.cc.add_cdlnks(self.lft, [0, 1])
-            self.cc.add_cdlnks(self.rgt, [1])
+            self.cc.add_cdlnks(self.lft, [0, 1, 2])
+            self.cc.add_cdlnks(self.rgt, [1, 2])
             activelist = [self.lft.lnks[0],
                           self.lft.lnks[1],
-                          self.rgt.lnks[1]]
+                          self.lft.lnks[2],
+                          self.rgt.lnks[1],
+                          self.rgt.lnks[2]]
             self.cc.set_active_cdlnks(activelist)
             self.all_cdelements = self.cc.all_cdelements
         # cdmesh
@@ -164,9 +178,9 @@ if __name__ == '__main__':
     #     grpr.fk(angle)
     #     grpr.gen_meshmodel().attach_to(base)
     grpr = SchunkRH918(enable_cc=True)
-    grpr.jaw_to(.02)
+    grpr.jaw_to(.05)
     grpr.gen_meshmodel().attach_to(base)
-    grpr.gen_stickmodel().attach_to(base)
+    # grpr.gen_stickmodel().attach_to(base)
     grpr.fix_to(pos=np.array([0, .3, .2]), rotmat=rm.rotmat_from_axangle([1, 0, 0], .05))
     grpr.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
     grpr.show_cdmesh()
