@@ -43,6 +43,7 @@ class FR5_robot(ri.RobotInterface):
                           homeconf=homeconf,
                           enable_cc=False)
         self.manipulator_dict['arm'] = self.arm
+        self.manipulator_dict['hnd'] = self.arm
         self.hnd_attached = hnd_attached
         if hnd_attached:
             self.hnd = rtq.Robotiq85(pos=self.arm.jnts[-1]['gl_posq'],
@@ -54,7 +55,7 @@ class FR5_robot(ri.RobotInterface):
             self.arm.tcp_loc_rotmat = self.hnd.jaw_center_rotmat
             # a list of detailed information about objects in hand, see CollisionChecker.add_objinhnd
             self.oih_infos = []
-            self.hnd_dict['arm'] = self.hnd
+            self.hnd_dict['hnd'] = self.hnd
         # collision detection
         if enable_cc:
             self.enable_cc()
@@ -187,6 +188,76 @@ class FR5_robot(ri.RobotInterface):
             self.hnd.fix_to(pos=self.arm.jnts[-1]['gl_posq'],
                             rotmat=self.arm.jnts[-1]['gl_rotmatq'])
 
+    def jaw_to(self, hnd_name='hnd', jawwidth=0.0):
+        self.hnd_dict[hnd_name].jaw_to(jawwidth)
+
+    def hold(self, hnd_name, objcm, jawwidth=None):
+        """
+        the objcm is added as a part of the robot_s to the cd checker
+        :param jawwidth:
+        :param objcm:
+        :return:
+        """
+        if hnd_name not in self.hnd_dict:
+            raise ValueError("Hand name does not exist!")
+        if jawwidth is not None:
+            self.hnd_dict[hnd_name].jaw_to(jawwidth)
+        rel_pos, rel_rotmat = self.manipulator_dict[hnd_name].cvt_gl_to_loc_tcp(objcm.get_pos(), objcm.get_rotmat())
+        intolist = [self.arm.lnks[0],
+                    self.arm.lnks[1],
+                    self.arm.lnks[2],
+                    self.arm.lnks[3],
+                    self.arm.lnks[4],
+                    self.arm.lnks[5],
+                    self.arm.lnks[6]]
+        self.oih_infos.append(self.cc.add_cdobj(objcm, rel_pos, rel_rotmat, intolist))
+        return rel_pos, rel_rotmat
+
+    def get_oih_list(self):
+        return_list = []
+        for obj_info in self.oih_infos:
+            objcm = obj_info['collisionmodel']
+            objcm.set_pos(obj_info['gl_pos'])
+            objcm.set_rotmat(obj_info['gl_rotmat'])
+            return_list.append(objcm)
+        return return_list
+
+    def get_gl_pose_from_hio(self, component_name, hio_pos, hio_rotmat):
+        """
+        get the global pose of an object from a grasp pose described in an object's local frame
+        :param hio_pos: a grasp pose described in an object's local frame -- pos
+        :param hio_rotmat: a grasp pose described in an object's local frame -- rotmat
+        :return:
+        author: weiwei
+        date: 20210302
+        """
+        if component_name != 'arm':
+            raise ValueError("Component name for Fr5_Robot must be \'arm\'!")
+        hnd_pos = self.arm.jnts[-1]['gl_posq']
+        hnd_rotmat = self.arm.jnts[-1]['gl_rotmatq']
+        hnd_homomat = rm.homomat_from_posrot(hnd_pos, hnd_rotmat)
+        hio_homomat = rm.homomat_from_posrot(hio_pos, hio_rotmat)
+        oih_homomat = rm.homomat_inverse(hio_homomat)
+        gl_obj_homomat = hnd_homomat.dot(oih_homomat)
+        return gl_obj_homomat[:3, 3], gl_obj_homomat[:3, :3]
+
+    def release(self, hnd_name, objcm, jawwidth=None):
+        """
+        the objcm is added as a part of the robot_s to the cd checker
+        :param jawwidth:
+        :param objcm:
+        :return:
+        """
+        if hnd_name not in self.hnd_dict:
+            raise ValueError("Hand name does not exist!")
+        if jawwidth is not None:
+            self.hnd_dict[hnd_name].jaw_to(jawwidth)
+        for obj_info in self.oih_infos:
+            if obj_info['collisionmodel'] is objcm:
+                self.cc.delete_cdobj(obj_info)
+                self.oih_infos.remove(obj_info)
+                break
+
     def fk(self, component_name, jnt_values):
         """
         :param jnt_values: nparray 1x6
@@ -196,12 +267,19 @@ class FR5_robot(ri.RobotInterface):
         date: 20201208toyonaka, 20210403osaka
         """
 
+        def update_oih(component_name='arm'):
+            for obj_info in self.oih_infos:
+                gl_pos, gl_rotmat = self.cvt_loc_tcp_to_gl(component_name, obj_info['rel_pos'], obj_info['rel_rotmat'])
+                obj_info['gl_pos'] = gl_pos
+                obj_info['gl_rotmat'] = gl_rotmat
+
         def update_component(component_name='arm', jnt_values=np.zeros(6)):
             self.manipulator_dict[component_name].fk(jnt_values=jnt_values)
             if self.hnd_attached:
-                self.get_hnd_on_manipulator(component_name).fix_to(
+                self.hnd_dict[component_name].fix_to(
                     pos=self.manipulator_dict[component_name].jnts[-1]['gl_posq'],
                     rotmat=self.manipulator_dict[component_name].jnts[-1]['gl_rotmatq'])
+            update_oih(component_name=component_name)
 
         super().fk(component_name, jnt_values)
         # examine length

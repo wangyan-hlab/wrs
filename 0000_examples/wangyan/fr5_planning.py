@@ -35,7 +35,7 @@ if __name__ == '__main__':
     component_name = 'arm'
     robot_s = fr5.FR5_robot(enable_cc=True)
     robot_s.fix_to(pos=[0,0,0], rotmat=rm.rotmat_from_euler(0,0,0))
-    robot_s.hnd.jaw_to(0.01)
+    robot_s.jaw_to(jawwidth=0.01)
     start_conf = np.array([math.pi*120/180,-math.pi*120/180,math.pi*120/180,0,0,0])
     goal_conf = np.array([math.pi*0/180,-math.pi*110/180,math.pi*80/180,-math.pi*80/180,-math.pi*70/180,math.pi*20/180])
     robot_s.fk(component_name, start_conf)

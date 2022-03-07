@@ -200,6 +200,10 @@ class Robotiq85(gp.GripperInterface):
         self.fk(motion_val)
         # TODO dynamically change jaw center
 
+    def get_jawwidth(self):
+        motion_val = self.lft_outer.jnts[1]['motion_val']
+        return (math.sin(math.asin((self.jawwidth_rng[1] / 2.0 + .0064 - .0306011) / 0.055) - motion_val)*0.055 - .0064 + .0306011)*2.0
+
     def gen_stickmodel(self,
                        tcp_jntid=None,
                        tcp_loc_pos=None,
