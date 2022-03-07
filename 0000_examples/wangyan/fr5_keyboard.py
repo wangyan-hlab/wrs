@@ -3,7 +3,7 @@ import time
 import keyboard
 import numpy as np
 import sys
-sys.path.append(".")
+sys.path.append("..")
 from visualization.panda import world as wd
 from modeling import geometric_model as gm
 from modeling import collision_model as cm
@@ -13,9 +13,10 @@ from direct.task.TaskManagerGlobal import taskMgr
 
 base = wd.World(cam_pos=[2, 0, 1], lookat_pos=[0, 0, 0.5], w=960, h=720)
 component_name = 'arm'
-init_conf = np.array([90/180*math.pi, -90/180*math.pi, -90/180*math.pi, -180/180*math.pi, 0/180*math.pi, 0/180*math.pi])
+init_conf = np.array([0,-60,-130,10,10,0])*math.pi/180
 robot_s = fr5.FR5_robot(homeconf=init_conf)
-current_gripper_width = robot_s.hnd.jawwidth_rng
+robot_s.jaw_to(hnd_name="hnd", jawwidth=0.03)
+current_gripper_width = robot_s.hnd.get_jawwidth()
 onscreen = []
 operation_count = 0
 pre_pos = np.array([0, 0, math.radians(0)])

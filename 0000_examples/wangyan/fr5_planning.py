@@ -16,7 +16,7 @@ def genSphere(pos, radius=0.02, rgba=None):
 
 if __name__ == '__main__':
 
-    base = wd.World(cam_pos=[-2, -3, 1], lookat_pos=[0, 0, 0.5], w=960, h=720)
+    base = wd.World(cam_pos=[-2, -3, 1], lookat_pos=[0, 0, 0.5], w=960, h=720, backgroundcolor=[.8, .8, .8, .5])
     gm.gen_frame().attach_to(base)
     # object
     obj = cm.CollisionModel("../objects/bunnysim.stl")
