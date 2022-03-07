@@ -11,6 +11,12 @@ from panda3d.core import CollisionNode, CollisionBox, Point3
 import robot_sim.robots.robot_interface as ri
 
 class FR5_robot(ri.RobotInterface):
+
+    """
+        author: wangyan
+        date: 2022/02/21, Suzhou
+    """
+    
     def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name='fr5', homeconf=np.zeros(6), enable_cc=True, hnd_attached=True):
         super().__init__(pos=pos, rotmat=rotmat, name=name)
         this_dir, this_filename = os.path.split(__file__)
@@ -58,8 +64,6 @@ class FR5_robot(ri.RobotInterface):
             self.oih_infos = []
             self.hnd_dict['arm'] = self.hnd
             self.hnd_dict['hnd'] = self.hnd
-        # a list of detailed information about objects in hand, see CollisionChecker.add_objinhnd
-        self.oih_infos = []
         # collision detection
         if enable_cc:
             self.enable_cc()
@@ -283,7 +287,7 @@ class FR5_robot(ri.RobotInterface):
                 self.hnd_dict[component_name].fix_to(
                     pos=self.manipulator_dict[component_name].jnts[-1]['gl_posq'],
                     rotmat=self.manipulator_dict[component_name].jnts[-1]['gl_rotmatq'])
-            update_oih(component_name=component_name)
+                update_oih(component_name=component_name)
 
         super().fk(component_name, jnt_values)
         # examine length
