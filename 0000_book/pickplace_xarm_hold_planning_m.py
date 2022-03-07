@@ -64,12 +64,11 @@ for grasp_info in grasp_info_list:
                            obstacle_list=[],
                            ext_dist=.1,
                            max_time=300)
+        for jvp in path:
+            robot_s.fk(component_name, jvp)
+            gl_obj_pos, gl_obj_rotmat = robot_s.cvt_loc_tcp_to_gl(component_name, rel_obj_pos, rel_obj_rotmat)
+            # robot_s.gen_meshmodel().attach_to(base)
         break
-        # for jvp in path:
-        #     robot_s.fk(component_name, jvp)
-        #     gl_obj_pos, gl_obj_rotmat = robot_s.cvt_loc_tcp_to_gl(component_name, rel_obj_pos, rel_obj_rotmat)
-        #     robot_s.gen_meshmodel().attach_to(base)
-        # break
 
 def update(rbtmnp, motioncounter, robot, path, armname, task):
     if motioncounter[0] < len(path):

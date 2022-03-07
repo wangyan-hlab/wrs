@@ -46,6 +46,26 @@ for grasp_info in grasp_info_list:
     else:
         for jvs in conf_path:
             robot_s.fk(component_name, jvs)
-            robot_s.gen_meshmodel(rgba=[0,1,1,.3]).attach_to(base)
+            # robot_s.gen_meshmodel(rgba=[0,1,1,.3]).attach_to(base)
         break
+
+def update(rbtmnp, motioncounter, robot, path, armname, task):
+    if motioncounter[0] < len(path):
+        if rbtmnp[0] is not None:
+            rbtmnp[0].detach()
+        pose = path[motioncounter[0]]
+        robot.fk(armname, pose)
+        rbtmnp[0] = robot.gen_meshmodel(toggle_tcpcs=True)
+        rbtmnp[0].attach_to(base)
+        # genSphere(robot.get_gl_tcp(component_name)[0], radius=0.01, rgba=[1,1,0,1])
+        motioncounter[0] += 1
+    else:
+        motioncounter[0] = 0
+    return task.again
+rbtmnp = [None]
+motioncounter = [0]
+taskMgr.doMethodLater(0.07, update, "update",
+                      extraArgs=[rbtmnp, motioncounter, robot_s, conf_path, component_name],
+                      appendTask=True)
+base.setFrameRateMeter(True)
 base.run()

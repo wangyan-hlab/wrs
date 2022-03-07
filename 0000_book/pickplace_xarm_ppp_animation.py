@@ -16,7 +16,7 @@ ground = cm.gen_box(extent=[5, 5, 1], rgba=[.57, .57, .5, .7])
 ground.set_pos(np.array([0, 0, -.51]))
 ground.attach_to(base)
 # object box
-object_box = cm.gen_box(extent=[.02, .06, .7], rgba=[.7, .5, .3, .7])
+object_box = cm.gen_box(extent=[.02, .06, .2], rgba=[.7, .5, .3, .7])
 # object_box_gl_pos = np.array([.3, -.4, .35])
 # object_box_gl_rotmat = np.eye(3)
 object_box_gl_pos = np.array([.6, .2, .35])
@@ -30,8 +30,8 @@ object_box_copy.attach_to(base)
 # object box goal
 # object_box_gl_goal_pos = np.array([.6, -.1, .1])
 # object_box_gl_goal_rotmat = rm.rotmat_from_euler(0, math.pi / 2, math.pi / 2)
-object_box_gl_goal_pos = np.array([.35, -.35, .01])
-object_box_gl_goal_rotmat = rm.rotmat_from_euler(math.pi/3, math.pi / 2, math.pi / 2)
+object_box_gl_goal_pos = np.array([.35, .2, .35])
+object_box_gl_goal_rotmat = rm.rotmat_from_euler(0, 0, math.pi / 2)
 obgl_goal_homomat = rm.homomat_from_posrot(object_box_gl_goal_pos, object_box_gl_goal_rotmat)
 object_box_goal_copy = object_box.copy()
 object_box_goal_copy.set_homomat(obgl_goal_homomat)
@@ -43,7 +43,7 @@ robot_s.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
 rrtc_s = rrtc.RRTConnect(robot_s)
 ppp_s = ppp.PickPlacePlanner(robot_s)
 
-original_grasp_info_list = gpa.load_pickle_file('box', './', 'xarm_long_box.pickle')
+original_grasp_info_list = gpa.load_pickle_file('box', './', 'xarm_box.pickle')
 hnd_name = "hnd"
 start_conf = robot_s.get_jnt_values(hnd_name)
 conf_list, jawwidth_list, objpose_list = \
