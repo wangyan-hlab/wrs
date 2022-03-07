@@ -6,4 +6,5 @@
 /wrs架构与函数功能
 *.npy
 *.pth
+*.pickle
 /neuro/ik/runs

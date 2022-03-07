@@ -55,6 +55,7 @@ class FR5_robot(ri.RobotInterface):
             self.arm.tcp_loc_rotmat = self.hnd.jaw_center_rotmat
             # a list of detailed information about objects in hand, see CollisionChecker.add_objinhnd
             self.oih_infos = []
+            self.hnd_dict['arm'] = self.hnd
             self.hnd_dict['hnd'] = self.hnd
         # collision detection
         if enable_cc:
