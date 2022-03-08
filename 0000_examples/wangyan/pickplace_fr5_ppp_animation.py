@@ -12,11 +12,7 @@ import motion.probabilistic.rrt_connect as rrtc
 
 base = wd.World(cam_pos=[2.1, -2.1, 2.1], lookat_pos=[.0, 0, .3])
 gm.gen_frame().attach_to(base)
-# ground
-# ground = cm.gen_box(extent=[5, 5, 1], rgba=[.57, .57, .5, .7])
-# ground.set_pos(np.array([0, 0, -.51]))
-# ground.attach_to(base)
-# object box
+# object to grasp
 tubebig = cm.CollisionModel("../objects/tubebig.stl")
 tubebig.set_rgba([.9, .75, .35, 1])
 # tubebig_gl_pos = np.array([.3, -.4, .35])
@@ -39,10 +35,18 @@ tubebig_goal_copy = tubebig.copy()
 tubebig_goal_copy.set_homomat(obgl_goal_homomat)
 tubebig_goal_copy.attach_to(base)
 
-homeconf = np.array([-40, -60, -120, 0, 0, 0])*math.pi/180
+homeconf = np.array([-40, -60, -80, -120, 75, 20])*math.pi/180
 robot_s = fr5.FR5_robot(homeconf=homeconf)
-robot_s.gen_meshmodel(rgba=[1,1,1,0.1]).attach_to(base)
+robot_s.gen_meshmodel(rgba=[1, 0, 1, .3]).attach_to(base)
 # base.run()
+
+obj = cm.CollisionModel("../objects/bunnysim.stl")
+obj.set_pos(robot_s.get_gl_tcp()[0]+np.array([0.15, 0, 0.03]))
+obj.set_rpy(0, 0, 0)
+obj.set_scale([1.5, 1.5, 1.5])
+obj.set_rgba([.1, .2, .8, 1])
+obj.attach_to(base)
+
 rrtc_s = rrtc.RRTConnect(robot_s)
 ppp_s = ppp.PickPlacePlanner(robot_s)
 
@@ -59,7 +63,8 @@ conf_list, jawwidth_list, objpose_list = \
                                     approach_direction_list=[None, np.array([0, 0, -1])],
                                     approach_distance_list=[.2] * 2,
                                     depart_direction_list=[np.array([0, 0, 1]), None],
-                                    depart_distance_list=[.2] * 2)
+                                    depart_distance_list=[.2] * 2,
+                                    obstacle_list=[obj])
 robot_attached_list = []
 object_attached_list = []
 counter = [0]
@@ -85,7 +90,7 @@ def update(robot_s,
     pose = robot_path[counter[0]]
     robot_s.fk(hnd_name, pose)
     robot_s.jaw_to(hnd_name, jawwidth_path[counter[0]])
-    robot_meshmodel = robot_s.gen_meshmodel()
+    robot_meshmodel = robot_s.gen_meshmodel(toggle_tcpcs=True)
     robot_meshmodel.attach_to(base)
     robot_attached_list.append(robot_meshmodel)
     obj_pose = obj_path[counter[0]]
@@ -95,7 +100,7 @@ def update(robot_s,
     object_attached_list.append(objb_copy)
     counter[0] += 1
     return task.again
-taskMgr.doMethodLater(0.03, update, "update",
+taskMgr.doMethodLater(0.02, update, "update",
                       extraArgs=[robot_s,
                                  hnd_name,
                                  tubebig,
