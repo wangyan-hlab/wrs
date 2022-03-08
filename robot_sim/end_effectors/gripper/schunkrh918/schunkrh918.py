@@ -120,7 +120,7 @@ class SchunkRH918(gp.GripperInterface):
                        toggle_tcpcs=False,
                        toggle_jntscs=False,
                        toggle_connjnt=False,
-                       name='robotiqe_stickmodel'):
+                       name='schunkrh918_stickmodel'):
         stickmodel = mc.ModelCollection(name=name)
         self.coupling.gen_stickmodel(toggle_tcpcs=False,
                                      toggle_jntscs=toggle_jntscs).attach_to(stickmodel)
@@ -145,7 +145,7 @@ class SchunkRH918(gp.GripperInterface):
                       toggle_tcpcs=False,
                       toggle_jntscs=False,
                       rgba=None,
-                      name='xarm_gripper_meshmodel'):
+                      name='schunkrh918_meshmodel'):
         meshmodel = mc.ModelCollection(name=name)
         self.coupling.gen_meshmodel(toggle_tcpcs=False,
                                     toggle_jntscs=toggle_jntscs,

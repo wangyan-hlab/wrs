@@ -16,7 +16,7 @@ def genSphere(pos, radius=0.02, rgba=None):
 
 if __name__ == '__main__':
 
-    base = wd.World(cam_pos=[-2, -3, 1], lookat_pos=[0, 0, 0.5], w=960, h=720)
+    base = wd.World(cam_pos=[-2, -3, 1], lookat_pos=[0, 0, 0.5], w=960, h=720, backgroundcolor=[.8, .8, .8, .5])
     gm.gen_frame().attach_to(base)
     # object
     obj = cm.CollisionModel("../objects/bunnysim.stl")
@@ -35,9 +35,9 @@ if __name__ == '__main__':
     component_name = 'arm'
     robot_s = fr5.FR5_robot(enable_cc=True)
     robot_s.fix_to(pos=[0,0,0], rotmat=rm.rotmat_from_euler(0,0,0))
-    robot_s.hnd.jaw_to(0.01)
-    start_conf = np.array([math.pi*120/180,-math.pi*120/180,math.pi*120/180,0,0,0])
-    goal_conf = np.array([math.pi*0/180,-math.pi*110/180,math.pi*80/180,-math.pi*80/180,-math.pi*70/180,math.pi*20/180])
+    robot_s.jaw_to(jawwidth=0.01)
+    start_conf = np.radians([120,-120,120,0,0,0])
+    goal_conf = np.radians([0,-110,80,-80,-70,20])
     robot_s.fk(component_name, start_conf)
     robot_s.gen_meshmodel(toggle_tcpcs=True, rgba=[1,0,0,0.5]).attach_to(base)
     robot_s.fk(component_name, goal_conf)

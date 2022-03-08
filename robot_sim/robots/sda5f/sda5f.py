@@ -13,7 +13,7 @@ import robot_sim.robots.robot_interface as ri
 
 class SDA5F(ri.RobotInterface):
 
-    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name='ur3dual', enable_cc=True):
+    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name='sda5f', enable_cc=True):
         super().__init__(pos=pos, rotmat=rotmat, name=name)
         this_dir, this_filename = os.path.split(__file__)
         # left side
@@ -125,6 +125,14 @@ class SDA5F(ri.RobotInterface):
         super().enable_cc()
         # raise NotImplementedError
 
+    def get_hnd_on_manipulator(self, manipulator_name):
+        if manipulator_name == 'lft_arm':
+            return self.lft_hnd
+        elif manipulator_name == 'rgt_arm':
+            return self.rgt_hnd
+        else:
+            raise ValueError("The given jlc does not have a hand!")
+
     def move_to(self, pos, rotmat):
         self.pos = pos
         self.rotmat = rotmat
@@ -168,14 +176,14 @@ class SDA5F(ri.RobotInterface):
         super().fk(component_name, jnt_values)
         # examine length
         if component_name == 'lft_arm' or component_name == 'rgt_arm':
-            if not isinstance(jnt_values, np.ndarray) or jnt_values.size != 6:
-                raise ValueError("An 1x6 npdarray must be specified to move a single arm!")
+            if not isinstance(jnt_values, np.ndarray) or jnt_values.size != 7:
+                raise ValueError("An 1x7 npdarray must be specified to move a single arm!")
             update_component(component_name, jnt_values)
         elif component_name == 'both_arm':
-            if (jnt_values.size != 12):
-                raise ValueError("A 1x12 npdarrays must be specified to move both arm!")
-            update_component('lft_arm', jnt_values[0:6])
-            update_component('rgt_arm', jnt_values[6:12])
+            if (jnt_values.size != 14):
+                raise ValueError("A 1x14 npdarrays must be specified to move both arm!")
+            update_component('lft_arm', jnt_values[0:7])
+            update_component('rgt_arm', jnt_values[7:14])
         elif component_name == 'all':
             raise NotImplementedError
         else:
@@ -289,6 +297,8 @@ if __name__ == '__main__':
     base = wd.World(cam_pos=[3, 0, 3], lookat_pos=[0, 0, 1])
     gm.gen_frame().attach_to(base)
     sdarbt = SDA5F()
+    sdarbt.fk(component_name="both_arm",
+              jnt_values=np.concatenate((np.zeros(7), np.array([-90,0,0,0,0,0,0])*math.pi/180), axis=0))
     sdarbt_meshmodel = sdarbt.gen_meshmodel()
     sdarbt_meshmodel.attach_to(base)
     # sdarbt_meshmodel.show_cdprimit()

@@ -5,50 +5,57 @@ import grasping.planning.antipodal as gpa
 import math
 import numpy as np
 import basis.robot_math as rm
-import robot_sim.robots.xarm_shuidi.xarm_shuidi as xsm
+# import robot_sim.robots.xarm_shuidi.xarm_shuidi as xsm
+import robot_sim.robots.fr5.fr5 as fr5
 import manipulation.pick_place_planner as ppp
 import motion.probabilistic.rrt_connect as rrtc
 
 base = wd.World(cam_pos=[2.1, -2.1, 2.1], lookat_pos=[.0, 0, .3])
 gm.gen_frame().attach_to(base)
-# ground
-ground = cm.gen_box(extent=[5, 5, 1], rgba=[.57, .57, .5, .7])
-ground.set_pos(np.array([0, 0, -.51]))
-ground.attach_to(base)
-# object box
-object_box = cm.gen_box(extent=[.02, .06, .2], rgba=[.7, .5, .3, .7])
-# object_box_gl_pos = np.array([.3, -.4, .35])
-# object_box_gl_rotmat = np.eye(3)
-object_box_gl_pos = np.array([.6, .2, .35])
-object_box_gl_rotmat = rm.rotmat_from_euler(0,0,math.pi/2)
-obgl_start_homomat = rm.homomat_from_posrot(object_box_gl_pos, object_box_gl_rotmat)
-object_box.set_pos(object_box_gl_pos)
-object_box.set_rotmat(object_box_gl_rotmat)
-gm.gen_frame().attach_to(object_box)
-object_box_copy = object_box.copy()
-object_box_copy.attach_to(base)
+# object to grasp
+tubebig = cm.CollisionModel("../objects/tubebig.stl")
+tubebig.set_rgba([.9, .75, .35, 1])
+# tubebig_gl_pos = np.array([.3, -.4, .35])
+# tubebig_gl_rotmat = np.eye(3)
+tubebig_gl_pos = np.array([-0.3, -0.3, 0.6])
+tubebig_gl_rotmat = rm.rotmat_from_euler(0, math.pi/2, 0)
+obgl_start_homomat = rm.homomat_from_posrot(tubebig_gl_pos, tubebig_gl_rotmat)
+tubebig.set_pos(tubebig_gl_pos)
+tubebig.set_rotmat(tubebig_gl_rotmat)
+gm.gen_frame().attach_to(tubebig)
+tubebig_copy = tubebig.copy()
+tubebig_copy.attach_to(base)
 # object box goal
-# object_box_gl_goal_pos = np.array([.6, -.1, .1])
-# object_box_gl_goal_rotmat = rm.rotmat_from_euler(0, math.pi / 2, math.pi / 2)
-object_box_gl_goal_pos = np.array([.35, .2, .35])
-object_box_gl_goal_rotmat = rm.rotmat_from_euler(0, 0, math.pi / 2)
-obgl_goal_homomat = rm.homomat_from_posrot(object_box_gl_goal_pos, object_box_gl_goal_rotmat)
-object_box_goal_copy = object_box.copy()
-object_box_goal_copy.set_homomat(obgl_goal_homomat)
-object_box_goal_copy.attach_to(base)
+# tubebig_gl_goal_pos = np.array([.6, -.1, .1])
+# tubebig_gl_goal_rotmat = rm.rotmat_from_euler(0, math.pi / 2, math.pi / 2)
+tubebig_gl_goal_pos = np.array([-0.4, -0.4, 0.55])
+tubebig_gl_goal_rotmat = rm.rotmat_from_euler(0, math.pi/2, 0)
+obgl_goal_homomat = rm.homomat_from_posrot(tubebig_gl_goal_pos, tubebig_gl_goal_rotmat)
+tubebig_goal_copy = tubebig.copy()
+tubebig_goal_copy.set_homomat(obgl_goal_homomat)
+tubebig_goal_copy.attach_to(base)
 
-robot_s = xsm.XArmShuidi()
-robot_s.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
+homeconf = np.array([-40, -60, -80, -120, 75, 20])*math.pi/180
+robot_s = fr5.FR5_robot(homeconf=homeconf)
+robot_s.gen_meshmodel(rgba=[1, 0, 1, .3]).attach_to(base)
 # base.run()
+
+obj = cm.CollisionModel("../objects/bunnysim.stl")
+obj.set_pos(robot_s.get_gl_tcp()[0]+np.array([0.15, 0, 0.03]))
+obj.set_rpy(0, 0, 0)
+obj.set_scale([1.5, 1.5, 1.5])
+obj.set_rgba([.1, .2, .8, 1])
+obj.attach_to(base)
+
 rrtc_s = rrtc.RRTConnect(robot_s)
 ppp_s = ppp.PickPlacePlanner(robot_s)
 
-original_grasp_info_list = gpa.load_pickle_file('box', './', 'xarm_box.pickle')
+original_grasp_info_list = gpa.load_pickle_file('tubebig', './', 'fr5_tubebig.pickle')
 hnd_name = "hnd"
 start_conf = robot_s.get_jnt_values(hnd_name)
 conf_list, jawwidth_list, objpose_list = \
     ppp_s.gen_pick_and_place_motion(hnd_name=hnd_name,
-                                    objcm=object_box,
+                                    objcm=tubebig,
                                     grasp_info_list=original_grasp_info_list,
                                     start_conf=start_conf,
                                     end_conf=start_conf,
@@ -56,13 +63,14 @@ conf_list, jawwidth_list, objpose_list = \
                                     approach_direction_list=[None, np.array([0, 0, -1])],
                                     approach_distance_list=[.2] * 2,
                                     depart_direction_list=[np.array([0, 0, 1]), None],
-                                    depart_distance_list=[.2] * 2)
+                                    depart_distance_list=[.2] * 2,
+                                    obstacle_list=[obj])
 robot_attached_list = []
 object_attached_list = []
 counter = [0]
 def update(robot_s,
            hnd_name,
-           object_box,
+           tubebig,
            robot_path,
            jawwidth_path,
            obj_path,
@@ -82,20 +90,20 @@ def update(robot_s,
     pose = robot_path[counter[0]]
     robot_s.fk(hnd_name, pose)
     robot_s.jaw_to(hnd_name, jawwidth_path[counter[0]])
-    robot_meshmodel = robot_s.gen_meshmodel()
+    robot_meshmodel = robot_s.gen_meshmodel(toggle_tcpcs=True)
     robot_meshmodel.attach_to(base)
     robot_attached_list.append(robot_meshmodel)
     obj_pose = obj_path[counter[0]]
-    objb_copy = object_box.copy()
+    objb_copy = tubebig.copy()
     objb_copy.set_homomat(obj_pose)
     objb_copy.attach_to(base)
     object_attached_list.append(objb_copy)
     counter[0] += 1
     return task.again
-taskMgr.doMethodLater(0.01, update, "update",
+taskMgr.doMethodLater(0.02, update, "update",
                       extraArgs=[robot_s,
                                  hnd_name,
-                                 object_box,
+                                 tubebig,
                                  conf_list,
                                  jawwidth_list,
                                  objpose_list,

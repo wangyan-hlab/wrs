@@ -12,23 +12,19 @@ gm.gen_frame().attach_to(base)
 # object
 object_box = cm.gen_box(extent=[.15,.15,.15])
 object_box.set_pos(np.array([.4, .3, .4]))
+object_box.set_scale([.7,.7,.7])
 object_box.set_rgba([.5, .7, .3, 1])
 object_box.attach_to(base)
 # robot_s
 component_name = 'lft_arm_waist'
 robot_s = nxt.Nextage()
 
-start_pos = np.array([.4, 0, .2])
-start_rotmat = rm.rotmat_from_euler(0, math.pi * 2 / 3, -math.pi / 4)
-start_conf = robot_s.ik(component_name, start_pos, start_rotmat)
-goal_pos = np.array([.3, .5, .7])
-goal_rotmat = rm.rotmat_from_axangle([0, 1, 0], math.pi)
-goal_conf = robot_s.ik(component_name, goal_pos, goal_rotmat)
-
+start_conf = np.radians([45, 0, -60, -120, 0, 0, 0])
+goal_conf = np.radians([-35, 0, -40, -100, 0, 30, 0])
 rrtc_planner = rrtc.RRTConnect(robot_s)
 path = rrtc_planner.plan(component_name=component_name,
-                         start_conf=goal_conf,
-                         goal_conf=start_conf,
+                         start_conf=start_conf,
+                         goal_conf=goal_conf,
                          obstacle_list=[object_box],
                          ext_dist=.05,
                          smoothing_iterations=150,
@@ -37,7 +33,7 @@ print(path)
 for pose in path[1:-2]:
     print(pose)
     robot_s.fk(component_name, pose)
-    robot_s.gen_stickmodel().attach_to(base)
+    # robot_s.gen_stickmodel().attach_to(base)
 
 robot_attached_list = []
 counter = [0]
@@ -56,7 +52,7 @@ def update(robot_s, path, robot_attached_list, counter, task):
     counter[0]+=1
     return task.again
 
-taskMgr.doMethodLater(0.01, update, "update",
+taskMgr.doMethodLater(0.07, update, "update",
                       extraArgs=[robot_s, path[1:-1:3], robot_attached_list, counter],
                       appendTask=True)
 
