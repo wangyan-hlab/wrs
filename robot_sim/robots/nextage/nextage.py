@@ -43,7 +43,7 @@ class Nextage(ri.RobotInterface):
             os.path.join(this_dir, "meshes", "chest_joint0_link_mesh.dae"),
             cdprimit_type="user_defined", expand_radius=.005,
             userdefined_cdprimitive_fn=self._chest_combined_cdnp)
-        self.central_body.lnks[1]['rgba'] = [.67, .65, .5, 1]
+        self.central_body.lnks[1]['rgba'] = [.8, .8, .8, 1]
         self.central_body.lnks[2]['name'] = "head_joint0_link_mesh"
         self.central_body.lnks[2]['loc_pos'] = np.array([0, 0, 0.5695])
         self.central_body.lnks[2]['meshfile'] = os.path.join(this_dir, "meshes", "head_joint0_link_mesh.dae")
@@ -590,6 +590,9 @@ class Nextage(ri.RobotInterface):
             raise ValueError("hnd_name must be lft_hnd or rgt_hnd!")
 
         return rel_pos, rel_rotmat
+
+    def get_gl_tcp(self, manipulator_name="lft_arm"):
+        return super().get_gl_tcp(manipulator_name=manipulator_name[:7])
 
     def get_loc_pose_from_hio(self, hio_pos, hio_rotmat, component_name='lft_arm'):
         """
