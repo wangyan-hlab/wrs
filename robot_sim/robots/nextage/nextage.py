@@ -844,7 +844,7 @@ if __name__ == '__main__':
     base = wd.World(cam_pos=[3, 1, 2], lookat_pos=[0, 0, 0])
     gm.gen_frame().attach_to(base)
     nxt_instance = Nextage(enable_cc=True, hnd_attached='bothhnd')
-    jnt_values = np.array([45, 0, -60, -120, 0, 0, 90]) * math.pi / 180
+    jnt_values = np.radians([45, 0, -60, -120, 0, 0, 90])
     component_name = 'rgt_arm_waist'
     nxt_instance.fk(component_name, jnt_values)
     nxt_instance.jaw_to(hnd_name='lft_hnd', jawwidth=0.05)
