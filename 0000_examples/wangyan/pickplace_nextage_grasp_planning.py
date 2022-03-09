@@ -3,6 +3,7 @@ import modeling.geometric_model as gm
 import modeling.collision_model as cm
 import grasping.planning.antipodal as gpa
 import robot_sim.end_effectors.gripper.schunkrh918.schunkrh918 as hnd
+import math
 
 base = wd.World(cam_pos=[1, 1, 1], lookat_pos=[0, 0, 0])
 gm.gen_frame().attach_to(base)
@@ -15,8 +16,9 @@ obj.attach_to(base)
 gripper_s = hnd.SchunkRH918()
 grasp_info_list = gpa.plan_grasps(gripper_s, obj,
                                   openning_direction='loc_y',
-                                  max_samples=100,
-                                  min_dist_between_sampled_contact_points=.05)
+                                  rotation_interval=math.radians(15),
+                                  max_samples=300,
+                                  min_dist_between_sampled_contact_points=.02)
 gpa.write_pickle_file('tubebig', grasp_info_list, './', 'nextage_tubebig.pickle')
 for grasp_info in grasp_info_list:
     jaw_width, gl_jaw_center, gl_jaw_rotmat, hnd_pos, hnd_rotmat = grasp_info
