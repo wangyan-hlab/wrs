@@ -13,7 +13,8 @@ import robot_sim.robots.robot_interface as ri
 
 class Nextage(ri.RobotInterface):
 
-    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name='nextage', enable_cc=True, hnd_attached="bothhnd"):
+    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name='nextage',
+                 enable_cc=True, hnd_attached='bothhnd', mode='lft_arm_waist'):
         super().__init__(pos=pos, rotmat=rotmat, name=name)
         this_dir, this_filename = os.path.split(__file__)
         central_homeconf = np.radians(np.array([.0, .0, .0]))
@@ -182,8 +183,10 @@ class Nextage(ri.RobotInterface):
             self.rgt_oih_infos = []
             self.hnd_dict['lft_arm'] = self.lft_hnd
             self.hnd_dict['lft_hnd'] = self.lft_hnd
+            self.hnd_dict['lft_arm_waist'] = self.lft_hnd
             self.hnd_dict['rgt_arm'] = self.rgt_hnd
             self.hnd_dict['rgt_hnd'] = self.rgt_hnd
+            self.hnd_dict['rgt_arm_waist'] = self.rgt_hnd
         elif hnd_attached == "lft_hnd":
             self.lft_hnd = srh.SchunkRH918(
                 pos=np.dot(self.lft_arm.jnts[-1]['gl_rotmatq'], self.hnd_origin_pos) + self.lft_arm.jnts[-1]['gl_posq'],
@@ -218,6 +221,16 @@ class Nextage(ri.RobotInterface):
         self.manipulator_dict['lft_arm'] = self.lft_arm
         self.manipulator_dict['rgt_arm_waist'] = self.rgt_arm
         self.manipulator_dict['lft_arm_waist'] = self.lft_arm
+        self.manipulator_dict['rgt_hnd'] = self.rgt_arm
+        self.manipulator_dict['lft_hnd'] = self.lft_arm
+        # considering waist or not when getting joint values
+        self.mode = mode
+        if self.mode == 'lft_arm_waist' or self.mode == 'rgt_arm_waist':
+            self.read_waist = True
+        elif self.mode == 'lft_arm' or self.mode == 'rgt_arm':
+            self.read_waist = False
+        else:
+            raise ValueError("The given mode name is not available!")
 
     @staticmethod
     def _waist_combined_cdnp(name, radius):
@@ -445,7 +458,7 @@ class Nextage(ri.RobotInterface):
                 pos=np.dot(self.manipulator_dict[the_other_manipulator_name].jnts[-1]['gl_rotmatq'],self.hnd_origin_pos) +
                     self.manipulator_dict[the_other_manipulator_name].jnts[-1]['gl_posq'],
                 rotmat=np.dot(self.manipulator_dict[the_other_manipulator_name].jnts[-1]['gl_rotmatq'],self.hnd_origin_rotmat))
-        elif component_name == 'both_arm':
+        elif component_name == 'botharm':
             raise NotImplementedError
         elif component_name == 'all':
             raise NotImplementedError
@@ -514,13 +527,14 @@ class Nextage(ri.RobotInterface):
     def jaw_to(self, hnd_name='lft_hnd', jawwidth=0.05):
         self.hnd_dict[hnd_name].jaw_to(jawwidth)
 
-    def hold(self, objcm, jawwidth=None, hnd_name='lft_hnd'):
+    def hold(self, hnd_name, objcm, jawwidth=None):
         """
         the objcm is added as a part of the robot_s to the cd checker
         :param jaw_width:
         :param objcm:
         :return:
         """
+        hnd_name = hnd_name[:4]+"hnd"
         if hnd_name not in self.hnd_dict:
             raise ValueError("Hand name does not exist!")
         if jawwidth is not None:
@@ -593,6 +607,15 @@ class Nextage(ri.RobotInterface):
 
     def get_gl_tcp(self, manipulator_name="lft_arm"):
         return super().get_gl_tcp(manipulator_name=manipulator_name[:7])
+
+    def get_jnt_values(self, component_name="lft_arm", waist=None):
+        if component_name in self.manipulator_dict:
+            if waist is None:
+                waist = self.read_waist
+            if waist:
+                return self.manipulator_dict[component_name].get_jnt_values()
+            else:
+                return self.manipulator_dict[component_name].get_jnt_values()[1:]
 
     def get_loc_pose_from_hio(self, hio_pos, hio_rotmat, component_name='lft_arm'):
         """
@@ -705,6 +728,7 @@ class Nextage(ri.RobotInterface):
         :param hnd_name:
         :return:
         """
+        hnd_name = hnd_name[:4]+"hnd"
         if hnd_name == 'lft_hnd':
             oih_infos = self.lft_oih_infos
         elif hnd_name == 'rgt_hnd':
@@ -846,13 +870,15 @@ if __name__ == '__main__':
     #
     base = wd.World(cam_pos=[3, 1, 2], lookat_pos=[0, 0, 0])
     gm.gen_frame().attach_to(base)
-    nxt_instance = Nextage(enable_cc=True, hnd_attached='bothhnd')
+    nxt_instance = Nextage(enable_cc=True, hnd_attached='bothhnd', mode='rgt_arm_waist')
     jnt_values = np.radians([45, 0, -60, -120, 0, 0, 90])
-    component_name = 'rgt_arm_waist'
+    component_name = nxt_instance.mode
     nxt_instance.fk(component_name, jnt_values)
     nxt_instance.jaw_to(hnd_name='lft_hnd', jawwidth=0.05)
     nxt_instance.jaw_to(hnd_name='rgt_hnd', jawwidth=0.01)
     nxt_instance.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
+    print(nxt_instance.get_jnt_values("lft_arm"))
+    print(nxt_instance.get_jnt_values("rgt_arm"))
     # nxt_instance.show_cdprimit()
     base.run()
 

@@ -5,7 +5,6 @@ import grasping.planning.antipodal as gpa
 import math
 import numpy as np
 import basis.robot_math as rm
-# import robot_sim.robots.xarm_shuidi.xarm_shuidi as xsm
 import robot_sim.robots.fr5.fr5 as fr5
 import manipulation.pick_place_planner as ppp
 import motion.probabilistic.rrt_connect as rrtc
@@ -15,8 +14,7 @@ gm.gen_frame().attach_to(base)
 # object to grasp
 tubebig = cm.CollisionModel("../objects/tubebig.stl")
 tubebig.set_rgba([.9, .75, .35, 1])
-# tubebig_gl_pos = np.array([.3, -.4, .35])
-# tubebig_gl_rotmat = np.eye(3)
+# object start
 tubebig_gl_pos = np.array([-0.3, -0.3, 0.6])
 tubebig_gl_rotmat = rm.rotmat_from_euler(0, math.pi/2, 0)
 obgl_start_homomat = rm.homomat_from_posrot(tubebig_gl_pos, tubebig_gl_rotmat)
@@ -24,14 +22,14 @@ tubebig.set_pos(tubebig_gl_pos)
 tubebig.set_rotmat(tubebig_gl_rotmat)
 gm.gen_frame().attach_to(tubebig)
 tubebig_copy = tubebig.copy()
+tubebig_copy.set_rgba([1, 0, 0, .4])
 tubebig_copy.attach_to(base)
-# object box goal
-# tubebig_gl_goal_pos = np.array([.6, -.1, .1])
-# tubebig_gl_goal_rotmat = rm.rotmat_from_euler(0, math.pi / 2, math.pi / 2)
+# object goal
 tubebig_gl_goal_pos = np.array([-0.4, -0.4, 0.55])
 tubebig_gl_goal_rotmat = rm.rotmat_from_euler(0, math.pi/2, 0)
 obgl_goal_homomat = rm.homomat_from_posrot(tubebig_gl_goal_pos, tubebig_gl_goal_rotmat)
 tubebig_goal_copy = tubebig.copy()
+tubebig_goal_copy.set_rgba([0, 1, 0, .4])
 tubebig_goal_copy.set_homomat(obgl_goal_homomat)
 tubebig_goal_copy.attach_to(base)
 
