@@ -377,6 +377,11 @@ if __name__ == '__main__':
     print(fr5.is_collided())
     # toc = time.time()
     # print(toc - tic)
-    print(fr5.jacobian())
+
+    # import scipy
+    # jacob = fr5.jacobian()
+    # ns = scipy.linalg.null_space(jacob)
+    # print("null space = ", ns)
+    # print("check = ", np.dot(jacob, ns))
 
     base.run()
