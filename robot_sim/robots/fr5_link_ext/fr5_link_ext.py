@@ -241,14 +241,14 @@ if __name__ == '__main__':
     base = wd.World(cam_pos=[2, 2, 1], lookat_pos=[0, 0, 0], w=960, h=720)
     gm.gen_frame().attach_to(base)
     fr5 = FR5_robot(extl_attached=True)
-    conf1 = np.array([0, 0, 0, 0, 0, 20*math.pi/180])
+    conf1 = np.radians([0, 0, 0, 0, 0, 20])
     fr5.fk(component_name="arm", jnt_values=conf1)
     fr5.gen_meshmodel(toggle_tcpcs=True, rgba=[1,1,1,0.6]).attach_to(base)
     print(fr5.get_gl_tcp())
     print(fr5.is_collided())
-    conf2 = np.array([0/180*math.pi, -90/180*math.pi, 90/180*math.pi, 0/180*math.pi, -90/180*math.pi, 0/180*math.pi])
+    conf2 = np.radians([0, -90, 90, 0, -90, 0])
     fr5.fk(component_name="arm", jnt_values=conf2)
-    fr5.gen_meshmodel(toggle_tcpcs=True, rgba=[1,1,1,0.6]).attach_to(base)
+    fr5.gen_meshmodel(toggle_tcpcs=True, rgba=[1,0,0,1]).attach_to(base)
     print(fr5.get_gl_tcp())
 
     # fr5.show_cdprimit()   # show the collision model

@@ -14,20 +14,26 @@ class ExtLink(extl.ExtlinkInterface):
         this_dir, this_filename = os.path.split(__file__)
         cpl_end_pos = self.coupling.jnts[-1]['gl_posq']
         cpl_end_rotmat = self.coupling.jnts[-1]['gl_rotmatq']
-        self.jlc = jl.JLChain(pos=cpl_end_pos, rotmat=cpl_end_rotmat, homeconf=np.zeros(0), name='ext_link_jlc')
-        self.jlc.jnts[1]['loc_pos'] = np.array([.0, .0, .02])
-        self.jlc.jnts[1]['loc_motionax'] = np.array([0, 0, 1])
-        self.jlc.lnks[0]['name'] = "ext_link"
+        self.jlc = jl.JLChain(pos=cpl_end_pos, rotmat=cpl_end_rotmat, homeconf=np.zeros(1), name='ext_link_jlc')
+        self.jlc.jnts[1]['loc_pos'] = np.array([.0, .0, .04])
+        self.jlc.jnts[1]['loc_motionax'] = np.array([0, 1, 0])
+        self.jlc.jnts[2]['loc_pos'] = np.array([.0, .102, .0])
+        self.jlc.jnts[2]['loc_motionax'] = np.array([0, 1, 0])
+        self.jlc.lnks[0]['name'] = "ext_link_1"
         self.jlc.lnks[0]['loc_pos'] = np.zeros(3)
-        self.jlc.lnks[0]['meshfile'] = os.path.join(this_dir, "meshes", "ext_link.stl")
-        self.jlc.lnks[0]['rgba'] = [.55, .55, .55, 1]
+        self.jlc.lnks[0]['meshfile'] = os.path.join(this_dir, "meshes", "ext_link1.stl")
+        self.jlc.lnks[0]['rgba'] = [.5, .5, .5, 1]
+        self.jlc.lnks[1]['loc_pos'] = np.array([.0, .04, .0])
+        self.jlc.lnks[1]['loc_rotmat'] = rm.rotmat_from_euler(-math.pi/2, 0, 0)
+        self.jlc.lnks[1]['meshfile'] = os.path.join(this_dir, "meshes", "ext_link2.stl")
+        self.jlc.lnks[1]['rgba'] = [.6, .4, .2, 1]
         # reinitialize
         self.jlc.reinitialize()
         # extlink origin pose relative to the arm end
         self.origin_pos = np.array([0, 0, 0])
         self.origin_rotmat = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
         # extlink center relative to the origin
-        self.center_pos = np.array([.0, .06, .04])
+        self.center_pos = np.array([.0, .102, .04])
         self.center_rotmat = np.array([[1, 0, 0], [0, 0, 1], [0, -1, 0]])
         # collision detection
         self.all_cdelements = []
@@ -110,7 +116,7 @@ if __name__ == '__main__':
     #     grpr.fk(angle)
     #     grpr.gen_meshmodel().attach_to(base)
     grpr = ExtLink(enable_cc=True)
-    grpr.gen_meshmodel(rgba=[1,1,0,0.4]).attach_to(base)
+    grpr.gen_meshmodel().attach_to(base)
     grpr.gen_stickmodel(toggle_jntscs=True).attach_to(base)
     grpr.fix_to(pos=np.array([0, .3, .2]), rotmat=rm.rotmat_from_axangle([1, 0, 0], .05))
     grpr.gen_meshmodel(toggle_jntscs=True, toggle_tcpcs=True).attach_to(base)
