@@ -318,7 +318,7 @@ class PickPlacePlanner(adp.ADPlanner):
                                   depart_jawwidth=None,
                                   ad_granularity=.007,
                                   use_rrt=True,
-                                  obstacle_list=[],
+                                  obstacle_list=None,
                                   use_incremental=False):
         """
 
@@ -342,6 +342,8 @@ class PickPlacePlanner(adp.ADPlanner):
         author: weiwei
         date: 20191122, 20200105
         """
+        if obstacle_list is None:
+            obstacle_list = []
         if approach_jawwidth is None:
             approach_jawwidth = self.robot_s.hnd_dict[hnd_name].jawwidth_rng[1]
         if depart_jawwidth is None:

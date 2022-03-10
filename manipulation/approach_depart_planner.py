@@ -199,11 +199,15 @@ class ADPlanner(object):  # AD = Approach_Depart
                             approach_distance=.1,
                             approach_jawwidth=.05,
                             granularity=.03,
-                            obstacle_list=[], # obstacles, will be checked by both rrt and linear
-                            object_list=[], # target objects, will be checked by rrt, but not by linear
+                            obstacle_list=None,  # obstacles, will be checked by both rrt and linear
+                            object_list=None,  # target objects, will be checked by rrt, but not by linear
                             seed_jnt_values=None,
                             toggle_end_grasp=False,
                             end_jawwidth=.0):
+        if obstacle_list is None:
+            obstacle_list = []
+        if object_list is None:
+            object_list = []
         if seed_jnt_values is None:
             seed_jnt_values = start_conf
         if approach_direction is None:
