@@ -24,8 +24,6 @@ class FR5_robot(ri.RobotInterface):
         self.table.jnts[0]['loc_pos'] = np.array([0, 0, 0])
         self.table.jnts[1]['loc_pos'] = np.array([0, 0, 0])
         self.table.jnts[2]['loc_pos'] = np.array([0, 0, 0])
-        # self.table.jnts[2]['loc_pos'] = np.array([1820/2-54, 0, -1820/2])*0.001
-        # self.table.jnts[2]['loc_rotmat'] = rm.rotmat_from_euler(0, math.pi/2, 0)
         self.table.lnks[0]['name'] = "table"
         self.table.lnks[0]['loc_pos'] = np.array([0, 0, -0.054])
         self.table.lnks[0]['collisionmodel'] = cm.CollisionModel(
@@ -362,13 +360,13 @@ if __name__ == '__main__':
     base = wd.World(cam_pos=[2, 2, 1], lookat_pos=[0, 0, 0], w=960, h=720)
     gm.gen_frame().attach_to(base)
     fr5 = FR5_robot(hnd_attached=True)
-    conf1 = np.array([0, 0, 0, 0, 0, 0])
+    conf1 = np.radians([0, 0, 0, 0, 0, 20])
     fr5.fk(component_name="arm", jnt_values=conf1)
     fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
     print(fr5.get_gl_tcp())
-    conf2 = np.array([0/180*math.pi, -90/180*math.pi, 90/180*math.pi, 0/180*math.pi, -90/180*math.pi, 0/180*math.pi])
+    conf2 = np.radians([0, -90, 90, 0, -90, 0])
     fr5.fk(component_name="arm", jnt_values=conf2)
-    fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
+    fr5.gen_meshmodel(toggle_tcpcs=True, rgba=[1,0,0,1]).attach_to(base)
     print(fr5.get_gl_tcp())
 
     # fr5.show_cdprimit()   # show the collision model
@@ -378,5 +376,11 @@ if __name__ == '__main__':
     # toc = time.time()
     # print(toc - tic)
     print(fr5.jacobian())
+
+    # import scipy
+    # jacob = fr5.jacobian()
+    # ns = scipy.linalg.null_space(jacob)
+    # print("null space = ", ns)
+    # print("check = ", np.dot(jacob, ns))
 
     base.run()
