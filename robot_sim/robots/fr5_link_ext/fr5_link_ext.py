@@ -17,22 +17,21 @@ class FR5_robot(ri.RobotInterface):
         self.table = jl.JLChain(pos=pos, rotmat=rotmat, homeconf=np.zeros(2), name="fr5_to_table")
         self.table.jnts[0]['loc_pos'] = np.array([0, 0, 0])
         self.table.jnts[1]['loc_pos'] = np.array([0, 0, 0])
-        self.table.jnts[2]['loc_pos'] = np.array([1820/2-54, 0, -1820/2])*0.001
-        self.table.jnts[2]['loc_rotmat'] = rm.rotmat_from_euler(0, math.pi/2, 0)
+        self.table.jnts[2]['loc_pos'] = np.array([0, 0, 0])
         self.table.lnks[0]['name'] = "table"
         self.table.lnks[0]['loc_pos'] = np.array([0, 0, -0.054])
         self.table.lnks[0]['collisionmodel'] = cm.CollisionModel(
             os.path.join(this_dir, "meshes/table1820x54x800.stl"), expand_radius=.005)
         self.table.lnks[0]['rgba'] = [.5, .5, .5, 1.0]
         self.table.lnks[1]['name'] = "column_1"
-        self.table.lnks[1]['loc_pos'] = np.array([1820/2-54, 0, -1820/2-54])*0.001
-        self.table.lnks[1]['loc_rotmat'] = rm.rotmat_from_euler(0, math.pi/2, 0)
+        self.table.lnks[1]['loc_pos'] = np.array([1820 / 2 - 54, 0, -1820 / 2 - 54]) * 0.001
+        self.table.lnks[1]['loc_rotmat'] = rm.rotmat_from_euler(0, math.pi / 2, 0)
         self.table.lnks[1]['collisionmodel'] = cm.CollisionModel(
             os.path.join(this_dir, "meshes/table1820x54x800.stl"), expand_radius=.005)
         self.table.lnks[1]['rgba'] = [.3, .3, .3, 1.0]
         self.table.lnks[2]['name'] = "column_2"
-        self.table.lnks[2]['loc_pos'] = np.array([54, 0, -1820+54])*0.001
-        self.table.lnks[2]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, 0)
+        self.table.lnks[2]['loc_pos'] = np.array([-1820 / 2, 0, -1820 / 2 - 54]) * 0.001
+        self.table.lnks[2]['loc_rotmat'] = rm.rotmat_from_euler(0, math.pi / 2, 0)
         self.table.lnks[2]['collisionmodel'] = cm.CollisionModel(
             os.path.join(this_dir, "meshes/table1820x54x800.stl"), expand_radius=.005)
         self.table.lnks[2]['rgba'] = [.3, .3, .3, 1.0]

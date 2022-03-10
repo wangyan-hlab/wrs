@@ -24,8 +24,6 @@ class FR5_robot(ri.RobotInterface):
         self.table.jnts[0]['loc_pos'] = np.array([0, 0, 0])
         self.table.jnts[1]['loc_pos'] = np.array([0, 0, 0])
         self.table.jnts[2]['loc_pos'] = np.array([0, 0, 0])
-        # self.table.jnts[2]['loc_pos'] = np.array([1820/2-54, 0, -1820/2])*0.001
-        # self.table.jnts[2]['loc_rotmat'] = rm.rotmat_from_euler(0, math.pi/2, 0)
         self.table.lnks[0]['name'] = "table"
         self.table.lnks[0]['loc_pos'] = np.array([0, 0, -0.054])
         self.table.lnks[0]['collisionmodel'] = cm.CollisionModel(
