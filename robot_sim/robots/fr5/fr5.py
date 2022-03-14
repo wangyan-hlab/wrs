@@ -166,22 +166,22 @@ class FR5_robot(ri.RobotInterface):
         else:
             intolist = intolist_arm
         self.cc.set_cdpair(fromlist, intolist)
-        # fromlist = [self.arm.lnks[3]]
-        # intolist_arm = [self.arm.lnks[6]]
-        # if self.hnd_attached:
-        #     intolist_hnd = [self.hnd.lft_outer.lnks[0],
-        #                     self.hnd.lft_outer.lnks[1],
-        #                     self.hnd.lft_outer.lnks[2],
-        #                     self.hnd.lft_outer.lnks[3],
-        #                     self.hnd.lft_outer.lnks[4],
-        #                     self.hnd.rgt_outer.lnks[1],
-        #                     self.hnd.rgt_outer.lnks[2],
-        #                     self.hnd.rgt_outer.lnks[3],
-        #                     self.hnd.rgt_outer.lnks[4]]
-        #     intolist = intolist_arm + intolist_hnd
-        # else:
-        #     intolist = intolist_arm
-        # self.cc.set_cdpair(fromlist, intolist)
+        fromlist = [self.arm.lnks[3]]
+        intolist_arm = [self.arm.lnks[6]]
+        if self.hnd_attached:
+            intolist_hnd = [self.hnd.lft_outer.lnks[0],
+                            self.hnd.lft_outer.lnks[1],
+                            self.hnd.lft_outer.lnks[2],
+                            self.hnd.lft_outer.lnks[3],
+                            self.hnd.lft_outer.lnks[4],
+                            self.hnd.rgt_outer.lnks[1],
+                            self.hnd.rgt_outer.lnks[2],
+                            self.hnd.rgt_outer.lnks[3],
+                            self.hnd.rgt_outer.lnks[4]]
+            intolist = intolist_arm + intolist_hnd
+        else:
+            intolist = intolist_arm
+        self.cc.set_cdpair(fromlist, intolist)
 
     def get_hnd_on_manipulator(self, manipulator_name):
         if manipulator_name == 'arm':
