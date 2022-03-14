@@ -1,11 +1,13 @@
 import os
 import math
+import sys
+sys.path.append(".")
 import numpy as np
 import basis.robot_math as rm
 import robot_sim.robots.fr5_link_ext.fr5_link_ext as fr5
 import visualization.panda.world as wd
 import modeling.geometric_model as gm
-
+import argparse
 
 def genSphere(pos, radius=0.02, rgba=None):
     if rgba is None:
@@ -27,7 +29,11 @@ if __name__ == '__main__':
     # robot_s.gen_meshmodel().attach_to(base)
 
     # null space planning
-    mode = "all"  # "xyz", "rpy", or "all"
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--mode', type=str, default="all")  # mode = "xyz", "rpy", or "all"
+    args = parser.parse_args()
+    mode = args.mode
+
     path = []
     for t in range(0, 1000, 1):
         print("-------- timestep = ", t, " --------")
@@ -45,7 +51,7 @@ if __name__ == '__main__':
         cur_jnt_values = robot_s.get_jnt_values()
         cur_jnt_values += np.ravel(fr5_ns[:, 0]) * .01
         robot_s.fk(component_name=component_name, jnt_values=cur_jnt_values)
-        if t % 20 == 0:
+        if t % 10 == 0:
             path.append(cur_jnt_values)
             # robot_s.gen_meshmodel(rgba=[1, 0, 0, .1]).attach_to(base)
 
