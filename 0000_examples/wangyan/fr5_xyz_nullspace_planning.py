@@ -22,9 +22,8 @@ if __name__ == '__main__':
     component_name = 'arm'
     robot_s = fr5.FR5_robot(enable_cc=True, hnd_attached=False)
     robot_s.fix_to(pos=[0, -1, 0], rotmat=rm.rotmat_from_euler(0,0,0))
-    homeconf = np.radians([0, -60, 0, 15, 0, 15])
+    homeconf = np.radians([0, -60, 80, 15, 0, 15])
     # robot_s.gen_meshmodel(rgba=[0,1,0,.4]).attach_to(base)
-    homeconf[1] = -math.pi / 2
     robot_s.fk(component_name=component_name, jnt_values=homeconf)
     # robot_s.gen_meshmodel().attach_to(base)
 
@@ -68,9 +67,8 @@ if __name__ == '__main__':
     component_name = 'arm'
     robot_s = fr5.FR5_robot(enable_cc=True, hnd_attached=False)
     robot_s.fix_to(pos=[0, 0, 0], rotmat=rm.rotmat_from_euler(0,0,0))
-    homeconf = np.radians([0, -60, 0, 15, 0, 15])
+    homeconf = np.radians([0, -60, 80, 15, 0, 15])
     # robot_s.gen_meshmodel(rgba=[0,1,0,.4]).attach_to(base)
-    homeconf[1] = -math.pi / 2
     robot_s.fk(component_name=component_name, jnt_values=homeconf)
     # robot_s.gen_meshmodel().attach_to(base)
 
@@ -114,9 +112,8 @@ if __name__ == '__main__':
     component_name = 'arm'
     robot_s = fr5.FR5_robot(enable_cc=True, hnd_attached=False)
     robot_s.fix_to(pos=[0, 1, 0], rotmat=rm.rotmat_from_euler(0,0,0))
-    homeconf = np.radians([0, -60, 0, 15, 0, 15])
+    homeconf = np.radians([0, -60, 80, 15, 0, 15])
     # robot_s.gen_meshmodel(rgba=[0,1,0,.4]).attach_to(base)
-    homeconf[1] = -math.pi / 2
     robot_s.fk(component_name=component_name, jnt_values=homeconf)
     # robot_s.gen_meshmodel().attach_to(base)
 
