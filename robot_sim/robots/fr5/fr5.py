@@ -366,7 +366,6 @@ class FR5_robot(ri.RobotInterface):
 
 
 if __name__ == '__main__':
-    import time
     import visualization.panda.world as wd
     import modeling.geometric_model as gm
 
@@ -375,25 +374,19 @@ if __name__ == '__main__':
     fr5 = FR5_robot(hnd_attached=True)
     conf1 = np.radians([0, 0, 0, 0, 0, 20])
     fr5.fk(component_name="arm", jnt_values=conf1)
+    print("collision=", fr5.is_collided())
     fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
-    print(fr5.get_gl_tcp())
     conf2 = np.radians([-93, -98, -73, -97, 90, 91])
     fr5.fk(component_name="arm", jnt_values=conf2)
+    print("global_tcp=", fr5.get_gl_tcp())
+    print("collision=", fr5.is_collided())
+    print("jacobian=", fr5.jacobian())
+    print("manipulability=", fr5.manipulability())
     fr5.gen_meshmodel(toggle_tcpcs=True, rgba=[1,0,0,1]).attach_to(base)
-    print(fr5.get_gl_tcp())
+    fr5.show_cdprimit()  # show the collision model
 
-    fr5.show_cdprimit()   # show the collision model
-    fr5.gen_stickmodel().attach_to(base)
-    # tic = time.time()
-    print(fr5.is_collided())
-    # toc = time.time()
-    # print(toc - tic)
-    print(fr5.jacobian())
-
-    # import scipy
-    # jacob = fr5.jacobian()
-    # ns = scipy.linalg.null_space(jacob)
+    # ns = rm.null_space(fr5.jacobian())
     # print("null space = ", ns)
-    # print("check = ", np.dot(jacob, ns))
+    # print("check = ", np.dot(fr5.jacobian(), ns))
 
     base.run()

@@ -35,8 +35,8 @@ if __name__ == '__main__':
     component_name = 'arm'
     robot_s = fr5.FR5_robot(enable_cc=True)
     robot_s.fix_to(pos=[0,0,0], rotmat=rm.rotmat_from_euler(0,0,0))
-    start_conf = np.array([math.pi*120/180,-math.pi*120/180,math.pi*120/180,0,0,0])
-    goal_conf = np.array([math.pi*0/180,-math.pi*110/180,math.pi*80/180,-math.pi*80/180,-math.pi*70/180,math.pi*20/180])
+    start_conf = np.radians([120,-120,120,0,0,0,10])
+    goal_conf = np.radians([0,-110,80,-80,-70,20,0])
     robot_s.fk(component_name, start_conf)
     robot_s.gen_meshmodel(toggle_tcpcs=True, rgba=[1,0,0,0.5]).attach_to(base)
     robot_s.fk(component_name, goal_conf)
