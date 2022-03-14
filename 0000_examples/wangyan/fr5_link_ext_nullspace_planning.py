@@ -27,12 +27,20 @@ if __name__ == '__main__':
     # robot_s.gen_meshmodel().attach_to(base)
 
     # null space planning
+    mode = "all"  # "xyz", "rpy", or "all"
     path = []
     for t in range(0, 1000, 1):
         print("-------- timestep = ", t, " --------")
         fr5_jacob = robot_s.jacobian()
         print(fr5_jacob)
-        fr5_ns = rm.null_space(fr5_jacob)
+        if mode == "all":
+            fr5_ns = rm.null_space(fr5_jacob)
+        elif mode == "xyz":
+            fr5_ns = rm.null_space(fr5_jacob[:3, :])
+        elif mode == "rpy":
+            fr5_ns = rm.null_space(fr5_jacob[3:, :])
+        else:
+            raise ValueError("Unexpected MODE!")
         print(fr5_ns)
         cur_jnt_values = robot_s.get_jnt_values()
         cur_jnt_values += np.ravel(fr5_ns[:, 0]) * .01
