@@ -18,23 +18,24 @@ if __name__ == '__main__':
     base = wd.World(cam_pos=[1.5, 0, 3], lookat_pos=[0, 0, .5])
     gm.gen_frame().attach_to(base)
 
+    arm_jacobian_offset = np.array([0, 0, .145])
     # robot_s1
     component_name = 'arm'
-    robot_s = fr5.FR5_robot(enable_cc=True, hnd_attached=False)
+    robot_s = fr5.FR5_robot(enable_cc=True, arm_jacobian_offset=arm_jacobian_offset, hnd_attached=True)
     robot_s.fix_to(pos=[0, -1, 0], rotmat=rm.rotmat_from_euler(0,0,0))
     homeconf = np.radians([0, -60, 80, 15, 0, 15])
-    # robot_s.gen_meshmodel(rgba=[0,1,0,.4]).attach_to(base)
+    if robot_s.hnd_attached:
+        robot_s.jaw_to(jawwidth=0.001)
     robot_s.fk(component_name=component_name, jnt_values=homeconf)
-    # robot_s.gen_meshmodel().attach_to(base)
 
     # xyz null space planning
     path = []
     for t in range(0, 500, 1):
         print("-------- timestep = ", t, " --------")
         fr5_jacob = robot_s.jacobian()
-        print(fr5_jacob)
+        # print(fr5_jacob)
         fr5_ns = rm.null_space(fr5_jacob[:3, :])
-        print(fr5_ns)
+        # print(fr5_ns)
         cur_jnt_values = robot_s.get_jnt_values()
         cur_jnt_values += np.ravel(fr5_ns[:, 0]) * .01
         robot_s.fk(component_name=component_name, jnt_values=cur_jnt_values)
@@ -68,18 +69,18 @@ if __name__ == '__main__':
     robot_s = fr5.FR5_robot(enable_cc=True, hnd_attached=False)
     robot_s.fix_to(pos=[0, 0, 0], rotmat=rm.rotmat_from_euler(0,0,0))
     homeconf = np.radians([0, -60, 80, 15, 0, 15])
-    # robot_s.gen_meshmodel(rgba=[0,1,0,.4]).attach_to(base)
+    if robot_s.hnd_attached:
+        robot_s.jaw_to(jawwidth=0.001)
     robot_s.fk(component_name=component_name, jnt_values=homeconf)
-    # robot_s.gen_meshmodel().attach_to(base)
 
     # xyz null space planning
     path = []
     for t in range(0, 500, 1):
         print("-------- timestep = ", t, " --------")
         fr5_jacob = robot_s.jacobian()
-        print(fr5_jacob)
+        # print(fr5_jacob)
         fr5_ns = rm.null_space(fr5_jacob[:3, :])
-        print(fr5_ns)
+        # print(fr5_ns)
         cur_jnt_values = robot_s.get_jnt_values()
         cur_jnt_values += np.ravel(fr5_ns[:, 1]) * .01
         robot_s.fk(component_name=component_name, jnt_values=cur_jnt_values)
@@ -110,21 +111,21 @@ if __name__ == '__main__':
     ########################################################################################################
     # robot_s3
     component_name = 'arm'
-    robot_s = fr5.FR5_robot(enable_cc=True, hnd_attached=False)
+    robot_s = fr5.FR5_robot(enable_cc=True,  hnd_attached=False)
     robot_s.fix_to(pos=[0, 1, 0], rotmat=rm.rotmat_from_euler(0,0,0))
     homeconf = np.radians([0, -60, 80, 15, 0, 15])
-    # robot_s.gen_meshmodel(rgba=[0,1,0,.4]).attach_to(base)
+    if robot_s.hnd_attached:
+        robot_s.jaw_to(jawwidth=0.001)
     robot_s.fk(component_name=component_name, jnt_values=homeconf)
-    # robot_s.gen_meshmodel().attach_to(base)
 
     # xyz null space planning
     path = []
     for t in range(0, 500, 1):
         print("-------- timestep = ", t, " --------")
         fr5_jacob = robot_s.jacobian()
-        print(fr5_jacob)
+        # print(fr5_jacob)
         fr5_ns = rm.null_space(fr5_jacob[:3, :])
-        print(fr5_ns)
+        # print(fr5_ns)
         cur_jnt_values = robot_s.get_jnt_values()
         cur_jnt_values += np.ravel(fr5_ns[:, 2]) * .01
         robot_s.fk(component_name=component_name, jnt_values=cur_jnt_values)

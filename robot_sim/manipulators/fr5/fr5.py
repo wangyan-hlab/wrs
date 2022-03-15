@@ -7,10 +7,11 @@ import robot_sim.manipulators.manipulator_interface as mi
 
 class FR5(mi.ManipulatorInterface):
 
-    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), homeconf=np.zeros(6), name='fr5', enable_cc=True):
+    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), homeconf=np.zeros(6),
+                 name='fr5', enable_cc=True, arm_offset=np.zeros(3)):
         super().__init__(pos=pos, rotmat=rotmat, name=name)
         this_dir, this_filename = os.path.split(__file__)
-        self.jlc = jl.JLChain(pos=pos, rotmat=rotmat, homeconf=homeconf, name=name, cdprimitive_type="surface_balls")
+        self.jlc = jl.JLChain(pos=pos, rotmat=rotmat, homeconf=homeconf, name=name, cdprimitive_type="cylinder")
         # six joints, n_jnts = 6+2 (tgt ranges from 1-6), nlinks = 6+1
         self.jlc.jnts[1]['loc_pos'] = np.array([0, 0, 0])
         self.jlc.jnts[2]['loc_pos'] = np.array([0, 0, 0.155])
@@ -33,7 +34,8 @@ class FR5(mi.ManipulatorInterface):
         self.jlc.jnts[6]['loc_rotmat'] = rm.rotmat_from_euler(-math.pi / 2.0, 0, 0)
         self.jlc.jnts[6]['loc_motionax'] = np.array([0, 0, 1])
         self.jlc.jnts[6]['motion_rng'] = np.array([-175, 175]) * math.pi / 180
-        self.jlc.jnts[7]['loc_pos'] = np.array([0, 0, .102])
+        self.offset = arm_offset    # arm_offset + hnd_offset = 0, when hand is attached
+        self.jlc.jnts[7]['loc_pos'] = np.array([0, 0, .102]) + self.offset
         self.jlc.jnts[7]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, 0)
         self.jlc.jnts[7]['motion_rng'] = np.array([-175, 175]) * math.pi / 180
         # links

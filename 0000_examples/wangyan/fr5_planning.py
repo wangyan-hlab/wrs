@@ -33,9 +33,13 @@ if __name__ == '__main__':
     obj1.attach_to(base)
     # robot_s
     component_name = 'arm'
+    # robot_s = fr5.FR5_robot(enable_cc=True, arm_jacobian_offset=np.array([0, 0, .145]), hnd_attached=True)
     robot_s = fr5.FR5_robot(enable_cc=True)
-    robot_s.fix_to(pos=[0,0,0], rotmat=rm.rotmat_from_euler(0,0,0))
-    robot_s.jaw_to(jawwidth=0.01)
+    robot_s.fix_to(pos=[0, 0, 0], rotmat=rm.rotmat_from_euler(0, 0, 0))
+
+    if robot_s.hnd_attached:
+        robot_s.jaw_to(jawwidth=0.01)
+
     start_conf = np.radians([120,-120,120,0,0,0])
     goal_conf = np.radians([0,-110,80,-80,-70,20])
     robot_s.fk(component_name, start_conf)

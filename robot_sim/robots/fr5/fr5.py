@@ -17,7 +17,8 @@ class FR5_robot(ri.RobotInterface):
         date: 2022/02/21, Suzhou
     """
     
-    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name='fr5', homeconf=np.zeros(6), enable_cc=True, hnd_attached=True):
+    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name='fr5', homeconf=np.zeros(6),
+                 enable_cc=True, arm_jacobian_offset=np.zeros(3), hnd_attached=False):
         super().__init__(pos=pos, rotmat=rotmat, name=name)
         this_dir, this_filename = os.path.split(__file__)
         self.ground_base = jl.JLChain(pos=pos, rotmat=rotmat, homeconf=np.zeros(0), name="fr5_to_ground_base")
@@ -32,16 +33,22 @@ class FR5_robot(ri.RobotInterface):
         self.ground_base.reinitialize()
 
         self.arm = fr.FR5(pos=self.ground_base.jnts[0]['gl_posq'],
-                          rotmat=np.dot(self.ground_base.jnts[0]['gl_rotmatq'], rm.rotmat_from_euler(0,0,math.pi*135/180)),
+                          rotmat=np.dot(self.ground_base.jnts[0]['gl_rotmatq'],
+                                        rm.rotmat_from_euler(0, 0, math.pi*135/180)),
                           homeconf=homeconf,
-                          enable_cc=False)
+                          enable_cc=False,
+                          arm_offset=arm_jacobian_offset)
         self.manipulator_dict['arm'] = self.arm
         self.manipulator_dict['hnd'] = self.arm
         self.hnd_attached = hnd_attached
         if hnd_attached:
-            self.hnd = rtq.Robotiq85(pos=self.arm.jnts[-1]['gl_posq'],
+            self.hnd_offset = -arm_jacobian_offset
+            self.hnd_jaw_center_pos = arm_jacobian_offset + self.hnd_offset
+            self.hnd = rtq.Robotiq85(pos=np.dot(self.arm.jnts[-1]['gl_rotmatq'],
+                                                self.hnd_offset) + self.arm.jnts[-1]['gl_posq'],
                                      rotmat=self.arm.jnts[-1]['gl_rotmatq'],
-                                     enable_cc=False)
+                                     enable_cc=False,
+                                     jaw_center_pos=self.hnd_jaw_center_pos)
             # tool center point
             self.arm.tcp_jntid = -1
             self.arm.tcp_loc_pos = self.hnd.jaw_center_pos
@@ -202,9 +209,11 @@ class FR5_robot(ri.RobotInterface):
         self.rotmat = rotmat
         self.ground_base.fix_to(self.pos, self.rotmat)
         self.arm.fix_to(pos=self.ground_base.jnts[0]['gl_posq'],
-                        rotmat=np.dot(self.ground_base.jnts[0]['gl_rotmatq'],rm.rotmat_from_euler(0,0,math.pi*135/180)))
+                        rotmat=np.dot(self.ground_base.jnts[0]['gl_rotmatq'],
+                                      rm.rotmat_from_euler(0,0,math.pi*135/180)))
         if self.hnd_attached:
-            self.hnd.fix_to(pos=self.arm.jnts[-1]['gl_posq'],
+            self.hnd.fix_to(pos=np.dot(self.arm.jnts[-1]['gl_rotmatq'],
+                                       self.hnd_offset) + self.arm.jnts[-1]['gl_posq'],
                             rotmat=self.arm.jnts[-1]['gl_rotmatq'])
 
     def jaw_to(self, hnd_name='hnd', jawwidth=0.0):
@@ -296,7 +305,8 @@ class FR5_robot(ri.RobotInterface):
             self.manipulator_dict[component_name].fk(jnt_values=jnt_values)
             if self.hnd_attached:
                 self.hnd_dict[component_name].fix_to(
-                    pos=self.manipulator_dict[component_name].jnts[-1]['gl_posq'],
+                    pos=np.dot(self.manipulator_dict[component_name].jnts[-1]['gl_rotmatq'],
+                               self.hnd_offset)+self.manipulator_dict[component_name].jnts[-1]['gl_posq'],
                     rotmat=self.manipulator_dict[component_name].jnts[-1]['gl_rotmatq'])
                 update_oih(component_name=component_name)
 
@@ -309,7 +319,8 @@ class FR5_robot(ri.RobotInterface):
         elif component_name == "fr5_to_ground_base":
             self.ground_base.fk(jnt_values)
             self.arm.fix_to(pos=self.ground_base.jnts[0]['gl_posq'],
-                            rotmat=np.dot(self.ground_base.jnts[0]['gl_rotmatq'],rm.rotmat_from_euler(0,0,math.pi*135/180)))
+                            rotmat=np.dot(self.ground_base.jnts[0]['gl_rotmatq'],
+                                          rm.rotmat_from_euler(0,0,math.pi*135/180)))
         else:
             raise ValueError("The given component name is not available!")
 
@@ -371,18 +382,21 @@ if __name__ == '__main__':
 
     base = wd.World(cam_pos=[2, -2, 1], lookat_pos=[0, 0, 0], w=960, h=720)
     gm.gen_frame().attach_to(base)
-    fr5 = FR5_robot(hnd_attached=True)
+    fr5 = FR5_robot()
     conf1 = np.radians([0, 0, 0, 0, 0, 20])
     fr5.fk(component_name="arm", jnt_values=conf1)
     print("collision=", fr5.is_collided())
     fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
+
+    arm_jacobian_offset = np.array([0, 0, .145])
+    fr5 = FR5_robot(arm_jacobian_offset=arm_jacobian_offset, hnd_attached=True)
     conf2 = np.radians([-93, -98, -73, -97, 90, 91])
     fr5.fk(component_name="arm", jnt_values=conf2)
     print("global_tcp=", fr5.get_gl_tcp())
     print("collision=", fr5.is_collided())
     print("jacobian=", fr5.jacobian())
     print("manipulability=", fr5.manipulability())
-    fr5.gen_meshmodel(toggle_tcpcs=True, rgba=[1,0,0,1]).attach_to(base)
+    fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
     fr5.show_cdprimit()  # show the collision model
 
     # ns = rm.null_space(fr5.jacobian())
