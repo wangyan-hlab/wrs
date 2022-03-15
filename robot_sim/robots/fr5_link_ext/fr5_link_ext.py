@@ -23,7 +23,9 @@ class FR5_robot(ri.RobotInterface):
         self.ground_base.lnks[0]['rgba'] = [.5, .5, .5, 1.0]
         self.ground_base.reinitialize()
 
-        self.arm = jl.JLChain(pos=self.ground_base.jnts[0]['gl_posq'], rotmat=self.ground_base.jnts[0]['gl_rotmatq'],
+        self.arm = jl.JLChain(pos=self.ground_base.jnts[0]['gl_posq'],
+                              rotmat=np.dot(self.ground_base.jnts[0]['gl_rotmatq'],
+                                        rm.rotmat_from_euler(0, 0, math.pi*135/180)),
                               homeconf=homeconf, name=name)
         # six joints, n_jnts = 6+2 (tgt ranges from 1-6), nlinks = 6+1
         self.arm.jnts[1]['loc_pos'] = np.array([0, 0, 0])
@@ -53,8 +55,8 @@ class FR5_robot(ri.RobotInterface):
         self.arm.jnts[8]['loc_pos'] = np.array([.0, .102, .0])
         self.arm.jnts[8]['loc_motionax'] = np.array([0, 1, 0])
         # links
-        arm_color1 = [.6, .6, .6, 1.0]
-        arm_color2 = [.55, .27, .07, 1.0]
+        arm_color1 = [.65, .65, .65, 1.0]
+        arm_color2 = [1.0, .27, 0, 1.0]
         self.arm.lnks[0]['name'] = "base"
         self.arm.lnks[0]['loc_pos'] = np.zeros(3)
         self.arm.lnks[0]['mass'] = 2.0
@@ -96,15 +98,10 @@ class FR5_robot(ri.RobotInterface):
         self.arm.lnks[6]['mass'] = 0.8
         self.arm.lnks[6]['meshfile'] = os.path.join(this_dir, "meshes", "ext_link1.stl")
         self.arm.lnks[6]['rgba'] = arm_color1
-
-        # self.arm.lnks[7]['loc_pos'] = np.zeros(3)
-        # self.arm.lnks[7]['meshfile'] = os.path.join(this_dir, "meshes", "ext_link1.stl")
-        # self.arm.lnks[7]['rgba'] = [.5, .5, .5, 1]
-
         self.arm.lnks[7]['loc_pos'] = np.array([.0, .04, .0])
         self.arm.lnks[7]['loc_rotmat'] = rm.rotmat_from_euler(-math.pi / 2, 0, 0)
         self.arm.lnks[7]['meshfile'] = os.path.join(this_dir, "meshes", "ext_link2.stl")
-        self.arm.lnks[7]['rgba'] = [.6, .4, .2, 1]
+        self.arm.lnks[7]['rgba'] = [.8, .8, 0, 1.0]
 
         self.arm.reinitialize()
         self.manipulator_dict['arm'] = self.arm
@@ -274,7 +271,7 @@ if __name__ == '__main__':
     conf1 = np.radians([0, 0, 0, 0, 0, 0, 0])
     fr5.fk(component_name="arm", jnt_values=conf1)
     print("collision=", fr5.is_collided())
-    fr5.gen_meshmodel(toggle_tcpcs=True, rgba=[1,1,1,0.6]).attach_to(base)
+    fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
     conf2 = np.radians([0, -90, 90, 0, -90, 0, 0])
     fr5.fk(component_name="arm", jnt_values=conf2)
     print("collision=", fr5.is_collided())

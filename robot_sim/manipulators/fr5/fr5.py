@@ -39,8 +39,8 @@ class FR5(mi.ManipulatorInterface):
         self.jlc.jnts[7]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, 0)
         self.jlc.jnts[7]['motion_rng'] = np.array([-175, 175]) * math.pi / 180
         # links
-        arm_color1 = [.6, .6, .6, 1.0]
-        arm_color2 = [.55, .27, .07, 1.0]
+        arm_color1 = [.65, .65, .65, 1.0]
+        arm_color2 = [1.0, .27, 0, 1.0]
         self.jlc.lnks[0]['name'] = "base"
         self.jlc.lnks[0]['loc_pos'] = np.zeros(3)
         self.jlc.lnks[0]['mass'] = 2.0
@@ -131,7 +131,9 @@ if __name__ == '__main__':
     toc = time.time()
     print(toc - tic)
 
-    # base = wd.World(cam_pos=[1, 1, 1], lookat_pos=[0,0,0])
-    # gm.GeometricModel("./meshes/base.stl").attach_to(base)
-    # gm.gen_frame().attach_to(base)
+    manipulator_instance = FR5(enable_cc=True)
+    manipulator_instance.fix_to(pos=[0, .5, 0], rotmat=rm.rotmat_from_euler(0, 0, 0))
+    manipulator_meshmodel = manipulator_instance.gen_meshmodel()
+    manipulator_meshmodel.attach_to(base)
+
     base.run()
