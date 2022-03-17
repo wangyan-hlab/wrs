@@ -24,15 +24,20 @@ if __name__ == '__main__':
     gm.gen_frame().attach_to(base)
     component_name = 'arm'
     robot_s = fr5.FR5_robot(enable_cc=True)
-    seed_jnt_values = np.array([120, -90, 60, 80, 10, 0]) * math.pi / 180
-    # seed_jnt_values = robot_s.get_jnt_values(component_name=component_name)
+    seed_jnt_values = np.array([34, -85, 55.5, -61.65, -87.776, 116.7]) * math.pi / 180
     print("seed_jnt_values = ", seed_jnt_values)
     robot_s.fk(component_name=component_name, jnt_values=seed_jnt_values)
     if not robot_s.is_collided():
-        robot_s.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
+        robot_s.gen_meshmodel(toggle_tcpcs=True, rgba=[1,0,0,0.3]).attach_to(base)
     position = robot_s.get_gl_tcp()[0]
     orientation = robot_s.get_gl_tcp()[1]
     print("Robot tcp pose = ", position, orientation)
-    genSphere(pos=robot_s.get_gl_tcp(component_name)[0], radius=0.01)
+    orientation_new = np.array([[-1, 0, 0], [0, 1, 0], [0, 0, -1]])
+    jnt_values = robot_s.ik(tgt_pos=position, tgt_rotmat=orientation_new, seed_jnt_values=seed_jnt_values)
+    robot_s.fk(component_name=component_name, jnt_values=jnt_values)
+    if not robot_s.is_collided():
+        print("jnt_values = ", np.degrees(jnt_values))
+        robot_s.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
+    # genSphere(pos=robot_s.get_gl_tcp(component_name)[0], radius=0.01)
 
     base.run()
