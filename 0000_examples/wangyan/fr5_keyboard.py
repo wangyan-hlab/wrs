@@ -95,11 +95,11 @@ def move(task):
         else:
             raise NotImplementedError("IK is unsolved!")
 
-        current_gripper_width = current_gripper_width + rel_gripper_distance
+        current_gripper_width = current_gripper_width + rel_gripper_distance[1]
         print("current_gripper_width =", current_gripper_width)
 
-        if 0 <= current_gripper_width[1] <= 0.085:
-            robot_s.hnd.jaw_to(current_gripper_width[1])
+        if 0 <= current_gripper_width <= 0.085:
+            robot_s.hnd.jaw_to(current_gripper_width)
         else:
             raise NotImplementedError("The jaw width is out of range!")
         toc = time.time()

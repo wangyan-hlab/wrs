@@ -94,9 +94,9 @@ class RobotInterface(object):
         date: 20210417
         """
         jnt_values_bk = self.get_jnt_values(manipulator_name)
-        self.robot_s.fk(manipulator_name, jnt_values)
-        gl_tcp_pos, gl_tcp_rotmat = self.robot_s.get_gl_tcp(manipulator_name)
-        self.robot_s.fk(manipulator_name, jnt_values_bk)
+        self.fk(manipulator_name, jnt_values)
+        gl_tcp_pos, gl_tcp_rotmat = self.get_gl_tcp(manipulator_name)
+        self.fk(manipulator_name, jnt_values_bk)
         return gl_tcp_pos, gl_tcp_rotmat
 
     def cvt_gl_to_loc_tcp(self, manipulator_name, gl_obj_pos, gl_obj_rotmat):
@@ -105,7 +105,7 @@ class RobotInterface(object):
     def cvt_loc_tcp_to_gl(self, manipulator_name, rel_obj_pos, rel_obj_rotmat):
         return self.manipulator_dict[manipulator_name].cvt_loc_tcp_to_gl(rel_obj_pos, rel_obj_rotmat)
 
-    def is_collided(self, obstacle_list=[], otherrobot_list=[], toggle_contact_points=False):
+    def is_collided(self, obstacle_list=None, otherrobot_list=None, toggle_contact_points=False):
         """
         Interface for "is cdprimit collided", must be implemented in child class
         :param obstacle_list:
@@ -115,6 +115,10 @@ class RobotInterface(object):
         author: weiwei
         date: 20201223
         """
+        if obstacle_list is None:
+            obstacle_list = []
+        if otherrobot_list is None:
+            otherrobot_list = []
         collision_info = self.cc.is_collided(obstacle_list=obstacle_list,
                                              otherrobot_list=otherrobot_list,
                                              toggle_contact_points=toggle_contact_points)

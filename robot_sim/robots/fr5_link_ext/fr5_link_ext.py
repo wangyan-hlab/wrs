@@ -16,7 +16,7 @@ class FR5_robot(ri.RobotInterface):
         self.ground_base.jnts[0]['loc_pos'] = np.array([0, 0, 0])
         self.ground_base.lnks[0]['name'] = "ground_base"
         self.ground_base.lnks[0]['loc_pos'] = np.array([0, 0, 0])
-        self.ground_base.lnks[0]['collisionmodel'] = cm.CollisionModel(
+        self.ground_base.lnks[0]['collision_model'] = cm.CollisionModel(
             os.path.join(this_dir, "meshes/ground_base.stl"),
             cdprimit_type="user_defined", expand_radius=.002,
             userdefined_cdprimitive_fn=self._base_combined_cdnp)
@@ -60,47 +60,47 @@ class FR5_robot(ri.RobotInterface):
         self.arm.lnks[0]['name'] = "base"
         self.arm.lnks[0]['loc_pos'] = np.zeros(3)
         self.arm.lnks[0]['mass'] = 2.0
-        self.arm.lnks[0]['meshfile'] = os.path.join(this_dir, "meshes", "base.stl")
+        self.arm.lnks[0]['mesh_file'] = os.path.join(this_dir, "meshes", "base.stl")
         self.arm.lnks[0]['rgba'] = arm_color1
         self.arm.lnks[1]['name'] = "shoulder"
         self.arm.lnks[1]['loc_pos'] = np.zeros(3)
         self.arm.lnks[1]['com'] = np.array([.0, -.02, .0])
         self.arm.lnks[1]['mass'] = 1.95
-        self.arm.lnks[1]['meshfile'] = os.path.join(this_dir, "meshes", "shoulder.stl")
+        self.arm.lnks[1]['mesh_file'] = os.path.join(this_dir, "meshes", "shoulder.stl")
         self.arm.lnks[1]['rgba'] = arm_color2
         self.arm.lnks[2]['name'] = "upperarm"
         self.arm.lnks[2]['loc_pos'] = np.array([.0, .0, .0])
         self.arm.lnks[2]['com'] = np.array([.13, 0, .1157])
         self.arm.lnks[2]['mass'] = 3.42
-        self.arm.lnks[2]['meshfile'] = os.path.join(this_dir, "meshes", "upperarm.stl")
+        self.arm.lnks[2]['mesh_file'] = os.path.join(this_dir, "meshes", "upperarm.stl")
         self.arm.lnks[2]['rgba'] = arm_color1
         self.arm.lnks[3]['name'] = "forearm"
         self.arm.lnks[3]['loc_pos'] = np.array([.0, .0, .0])
         self.arm.lnks[3]['com'] = np.array([.05, .0, .0238])
         self.arm.lnks[3]['mass'] = 1.437
-        self.arm.lnks[3]['meshfile'] = os.path.join(this_dir, "meshes", "forearm.stl")
+        self.arm.lnks[3]['mesh_file'] = os.path.join(this_dir, "meshes", "forearm.stl")
         self.arm.lnks[3]['rgba'] = arm_color2
         self.arm.lnks[4]['name'] = "wrist1"
         self.arm.lnks[4]['loc_pos'] = np.array([.0, .0, .0])
         self.arm.lnks[4]['com'] = np.array([.0, .0, 0.01])
         self.arm.lnks[4]['mass'] = 0.871
-        self.arm.lnks[4]['meshfile'] = os.path.join(this_dir, "meshes", "wrist1.stl")
+        self.arm.lnks[4]['mesh_file'] = os.path.join(this_dir, "meshes", "wrist1.stl")
         self.arm.lnks[4]['rgba'] = arm_color1
         self.arm.lnks[5]['name'] = "wrist2"
         self.arm.lnks[5]['loc_pos'] = np.array([.0, .0, .0])
         self.arm.lnks[5]['com'] = np.array([.0, .0, 0.01])
         self.arm.lnks[5]['mass'] = 0.8
-        self.arm.lnks[5]['meshfile'] = os.path.join(this_dir, "meshes", "wrist2.stl")
+        self.arm.lnks[5]['mesh_file'] = os.path.join(this_dir, "meshes", "wrist2.stl")
         self.arm.lnks[5]['rgba'] = arm_color2
         self.arm.lnks[6]['name'] = "wrist3"
         self.arm.lnks[6]['loc_pos'] = np.array([.0, .0, .0])
         self.arm.lnks[6]['com'] = np.array([.0, .0, -0.02])
         self.arm.lnks[6]['mass'] = 0.8
-        self.arm.lnks[6]['meshfile'] = os.path.join(this_dir, "meshes", "ext_link1.stl")
+        self.arm.lnks[6]['mesh_file'] = os.path.join(this_dir, "meshes", "ext_link1.stl")
         self.arm.lnks[6]['rgba'] = arm_color1
         self.arm.lnks[7]['loc_pos'] = np.array([.0, .04, .0])
         self.arm.lnks[7]['loc_rotmat'] = rm.rotmat_from_euler(-math.pi / 2, 0, 0)
-        self.arm.lnks[7]['meshfile'] = os.path.join(this_dir, "meshes", "ext_link2.stl")
+        self.arm.lnks[7]['mesh_file'] = os.path.join(this_dir, "meshes", "ext_link2.stl")
         self.arm.lnks[7]['rgba'] = [.8, .8, 0, 1.0]
 
         self.arm.reinitialize()
@@ -217,7 +217,7 @@ class FR5_robot(ri.RobotInterface):
             raise ValueError("The given component name is not available!")
 
     def gen_meshmodel(self,
-                      tcp_jntid=None,
+                      tcp_jnt_id=None,
                       tcp_loc_pos=None,
                       tcp_loc_rotmat=None,
                       toggle_tcpcs=False,
@@ -230,7 +230,7 @@ class FR5_robot(ri.RobotInterface):
                                  toggle_tcpcs=toggle_tcpcs,
                                  toggle_jntscs=toggle_jntscs,
                                  rgba=rgba).attach_to(meshmodel)
-        self.arm.gen_meshmodel(tcp_jntid=tcp_jntid,
+        self.arm.gen_meshmodel(tcp_jnt_id=tcp_jnt_id,
                                tcp_loc_pos=tcp_loc_pos,
                                tcp_loc_rotmat=tcp_loc_rotmat,
                                toggle_tcpcs=toggle_tcpcs,
@@ -239,7 +239,7 @@ class FR5_robot(ri.RobotInterface):
         return meshmodel
 
     def gen_stickmodel(self,
-                       tcp_jntid=None,
+                       tcp_jnt_id=None,
                        tcp_loc_pos=None,
                        tcp_loc_rotmat=None,
                        toggle_tcpcs=False,
@@ -251,7 +251,7 @@ class FR5_robot(ri.RobotInterface):
                                   tcp_loc_rotmat=None,
                                   toggle_tcpcs=False,
                                   toggle_jntscs=toggle_jntscs).attach_to(stickmodel)
-        self.arm.gen_stickmodel(tcp_jntid=tcp_jntid,
+        self.arm.gen_stickmodel(tcp_jnt_id=tcp_jnt_id,
                                 tcp_loc_pos=tcp_loc_pos,
                                 tcp_loc_rotmat=tcp_loc_rotmat,
                                 toggle_tcpcs=toggle_tcpcs,

@@ -25,7 +25,7 @@ class FR5_robot(ri.RobotInterface):
         self.ground_base.jnts[0]['loc_pos'] = np.array([0, 0, 0])
         self.ground_base.lnks[0]['name'] = "ground_base"
         self.ground_base.lnks[0]['loc_pos'] = np.array([0, 0, 0])
-        self.ground_base.lnks[0]['collisionmodel'] = cm.CollisionModel(
+        self.ground_base.lnks[0]['collision_model'] = cm.CollisionModel(
             os.path.join(this_dir, "meshes/ground_base.stl"),
             cdprimit_type="user_defined", expand_radius=.002,
             userdefined_cdprimitive_fn=self._base_combined_cdnp)
@@ -325,7 +325,7 @@ class FR5_robot(ri.RobotInterface):
             raise ValueError("The given component name is not available!")
 
     def gen_meshmodel(self,
-                      tcp_jntid=None,
+                      tcp_jnt_id=None,
                       tcp_loc_pos=None,
                       tcp_loc_rotmat=None,
                       toggle_tcpcs=False,
@@ -338,7 +338,7 @@ class FR5_robot(ri.RobotInterface):
                                  toggle_tcpcs=False,
                                  toggle_jntscs=toggle_jntscs,
                                  rgba=rgba).attach_to(meshmodel)
-        self.arm.gen_meshmodel(tcp_jntid=tcp_jntid,
+        self.arm.gen_meshmodel(tcp_jnt_id=tcp_jnt_id,
                                tcp_loc_pos=tcp_loc_pos,
                                tcp_loc_rotmat=tcp_loc_rotmat,
                                toggle_tcpcs=toggle_tcpcs,
@@ -351,7 +351,7 @@ class FR5_robot(ri.RobotInterface):
         return meshmodel
 
     def gen_stickmodel(self,
-                       tcp_jntid=None,
+                       tcp_jnt_id=None,
                        tcp_loc_pos=None,
                        tcp_loc_rotmat=None,
                        toggle_tcpcs=False,
@@ -363,7 +363,7 @@ class FR5_robot(ri.RobotInterface):
                                   tcp_loc_rotmat=None,
                                   toggle_tcpcs=False,
                                   toggle_jntscs=toggle_jntscs).attach_to(stickmodel)
-        self.arm.gen_stickmodel(tcp_jntid=tcp_jntid,
+        self.arm.gen_stickmodel(tcp_jnt_id=tcp_jnt_id,
                                 tcp_loc_pos=tcp_loc_pos,
                                 tcp_loc_rotmat=tcp_loc_rotmat,
                                 toggle_tcpcs=toggle_tcpcs,
@@ -395,7 +395,7 @@ if __name__ == '__main__':
     print("global_tcp=", fr5.get_gl_tcp())
     print("collision=", fr5.is_collided())
     print("jacobian=", fr5.jacobian())
-    print("manipulability=", fr5.manipulability())
+    # print("manipulability=", fr5.manipulability())
     fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
     fr5.show_cdprimit()  # show the collision model
 
