@@ -9,3 +9,4 @@
 *.pth
 *.pickle
 /neuro/ik/runs
+/yantools
