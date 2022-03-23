@@ -438,17 +438,18 @@ class Nextage(ri.RobotInterface):
                         self.manipulator_dict[component_name].jnts[-1]['gl_posq'],
                     rotmat=np.dot(self.manipulator_dict[component_name].jnts[-1]['gl_rotmatq'], self.hnd_origin_rotmat))
             update_oih(component_name=component_name)
+            return status
 
         # examine length
         if component_name == 'lft_arm' or component_name == 'rgt_arm':
             if not isinstance(jnt_values, np.ndarray) or jnt_values.size != 6:
                 raise ValueError("An 1x6 npdarray must be specified to move a single arm!")
             waist_value = self.central_body.jnts[1]['motion_val']
-            update_component(component_name, np.append(waist_value, jnt_values))
+            return update_component(component_name, np.append(waist_value, jnt_values))
         elif component_name == 'lft_arm_waist' or component_name == 'rgt_arm_waist':
             if not isinstance(jnt_values, np.ndarray) or jnt_values.size != 7:
                 raise ValueError("An 1x7 npdarray must be specified to move a single arm plus the waist!")
-            update_component(component_name, jnt_values)
+            status = update_component(component_name, jnt_values)
             self.central_body.jnts[1]['motion_val'] = jnt_values[0]
             self.central_body.fk()
             the_other_manipulator_name = 'lft_arm' if component_name[:7] == 'rgt_arm' else 'rgt_arm'
@@ -470,7 +471,7 @@ class Nextage(ri.RobotInterface):
            tgt_pos,
            tgt_rotmat,
            seed_jnt_values=None,
-           tcp_jntid=None,
+           tcp_jnt_id=None,
            tcp_loc_pos=None,
            tcp_loc_rotmat=None,
            max_niter=100,
@@ -482,7 +483,7 @@ class Nextage(ri.RobotInterface):
             ik_results = self.manipulator_dict[component_name].ik(tgt_pos,
                                                                   tgt_rotmat,
                                                                   seed_jnt_values=seed_jnt_values,
-                                                                  tcp_jntid=tcp_jntid,
+                                                                  tcp_jnt_id=tcp_jnt_id,
                                                                   tcp_loc_pos=tcp_loc_pos,
                                                                   tcp_loc_rotmat=tcp_loc_rotmat,
                                                                   max_niter=max_niter,
@@ -494,7 +495,7 @@ class Nextage(ri.RobotInterface):
             return self.manipulator_dict[component_name].ik(tgt_pos,
                                                             tgt_rotmat,
                                                             seed_jnt_values=seed_jnt_values,
-                                                            tcp_jntid=tcp_jntid,
+                                                            tcp_jnt_id=tcp_jnt_id,
                                                             tcp_loc_pos=tcp_loc_pos,
                                                             tcp_loc_rotmat=tcp_loc_rotmat,
                                                             max_niter=max_niter,
@@ -765,7 +766,7 @@ class Nextage(ri.RobotInterface):
         oih_infos.clear()
 
     def gen_stickmodel(self,
-                       tcp_jntid=None,
+                       tcp_jnt_id=None,
                        tcp_loc_pos=None,
                        tcp_loc_rotmat=None,
                        toggle_tcpcs=False,
@@ -777,7 +778,7 @@ class Nextage(ri.RobotInterface):
                                          tcp_loc_rotmat=None,
                                          toggle_tcpcs=False,
                                          toggle_jntscs=toggle_jntscs).attach_to(stickmodel)
-        self.lft_arm.gen_stickmodel(tcp_jntid=tcp_jntid,
+        self.lft_arm.gen_stickmodel(tcp_jnt_id=tcp_jnt_id,
                                     tcp_loc_pos=tcp_loc_pos,
                                     tcp_loc_rotmat=tcp_loc_rotmat,
                                     toggle_tcpcs=toggle_tcpcs,
@@ -807,7 +808,7 @@ class Nextage(ri.RobotInterface):
         return stickmodel
 
     def gen_meshmodel(self,
-                      tcp_jntid=None,
+                      tcp_jnt_id=None,
                       tcp_loc_pos=None,
                       tcp_loc_rotmat=None,
                       toggle_tcpcs=False,
@@ -820,7 +821,7 @@ class Nextage(ri.RobotInterface):
                                         toggle_tcpcs=False,
                                         toggle_jntscs=toggle_jntscs,
                                         rgba=rgba).attach_to(meshmodel)
-        self.lft_arm.gen_meshmodel(tcp_jntid=tcp_jntid,
+        self.lft_arm.gen_meshmodel(tcp_jnt_id=tcp_jnt_id,
                                    tcp_loc_pos=tcp_loc_pos,
                                    tcp_loc_rotmat=tcp_loc_rotmat,
                                    toggle_tcpcs=toggle_tcpcs,

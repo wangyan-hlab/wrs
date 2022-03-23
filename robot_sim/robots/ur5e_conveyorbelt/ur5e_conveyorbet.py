@@ -52,7 +52,7 @@ class UR5EConveyorBelt(ri.RobotInterface):
                                   rotmat=self.arm.jnts[-1]['gl_rotmatq'],
                                   name='hnd_s', enable_cc=False)
         # tool center point
-        self.arm.jlc.tcp_jntid = -1
+        self.arm.jlc.tcp_jnt_id = -1
         self.arm.jlc.tcp_loc_pos = self.hnd.jaw_center_pos
         self.arm.jlc.tcp_loc_rotmat = self.hnd.jaw_center_rotmat
         # a list of detailed information about objects in hand, see CollisionChecker.add_objinhnd
@@ -151,16 +151,17 @@ class UR5EConveyorBelt(ri.RobotInterface):
                 obj_info['gl_rotmat'] = gl_rotmat
 
         def update_component(component_name, jnt_values):
-            self.manipulator_dict[component_name].fk(jnt_values=jnt_values)
+            status = self.manipulator_dict[component_name].fk(jnt_values=jnt_values)
             self.hnd_dict[component_name].fix_to(
                 pos=self.manipulator_dict[component_name].jnts[-1]['gl_posq'],
                 rotmat=self.manipulator_dict[component_name].jnts[-1]['gl_rotmatq'])
             update_oih(component_name=component_name)
+            return status
 
         if component_name in self.manipulator_dict:
             if not isinstance(jnt_values, np.ndarray) or jnt_values.size != 6:
                 raise ValueError("An 1x6 npdarray must be specified to move the arm!")
-            update_component(component_name, jnt_values)
+            return update_component(component_name, jnt_values)
         else:
             raise ValueError("The given component name is not supported!")
 
@@ -226,7 +227,7 @@ class UR5EConveyorBelt(ri.RobotInterface):
                 break
 
     def gen_stickmodel(self,
-                       tcp_jntid=None,
+                       tcp_jnt_id=None,
                        tcp_loc_pos=None,
                        tcp_loc_rotmat=None,
                        toggle_tcpcs=False,
@@ -234,13 +235,13 @@ class UR5EConveyorBelt(ri.RobotInterface):
                        toggle_connjnt=False,
                        name='xarm7_shuidi_mobile_stickmodel'):
         stickmodel = mc.ModelCollection(name=name)
-        self.base_stand.gen_stickmodel(tcp_jntid=tcp_jntid,
+        self.base_stand.gen_stickmodel(tcp_jnt_id=tcp_jnt_id,
                                        tcp_loc_pos=tcp_loc_pos,
                                        tcp_loc_rotmat=tcp_loc_rotmat,
                                        toggle_tcpcs=False,
                                        toggle_jntscs=toggle_jntscs,
                                        toggle_connjnt=toggle_connjnt).attach_to(stickmodel)
-        self.arm.gen_stickmodel(tcp_jntid=tcp_jntid,
+        self.arm.gen_stickmodel(tcp_jnt_id=tcp_jnt_id,
                                 tcp_loc_pos=tcp_loc_pos,
                                 tcp_loc_rotmat=tcp_loc_rotmat,
                                 toggle_tcpcs=toggle_tcpcs,
@@ -251,7 +252,7 @@ class UR5EConveyorBelt(ri.RobotInterface):
         return stickmodel
 
     def gen_meshmodel(self,
-                      tcp_jntid=None,
+                      tcp_jnt_id=None,
                       tcp_loc_pos=None,
                       tcp_loc_rotmat=None,
                       toggle_tcpcs=False,
@@ -259,12 +260,12 @@ class UR5EConveyorBelt(ri.RobotInterface):
                       rgba=None,
                       name='xarm_shuidi_mobile_meshmodel'):
         meshmodel = mc.ModelCollection(name=name)
-        self.base_stand.gen_meshmodel(tcp_jntid=tcp_jntid,
+        self.base_stand.gen_meshmodel(tcp_jnt_id=tcp_jnt_id,
                                       tcp_loc_pos=tcp_loc_pos,
                                       tcp_loc_rotmat=tcp_loc_rotmat,
                                       toggle_tcpcs=False,
                                       toggle_jntscs=toggle_jntscs).attach_to(meshmodel)
-        self.arm.gen_meshmodel(tcp_jntid=tcp_jntid,
+        self.arm.gen_meshmodel(tcp_jnt_id=tcp_jnt_id,
                                tcp_loc_pos=tcp_loc_pos,
                                tcp_loc_rotmat=tcp_loc_rotmat,
                                toggle_tcpcs=toggle_tcpcs,

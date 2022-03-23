@@ -82,11 +82,11 @@ class SDA5F(ri.RobotInterface):
                                      enable_cc=False)
         # tool center point
         # lft
-        self.lft_arm.tcp_jntid = -1
+        self.lft_arm.tcp_jnt_id = -1
         self.lft_arm.tcp_loc_pos = np.array([0, 0, .145])
         self.lft_arm.tcp_loc_rotmat = np.eye(3)
         # rgt
-        self.rgt_arm.tcp_jntid = -1
+        self.rgt_arm.tcp_jnt_id = -1
         self.rgt_arm.tcp_loc_pos = np.array([0, 0, .145])
         self.rgt_arm.tcp_loc_rotmat = np.eye(3)
         # a list of detailed information about objects in hand, see CollisionChecker.add_objinhnd
@@ -167,23 +167,25 @@ class SDA5F(ri.RobotInterface):
                 obj_info['gl_rotmat'] = gl_rotmat
 
         def update_component(component_name, jnt_values):
-            self.manipulator_dict[component_name].fk(jnt_values=jnt_values)
+            status = self.manipulator_dict[component_name].fk(jnt_values=jnt_values)
             self.get_hnd_on_manipulator(component_name).fix_to(
                 pos=self.manipulator_dict[component_name].jnts[-1]['gl_posq'],
                 rotmat=self.manipulator_dict[component_name].jnts[-1]['gl_rotmatq'])
             update_oih(component_name=component_name)
+            return status
 
         super().fk(component_name, jnt_values)
         # examine length
         if component_name == 'lft_arm' or component_name == 'rgt_arm':
             if not isinstance(jnt_values, np.ndarray) or jnt_values.size != 7:
                 raise ValueError("An 1x7 npdarray must be specified to move a single arm!")
-            update_component(component_name, jnt_values)
+            return update_component(component_name, jnt_values)
         elif component_name == 'both_arm':
             if (jnt_values.size != 14):
                 raise ValueError("A 1x14 npdarrays must be specified to move both arm!")
-            update_component('lft_arm', jnt_values[0:7])
-            update_component('rgt_arm', jnt_values[7:14])
+            status_lft = update_component('lft_arm', jnt_values[0:7])
+            status_rgt = update_component('rgt_arm', jnt_values[7:14])
+            return "succ" if status_lft == "succ" and status_rgt == "succ" else "out_of_rng"
         elif component_name == 'all':
             raise NotImplementedError
         else:
@@ -205,7 +207,7 @@ class SDA5F(ri.RobotInterface):
             raise NotImplementedError
 
     def gen_stickmodel(self,
-                       tcp_jntid=None,
+                       tcp_jnt_id=None,
                        tcp_loc_pos=None,
                        tcp_loc_rotmat=None,
                        toggle_tcpcs=False,
@@ -217,7 +219,7 @@ class SDA5F(ri.RobotInterface):
                                      tcp_loc_rotmat=None,
                                      toggle_tcpcs=False,
                                      toggle_jntscs=toggle_jntscs).attach_to(stickmodel)
-        self.lft_arm.gen_stickmodel(tcp_jntid=tcp_jntid,
+        self.lft_arm.gen_stickmodel(tcp_jnt_id=tcp_jnt_id,
                                     tcp_loc_pos=tcp_loc_pos,
                                     tcp_loc_rotmat=tcp_loc_rotmat,
                                     toggle_tcpcs=toggle_tcpcs,
@@ -232,7 +234,7 @@ class SDA5F(ri.RobotInterface):
                                      tcp_loc_rotmat=None,
                                      toggle_tcpcs=False,
                                      toggle_jntscs=toggle_jntscs).attach_to(stickmodel)
-        self.rgt_arm.gen_stickmodel(tcp_jntid=tcp_jntid,
+        self.rgt_arm.gen_stickmodel(tcp_jnt_id=tcp_jnt_id,
                                     tcp_loc_pos=tcp_loc_pos,
                                     tcp_loc_rotmat=tcp_loc_rotmat,
                                     toggle_tcpcs=toggle_tcpcs,
@@ -246,7 +248,7 @@ class SDA5F(ri.RobotInterface):
         return stickmodel
 
     def gen_meshmodel(self,
-                      tcp_jntid=None,
+                      tcp_jnt_id=None,
                       tcp_loc_pos=None,
                       tcp_loc_rotmat=None,
                       toggle_tcpcs=False,
@@ -259,7 +261,7 @@ class SDA5F(ri.RobotInterface):
                                     toggle_tcpcs=False,
                                     toggle_jntscs=toggle_jntscs,
                                     rgba=rgba).attach_to(meshmodel)
-        self.lft_arm.gen_meshmodel(tcp_jntid=tcp_jntid,
+        self.lft_arm.gen_meshmodel(tcp_jnt_id=tcp_jnt_id,
                                    tcp_loc_pos=tcp_loc_pos,
                                    tcp_loc_rotmat=tcp_loc_rotmat,
                                    toggle_tcpcs=toggle_tcpcs,
@@ -268,7 +270,7 @@ class SDA5F(ri.RobotInterface):
         self.lft_hnd.gen_meshmodel(toggle_tcpcs=False,
                                    toggle_jntscs=toggle_jntscs,
                                    rgba=rgba).attach_to(meshmodel)
-        self.rgt_arm.gen_meshmodel(tcp_jntid=tcp_jntid,
+        self.rgt_arm.gen_meshmodel(tcp_jnt_id=tcp_jnt_id,
                                    tcp_loc_pos=tcp_loc_pos,
                                    tcp_loc_rotmat=tcp_loc_rotmat,
                                    toggle_tcpcs=toggle_tcpcs,
