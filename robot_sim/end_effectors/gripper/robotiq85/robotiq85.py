@@ -154,7 +154,7 @@ class Robotiq85(gp.GripperInterface):
             self.all_cdelements = self.cc.all_cdelements
         # cdmesh
         for cdelement in self.all_cdelements:
-            cdmesh = cdelement['collisionmodel'].copy()
+            cdmesh = cdelement['collision_model'].copy()
             self.cdmesh_collection.add_cm(cdmesh)
 
     def fix_to(self, pos, rotmat, angle=None):

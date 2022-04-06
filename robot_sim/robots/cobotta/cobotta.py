@@ -20,7 +20,7 @@ class Cobotta(ri.RobotInterface):
                                      homeconf=np.zeros(0),
                                      name='base_plate')
         self.base_plate.jnts[1]['loc_pos'] = np.array([0, 0, 0.035])
-        self.base_plate.lnks[0]['meshfile'] = os.path.join(this_dir, "meshes", "base_plate.stl")
+        self.base_plate.lnks[0]['mesh_file'] = os.path.join(this_dir, "meshes", "base_plate.stl")
         self.base_plate.lnks[0]['rgba'] = [.35,.35,.35,1]
         self.base_plate.reinitialize()
         # arm
@@ -254,7 +254,7 @@ if __name__ == '__main__':
 
     gm.gen_frame().attach_to(base)
     robot_s = Cobotta(enable_cc=True)
-    robot_s.jaw_to(.02)
+    robot_s.jaw_to(jawwidth=.02)
     # robot_s.gen_meshmodel(toggle_tcpcs=True, toggle_jntscs=True).attach_to(base)
     # robot_s.gen_meshmodel(toggle_tcpcs=False, toggle_jntscs=False).attach_to(base)
     robot_s.gen_stickmodel(toggle_tcpcs=True, toggle_jntscs=True).attach_to(base)

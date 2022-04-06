@@ -5,7 +5,7 @@ import basis.robot_math as rm
 import robot_sim.robots.cobotta.cobotta as cbt
 import visualization.panda.world as wd
 import modeling.geometric_model as gm
-import robot_con.cobotta.cobotta_x as cbtx
+# import robot_con.cobotta.cobotta_x as cbtx
 
 
 def genSphere(pos, radius=0.02, rgba=None):

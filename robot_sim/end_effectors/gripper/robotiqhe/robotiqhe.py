@@ -22,10 +22,10 @@ class RobotiqHE(gp.GripperInterface):
         self.lft.jnts[1]['loc_motionax'] = np.array([1, 0, 0])
         self.lft.lnks[0]['name'] = "base"
         self.lft.lnks[0]['loc_pos'] = np.zeros(3)
-        self.lft.lnks[0]['meshfile'] = os.path.join(this_dir, "meshes", "base_cvt.stl")
+        self.lft.lnks[0]['mesh_file'] = os.path.join(this_dir, "meshes", "base_cvt.stl")
         self.lft.lnks[0]['rgba'] = [.2, .2, .2, 1]
         self.lft.lnks[1]['name'] = "finger1"
-        self.lft.lnks[1]['meshfile'] = os.path.join(this_dir, "meshes", "finger1_cvt.stl")
+        self.lft.lnks[1]['mesh_file'] = os.path.join(this_dir, "meshes", "finger1_cvt.stl")
         self.lft.lnks[1]['rgba'] = [.5, .5, .5, 1]
         # - rgt
         self.rgt = jl.JLChain(pos=cpl_end_pos, rotmat=cpl_end_rotmat, homeconf=np.zeros(1), name='rgt_finger')
@@ -33,7 +33,7 @@ class RobotiqHE(gp.GripperInterface):
         self.rgt.jnts[1]['type'] = 'prismatic'
         self.rgt.jnts[1]['loc_motionax'] = np.array([-1, 0, 0])
         self.rgt.lnks[1]['name'] = "finger2"
-        self.rgt.lnks[1]['meshfile'] = os.path.join(this_dir, "meshes", "finger2_cvt.stl")
+        self.rgt.lnks[1]['mesh_file'] = os.path.join(this_dir, "meshes", "finger2_cvt.stl")
         self.rgt.lnks[1]['rgba'] = [.5, .5, .5, 1]
         # jaw center
         self.jaw_center_pos = np.array([0,0,.14])
@@ -57,7 +57,7 @@ class RobotiqHE(gp.GripperInterface):
             self.all_cdelements = self.cc.all_cdelements
         # cdmesh
         for cdelement in self.all_cdelements:
-            cdmesh = cdelement['collisionmodel'].copy()
+            cdmesh = cdelement['collision_model'].copy()
             self.cdmesh_collection.add_cm(cdmesh)
 
     def fix_to(self, pos, rotmat, jawwidth=None):
