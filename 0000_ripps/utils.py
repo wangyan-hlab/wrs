@@ -1,6 +1,6 @@
 import os
 
-import nptyping
+# import nptyping
 import numpy as np
 import basis.robot_math as rm
 import modeling.collision_model as cm

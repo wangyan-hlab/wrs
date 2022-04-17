@@ -8,11 +8,11 @@ import visualization.panda.world as wd
 import modeling.geometric_model as gm
 import utils
 import motion.probabilistic.rrt_connect as rrtc
-import motion.trajectory.piecewisepoly_toppra as trajp
+# import motion.trajectory.piecewisepoly_toppra as trajp
 
 if __name__ == '__main__':
     base = wd.World(cam_pos=[1.7, .7, .7], lookat_pos=[0, 0, 0])
-    traj_gen = trajp.PiecewisePolyTOPPRA()
+    # traj_gen = trajp.PiecewisePolyTOPPRA()
     max_vels = [np.pi * .6, np.pi * .4, np.pi, np.pi, np.pi, np.pi * 1.5]
     gm.gen_frame().attach_to(base)
 
