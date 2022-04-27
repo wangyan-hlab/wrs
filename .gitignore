@@ -5,8 +5,10 @@
 /0000_examples/wangyan/*_test.py
 /0000_examples/wangyan/work_fr/
 /wrs架构与函数功能
+/yantools
+*.jpg
 *.npy
 *.pth
 *.pickle
 /neuro/ik/runs
-/yantools
+

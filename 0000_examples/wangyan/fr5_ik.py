@@ -15,7 +15,6 @@ def genSphere(pos, radius=0.005, rgba=None):
 if __name__ == '__main__':
 
     """
-    How about creating an NN as the FK model of the FR5 robot?
     author: wangyan
     date: 2022/02/21, Suzhou
     """
