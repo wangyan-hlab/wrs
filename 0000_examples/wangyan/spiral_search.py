@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 from numpy import *
-import snsplot
 import math
 import time
 import numpy as np
@@ -11,6 +10,8 @@ import robot_sim.robots.fr5.fr5 as fr5
 import motion.probabilistic.rrt_connect as rrtc
 import basis.robot_math as rm
 import motion.optimization_based.incremental_nik as inik
+import snsplot
+snsplot.set()
 
 def genSphere(pos, radius=0.02, rgba=None):
     if rgba is None:
@@ -33,23 +34,23 @@ if __name__ == '__main__':
     base = wd.World(cam_pos=[2, 2, 1], lookat_pos=[0, 0, 0.5], w=960, h=720)
     gm.gen_frame().attach_to(base)
     component_name = 'arm'
-    robot_s = fr5.FR5_robot(enable_cc=True, arm_jacobian_offset=np.array([0, 0, .145]), hnd_attached=True)
+    robot_s = fr5.FR5_robot(enable_cc=True, zrot_to_gndbase=0)
 
+    ## Generating a new spiral path
     seed_jnt_values = radians([30, -80, 50, -60, -90, 80])
-    # seed_jnt_values = None
-    init_pos = array([.50, 0.03, .45])
-    init_orn = array([[-1, 0, 0], [0, 1, 0], [0, 0, -1]])
-    print("Robot tcp pose = ", init_pos, init_orn)
+    robot_s.fk(component_name=component_name, jnt_values=seed_jnt_values)
+    init_pos = robot_s.get_gl_tcp()[0]
+    init_orn = robot_s.get_gl_tcp()[1]
     jnt_values = robot_s.ik(tgt_pos=init_pos, tgt_rotmat=init_orn, seed_jnt_values=seed_jnt_values)
     robot_s.fk(component_name=component_name, jnt_values=jnt_values)
-    # if not robot_s.is_collided():
-    #     robot_s.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
+    print("Robot tcp pose = ", robot_s.get_gl_tcp())
+    # defining a spiral path
     spiral_x, spiral_y = spiral(start_angle=0, start_radius=5e-4,
-                                angle_to_step=pi/12, radius_to_step=5e-4,
+                                angle_to_step=pi/30, radius_to_step=0.001,
                                 max_angle=6*pi, max_radius=0.15)
 
     print(len(spiral_x), len(spiral_y))
-    ## Plot the spiral
+    # plotting the spiral path
     fig, ax = plt.subplots(figsize=(6, 6))
     ax.plot(spiral_x, spiral_y, label='spiral')
     ax.legend()
@@ -64,7 +65,7 @@ if __name__ == '__main__':
         print(">> pt# ", count)
         print(">> x={}, y={}".format(x, y))
         print(">> pos = ", pos)
-        pos = array([init_pos[0]+x, init_pos[1]+y, pos[2]+0.001])
+        pos = array([init_pos[0]+x, init_pos[1]+y, pos[2]])
         jnt_values = robot_s.ik(tgt_pos=pos, tgt_rotmat=orn, seed_jnt_values=jnt_values)
         robot_s.fk(component_name=component_name, jnt_values=jnt_values)
         if not robot_s.is_collided():
@@ -74,6 +75,7 @@ if __name__ == '__main__':
 
     path = path[::-1]
     robot_s.fk(component_name=component_name, jnt_values=path[-1])
+    # adding a subsequent linear path
     linear_start_pos = robot_s.get_gl_tcp()[0]
     linear_goal_pos = linear_start_pos + np.array([0, 0, -0.03])
     print("linear_start_pos = ", linear_start_pos)
@@ -86,6 +88,9 @@ if __name__ == '__main__':
                                                       goal_tcp_rotmat=orn,
                                                       obstacle_list=[], granularity=0.005)
     path += linear_path
+
+    ## Using the existed spiral path
+    path = loadtxt('spiral_path.txt', delimiter=',')
 
     def update(rbtmnp, motioncounter, robot, path, armname, task):
         if motioncounter[0] < len(path):
