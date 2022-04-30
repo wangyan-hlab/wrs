@@ -14,7 +14,7 @@ from direct.task.TaskManagerGlobal import taskMgr
 base = wd.World(cam_pos=[2, 0, 1], lookat_pos=[0, 0, 0.5], w=960, h=720)
 component_name = 'arm'
 init_conf = np.array([0,-60,-130,10,10,0])*math.pi/180
-robot_s = fr5.FR5_robot(homeconf=init_conf)
+robot_s = fr5.FR5_robot(homeconf=init_conf, arm_jacobian_offset=np.array([0,0,.145]), hnd_attached=True)
 robot_s.jaw_to(hnd_name="hnd", jawwidth=0.03)
 current_gripper_width = robot_s.hnd.get_jawwidth()
 onscreen = []
@@ -95,11 +95,11 @@ def move(task):
         else:
             raise NotImplementedError("IK is unsolved!")
 
-        current_gripper_width = current_gripper_width + rel_gripper_distance
+        current_gripper_width = current_gripper_width + rel_gripper_distance[1]
         print("current_gripper_width =", current_gripper_width)
 
-        if 0 <= current_gripper_width[1] <= 0.085:
-            robot_s.hnd.jaw_to(current_gripper_width[1])
+        if 0 <= current_gripper_width <= 0.085:
+            robot_s.hnd.jaw_to(current_gripper_width)
         else:
             raise NotImplementedError("The jaw width is out of range!")
         toc = time.time()

@@ -33,6 +33,9 @@ class RobotInterface(object):
     def get_gl_tcp(self, manipulator_name):
         return self.manipulator_dict[manipulator_name].get_gl_tcp()
 
+    def is_jnt_values_in_ranges(self, component_name, jnt_values):
+        return self.manipulator_dict[component_name].is_jnt_values_in_ranges(jnt_values)
+
     def fix_to(self, pos, rotmat):
         return NotImplementedError
 
@@ -40,27 +43,27 @@ class RobotInterface(object):
         return NotImplementedError
 
     def jaw_to(self, hnd_name, jaw_width):
-        self.hnd_dict[hnd_name].jaw_to(jawwidth=jaw_width)
+        self.hnd_dict[hnd_name].jaw_to(jaw_width=jaw_width)
 
     def get_jawwidth(self, hand_name):
         return self.hnd_dict[hand_name].get_jawwidth()
 
     def ik(self,
-           component_name="arm",
-           tgt_pos=np.array([.7,0,.7]),
+           component_name: str = "arm",
+           tgt_pos=np.zeros(3),
            tgt_rotmat=np.eye(3),
            seed_jnt_values=None,
-           max_niter=100,
-           tcp_jntid=None,
+           max_niter=200,
+           tcp_jnt_id=None,
            tcp_loc_pos=None,
            tcp_loc_rotmat=None,
-           local_minima="accept",
+           local_minima: str = "accept",
            toggle_debug=False):
         return self.manipulator_dict[component_name].ik(tgt_pos,
                                                         tgt_rotmat,
                                                         seed_jnt_values=seed_jnt_values,
                                                         max_niter=max_niter,
-                                                        tcp_jntid=tcp_jntid,
+                                                        tcp_jnt_id=tcp_jnt_id,
                                                         tcp_loc_pos=tcp_loc_pos,
                                                         tcp_loc_rotmat=tcp_loc_rotmat,
                                                         local_minima=local_minima,
@@ -72,8 +75,14 @@ class RobotInterface(object):
     def manipulability_axmat(self, component_name='arm', type="translational"):
         return self.manipulator_dict[component_name].manipulability_axmat(type=type)
 
-    def jacobian(self, component_name='arm'):
-        return self.manipulator_dict[component_name].jacobian()
+    def jacobian(self,
+                 component_name='arm',
+                 tcp_jnt_id=None,
+                 tcp_loc_pos=None,
+                 tcp_loc_rotmat=None):
+        return self.manipulator_dict[component_name].jacobian(tcp_jnt_id=tcp_jnt_id,
+                                                              tcp_loc_pos=tcp_loc_pos,
+                                                              tcp_loc_rotmat=tcp_loc_rotmat)
 
     def rand_conf(self, component_name):
         return self.manipulator_dict[component_name].rand_conf()
@@ -88,9 +97,9 @@ class RobotInterface(object):
         date: 20210417
         """
         jnt_values_bk = self.get_jnt_values(manipulator_name)
-        self.robot_s.fk(manipulator_name, jnt_values)
-        gl_tcp_pos, gl_tcp_rotmat = self.robot_s.get_gl_tcp(manipulator_name)
-        self.robot_s.fk(manipulator_name, jnt_values_bk)
+        self.fk(manipulator_name, jnt_values)
+        gl_tcp_pos, gl_tcp_rotmat = self.get_gl_tcp(manipulator_name)
+        self.fk(manipulator_name, jnt_values_bk)
         return gl_tcp_pos, gl_tcp_rotmat
 
     def cvt_gl_to_loc_tcp(self, manipulator_name, gl_obj_pos, gl_obj_rotmat):
@@ -99,7 +108,7 @@ class RobotInterface(object):
     def cvt_loc_tcp_to_gl(self, manipulator_name, rel_obj_pos, rel_obj_rotmat):
         return self.manipulator_dict[manipulator_name].cvt_loc_tcp_to_gl(rel_obj_pos, rel_obj_rotmat)
 
-    def is_collided(self, obstacle_list=[], otherrobot_list=[], toggle_contact_points=False):
+    def is_collided(self, obstacle_list=None, otherrobot_list=None, toggle_contact_points=False):
         """
         Interface for "is cdprimit collided", must be implemented in child class
         :param obstacle_list:
@@ -109,6 +118,10 @@ class RobotInterface(object):
         author: weiwei
         date: 20201223
         """
+        if obstacle_list is None:
+            obstacle_list = []
+        if otherrobot_list is None:
+            otherrobot_list = []
         collision_info = self.cc.is_collided(obstacle_list=obstacle_list,
                                              otherrobot_list=otherrobot_list,
                                              toggle_contact_points=toggle_contact_points)
@@ -121,7 +134,7 @@ class RobotInterface(object):
         self.cc.unshow_cdprimit()
 
     def gen_stickmodel(self,
-                       tcp_jntid=None,
+                       tcp_jnt_id=None,
                        tcp_loc_pos=None,
                        tcp_loc_rotmat=None,
                        toggle_tcpcs=False,
@@ -131,7 +144,7 @@ class RobotInterface(object):
         raise NotImplementedError
 
     def gen_meshmodel(self,
-                      tcp_jntid=None,
+                      tcp_jnt_id=None,
                       tcp_loc_pos=None,
                       tcp_loc_rotmat=None,
                       toggle_tcpcs=False,

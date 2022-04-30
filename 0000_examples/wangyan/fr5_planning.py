@@ -20,28 +20,32 @@ if __name__ == '__main__':
     gm.gen_frame().attach_to(base)
     # object
     obj = cm.CollisionModel("../objects/bunnysim.stl")
-    obj.set_pos(np.array([0.3, -0.3, 0.554]))
+    obj.set_pos(np.array([-0.3, 0.3, 0.554]))
     obj.set_rpy(0, 0, 0)
     # obj.set_scale([4, 4, 4])
     obj.set_rgba([.1, .2, .8, 1])
     obj.attach_to(base)
     obj1 = cm.CollisionModel("../objects/bunnysim.stl")
-    obj1.set_pos(np.array([-0.3, -0.35, 0.554]))
+    obj1.set_pos(np.array([0.3, 0.35, 0.554]))
     obj1.set_rpy(0, 0, math.pi)
     obj1.set_scale([2, 2, 2])
     obj1.set_rgba([.5, .9, .1, 1])
     obj1.attach_to(base)
     # robot_s
     component_name = 'arm'
-    robot_s = fr5.FR5_robot(enable_cc=True)
-    robot_s.fix_to(pos=[0,0,0], rotmat=rm.rotmat_from_euler(0,0,0))
-    robot_s.jaw_to(jawwidth=0.01)
-    start_conf = np.radians([120,-120,120,0,0,0])
-    goal_conf = np.radians([0,-110,80,-80,-70,20])
+    robot_s = fr5.FR5_robot(enable_cc=True, arm_jacobian_offset=np.array([0, 0, .145]), hnd_attached=True)
+    # robot_s = fr5.FR5_robot(enable_cc=True)
+    robot_s.fix_to(pos=[0, 0, 0], rotmat=rm.rotmat_from_euler(0, 0, 0))
+
+    if robot_s.hnd_attached:
+        robot_s.jaw_to(jawwidth=0.01)
+
+    start_conf = np.radians([120, -120, 70, 0, 0, 0])
+    goal_conf = np.radians([0, -110, 80, -80, -70, 20])
     robot_s.fk(component_name, start_conf)
-    robot_s.gen_meshmodel(toggle_tcpcs=True, rgba=[1,0,0,0.5]).attach_to(base)
+    robot_s.gen_meshmodel(toggle_tcpcs=True, rgba=[1, 0, 0, 0.5]).attach_to(base)
     robot_s.fk(component_name, goal_conf)
-    robot_s.gen_meshmodel(toggle_tcpcs=True, rgba=[0,1,0,0.5]).attach_to(base)
+    robot_s.gen_meshmodel(toggle_tcpcs=True, rgba=[0, 1, 0, 0.5]).attach_to(base)
     # planner
     time_start = time.time()
     rrtc_planner = rrtc.RRTConnect(robot_s)
