@@ -13,12 +13,12 @@ class FR5(mi.ManipulatorInterface):
         this_dir, this_filename = os.path.split(__file__)
         self.jlc = jl.JLChain(pos=pos, rotmat=rotmat, homeconf=homeconf, name=name, cdprimitive_type="cylinder")
         # six joints, n_jnts = 6+2 (tgt ranges from 1-6), nlinks = 6+1
-        self.jlc.jnts[1]['loc_pos'] = np.array([0, 0, 0])
-        self.jlc.jnts[2]['loc_pos'] = np.array([0, 0, 0.155])
+        self.jlc.jnts[1]['loc_pos'] = np.array([0, 0, 0.155])
+        self.jlc.jnts[2]['loc_pos'] = np.array([0, -0.138, 0])
         self.jlc.jnts[2]['loc_rotmat'] = rm.rotmat_from_euler(math.pi/2.0, .0, .0)
         self.jlc.jnts[2]['loc_motionax'] = np.array([0, 0, 1])
         self.jlc.jnts[2]['motion_rng'] = np.array([-175, 175])*math.pi/180
-        self.jlc.jnts[3]['loc_pos'] = np.array([-.425, 0, 0])
+        self.jlc.jnts[3]['loc_pos'] = np.array([-0.425, 0, -0.138])
         self.jlc.jnts[3]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, 0)
         self.jlc.jnts[3]['loc_motionax'] = np.array([0, 0, 1])
         self.jlc.jnts[3]['motion_rng'] = np.array([-265, 85]) * math.pi / 180
@@ -47,13 +47,13 @@ class FR5(mi.ManipulatorInterface):
         self.jlc.lnks[0]['mesh_file'] = os.path.join(this_dir, "meshes", "base.stl")
         self.jlc.lnks[0]['rgba'] = arm_color1
         self.jlc.lnks[1]['name'] = "shoulder"
-        self.jlc.lnks[1]['loc_pos'] = np.zeros(3)
+        self.jlc.lnks[1]['loc_pos'] = np.array([.0, .0, -0.155])
         self.jlc.lnks[1]['com'] = np.array([.0, -.02, .0])
         self.jlc.lnks[1]['mass'] = 1.95
         self.jlc.lnks[1]['mesh_file'] = os.path.join(this_dir, "meshes", "shoulder.stl")
         self.jlc.lnks[1]['rgba'] = arm_color2
         self.jlc.lnks[2]['name'] = "upperarm"
-        self.jlc.lnks[2]['loc_pos'] = np.array([.0, .0, .0])
+        self.jlc.lnks[2]['loc_pos'] = np.array([.0, .0, -0.138])
         self.jlc.lnks[2]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, math.pi/2)
         self.jlc.lnks[2]['com'] = np.array([.13, 0, .1157])
         self.jlc.lnks[2]['mass'] = 3.42

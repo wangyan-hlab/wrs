@@ -46,7 +46,7 @@ if __name__ == '__main__':
     print("Robot tcp pose = ", robot_s.get_gl_tcp())
     # defining a spiral path
     spiral_x, spiral_y = spiral(start_angle=0, start_radius=5e-4,
-                                angle_to_step=pi/30, radius_to_step=0.001,
+                                angle_to_step=pi/36, radius_to_step=5e-4,
                                 max_angle=6*pi, max_radius=0.15)
 
     print(len(spiral_x), len(spiral_y))
@@ -65,7 +65,7 @@ if __name__ == '__main__':
         print(">> pt# ", count)
         print(">> x={}, y={}".format(x, y))
         print(">> pos = ", pos)
-        pos = array([init_pos[0]+x, init_pos[1]+y, pos[2]])
+        pos = array([init_pos[0]+x, init_pos[1]+y, pos[2]+0.0001])
         jnt_values = robot_s.ik(tgt_pos=pos, tgt_rotmat=orn, seed_jnt_values=jnt_values)
         robot_s.fk(component_name=component_name, jnt_values=jnt_values)
         if not robot_s.is_collided():
