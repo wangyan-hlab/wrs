@@ -28,12 +28,12 @@ class FR5_robot(ri.RobotInterface):
                                         rm.rotmat_from_euler(0, 0, math.pi*135/180)),
                               homeconf=homeconf, name=name)
         # six joints, n_jnts = 6+2 (tgt ranges from 1-6), nlinks = 6+1
-        self.arm.jnts[1]['loc_pos'] = np.array([0, 0, 0])
-        self.arm.jnts[2]['loc_pos'] = np.array([0, 0, 0.155])
+        self.arm.jnts[1]['loc_pos'] = np.array([0, 0, 0.155])
+        self.arm.jnts[2]['loc_pos'] = np.array([0, -0.138, 0])
         self.arm.jnts[2]['loc_rotmat'] = rm.rotmat_from_euler(math.pi/2.0, .0, .0)
         self.arm.jnts[2]['loc_motionax'] = np.array([0, 0, 1])
         self.arm.jnts[2]['motion_rng'] = np.array([-175, 175]) * math.pi / 180
-        self.arm.jnts[3]['loc_pos'] = np.array([-.425, 0, 0])
+        self.arm.jnts[3]['loc_pos'] = np.array([-0.425, 0, -0.138])
         self.arm.jnts[3]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, 0)
         self.arm.jnts[3]['loc_motionax'] = np.array([0, 0, 1])
         self.arm.jnts[3]['motion_rng'] = np.array([-265, 85]) * math.pi / 180
@@ -63,13 +63,13 @@ class FR5_robot(ri.RobotInterface):
         self.arm.lnks[0]['mesh_file'] = os.path.join(this_dir, "meshes", "base.stl")
         self.arm.lnks[0]['rgba'] = arm_color1
         self.arm.lnks[1]['name'] = "shoulder"
-        self.arm.lnks[1]['loc_pos'] = np.zeros(3)
+        self.arm.lnks[1]['loc_pos'] = np.array([.0, .0, -0.155])
         self.arm.lnks[1]['com'] = np.array([.0, -.02, .0])
         self.arm.lnks[1]['mass'] = 1.95
         self.arm.lnks[1]['mesh_file'] = os.path.join(this_dir, "meshes", "shoulder.stl")
         self.arm.lnks[1]['rgba'] = arm_color2
         self.arm.lnks[2]['name'] = "upperarm"
-        self.arm.lnks[2]['loc_pos'] = np.array([.0, .0, .0])
+        self.arm.lnks[2]['loc_pos'] = np.array([.0, .0, -0.138])
         self.arm.lnks[2]['loc_rotmat'] = rm.rotmat_from_euler(0, 0, math.pi / 2)
         self.arm.lnks[2]['com'] = np.array([.13, 0, .1157])
         self.arm.lnks[2]['mass'] = 3.42
