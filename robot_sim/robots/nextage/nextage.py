@@ -740,7 +740,7 @@ class Nextage(ri.RobotInterface):
         if jaw_width is not None:
             self.jaw_to(hnd_name, jaw_width)
         for obj_info in oih_infos:
-            if obj_info['collisionmodel'] is objcm:
+            if obj_info['collision_model'] is objcm:
                 self.cc.delete_cdobj(obj_info)
                 oih_infos.remove(obj_info)
                 break

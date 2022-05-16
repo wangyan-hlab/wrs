@@ -17,7 +17,7 @@ if __name__ == '__main__':
     milkcarton = cm.CollisionModel("../objects/milkcarton.stl")
     milkcarton.set_rgba([.9, .75, .35, 1])
     # object start
-    milkcarton_gl_pos = np.array([0.4, 0.05, 0.25])
+    milkcarton_gl_pos = np.array([0.4, 0.05, 0.2])
     milkcarton_gl_rotmat = rm.rotmat_from_euler(0, 0, 0)
     obgl_start_homomat = rm.homomat_from_posrot(milkcarton_gl_pos, milkcarton_gl_rotmat)
     milkcarton.set_pos(milkcarton_gl_pos)
@@ -28,7 +28,7 @@ if __name__ == '__main__':
     milkcarton_copy.set_rgba([1, 0, 0, .4])
     milkcarton_copy.attach_to(base)
     # object goal
-    milkcarton_gl_goal_pos = np.array([0.4, 0.3, 0.35])
+    milkcarton_gl_goal_pos = np.array([0.4, 0.3, 0.2])
     milkcarton_gl_goal_rotmat = rm.rotmat_from_euler(0, 0, 0)
     obgl_goal_homomat = rm.homomat_from_posrot(milkcarton_gl_goal_pos, milkcarton_gl_goal_rotmat)
     milkcarton_goal_copy = milkcarton.copy()
@@ -60,10 +60,10 @@ if __name__ == '__main__':
                                         start_conf=start_conf,
                                         end_conf=start_conf,
                                         goal_homomat_list=[obgl_start_homomat, obgl_goal_homomat],
-                                        approach_direction_list=[None, np.array([0, 0, -1])],
-                                        approach_distance_list=[.2] * 2,
-                                        depart_direction_list=[np.array([0, 0, 1]), None],
-                                        depart_distance_list=[.2] * 2,
+                                        approach_direction_list=[np.array([0, 0, -1]), np.array([0, 0, -1])],
+                                        approach_distance_list=[.15] * 2,
+                                        depart_direction_list=[np.array([0, 0, 1]), np.array([0, 0, 1])],
+                                        depart_distance_list=[.15] * 2,
                                         obstacle_list=[obj])
     robot_attached_list = []
     object_attached_list = []
