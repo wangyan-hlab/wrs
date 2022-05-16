@@ -16,14 +16,14 @@ if __name__ == '__main__':
                                                      objcm,
                                                      gl_jaw_center_pos=np.array([0, 0, 0]),
                                                      gl_jaw_center_z=np.array([1, 0, 0]),
-                                                     gl_hndx=np.array([0, 1, 0]),
+                                                     gl_jaw_center_y=np.array([0, 1, 0]),
                                                      jaw_width=.04,
                                                      gl_rotation_ax=np.array([0, 0, 1]))
+
     for grasp_info in grasp_info_list:
-        jaw_width, gl_jaw_center, pos, rotmat = grasp_info
+        jaw_width, gl_jaw_center_pos, gl_jaw_center_rotmat, hnd_pos, hnd_rotmat = grasp_info
         gic = gripper_s.copy()
-        gic.fix_to(pos, rotmat)
+        gic.fix_to(hnd_pos, hnd_rotmat)
         gic.jaw_to(jaw_width)
-        print(pos, rotmat)
         gic.gen_meshmodel().attach_to(base)
     base.run()
