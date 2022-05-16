@@ -40,43 +40,43 @@ class TBMArm(mi.ManipulatorInterface):
         self.jlc.lnks[0]['loc_pos'] = np.zeros(3)
         # self.jlc.lnks[0]['mass'] = 1.4
         # self.jlc.lnks[0]['com'] = np.array([-.02131, .000002, .044011])
-        self.jlc.lnks[0]['meshfile'] = os.path.join(this_dir, "meshes", "base.stl")
+        self.jlc.lnks[0]['mesh_file'] = os.path.join(this_dir, "meshes", "base.stl")
         self.jlc.lnks[0]['rgba'] = [.5, .5, .5, 1.0]
         self.jlc.lnks[1]['name'] = "j1"
         self.jlc.lnks[1]['loc_pos'] = np.zeros(3)
         self.jlc.lnks[1]['com'] = np.array([.0, .0, .15])
         self.jlc.lnks[1]['mass'] = 1.29
-        self.jlc.lnks[1]['meshfile'] = os.path.join(this_dir, "meshes", "joint1.stl")
+        self.jlc.lnks[1]['mesh_file'] = os.path.join(this_dir, "meshes", "joint1.stl")
         self.jlc.lnks[1]['rgba'] = [.7, .7, .7, 1.0]
         self.jlc.lnks[2]['name'] = "j2"
         self.jlc.lnks[2]['loc_pos'] = np.array([.0, .0, .0])
         self.jlc.lnks[2]['com'] = np.array([-.02, .1, .07])
         self.jlc.lnks[2]['mass'] = 0.39
-        self.jlc.lnks[2]['meshfile'] = os.path.join(this_dir, "meshes", "joint2.stl")
+        self.jlc.lnks[2]['mesh_file'] = os.path.join(this_dir, "meshes", "joint2.stl")
         self.jlc.lnks[2]['rgba'] = [.77, .77, .60, 1]
         self.jlc.lnks[3]['name'] = "j3"
         self.jlc.lnks[3]['loc_pos'] = np.array([.0, .0, .0])
         self.jlc.lnks[3]['com'] = np.array([-.01, .02, .03])
         self.jlc.lnks[3]['mass'] = .35
-        self.jlc.lnks[3]['meshfile'] = os.path.join(this_dir, "meshes", "joint3.stl")
+        self.jlc.lnks[3]['mesh_file'] = os.path.join(this_dir, "meshes", "joint3.stl")
         self.jlc.lnks[3]['rgba'] = [.35, .35, .35, 1.0]
         self.jlc.lnks[4]['name'] = "j4"
         self.jlc.lnks[4]['loc_pos'] = np.array([.0, .0, .0])
         self.jlc.lnks[4]['com'] = np.array([.0, .0, 0.055])
         self.jlc.lnks[4]['mass'] = 0.35
-        self.jlc.lnks[4]['meshfile'] = os.path.join(this_dir, "meshes", "joint4.stl")
+        self.jlc.lnks[4]['mesh_file'] = os.path.join(this_dir, "meshes", "joint4.stl")
         self.jlc.lnks[4]['rgba'] = [.7, .7, .7, 1.0]
         self.jlc.lnks[5]['name'] = "j5"
         self.jlc.lnks[5]['loc_pos'] = np.array([.0, .0, .0])
         self.jlc.lnks[5]['com'] = np.array([.0, -.04, .015])
         self.jlc.lnks[5]['mass'] = 0.19
-        self.jlc.lnks[5]['meshfile'] = os.path.join(this_dir, "meshes", "joint5.stl")
+        self.jlc.lnks[5]['mesh_file'] = os.path.join(this_dir, "meshes", "joint5.stl")
         self.jlc.lnks[5]['rgba'] = [.77, .77, .60, 1]
         self.jlc.lnks[6]['name'] = "j6"
         self.jlc.lnks[6]['loc_pos'] = np.array([.0, .0, .0])
         self.jlc.lnks[6]['com'] = np.array([.0, .0, 0])
         self.jlc.lnks[6]['mass'] = 0.03
-        self.jlc.lnks[6]['meshfile'] = None
+        self.jlc.lnks[6]['mesh_file'] = None
         self.jlc.lnks[6]['rgba'] = [.5, .5, .5, 1.0]
         self.jlc.reinitialize()
         # collision detection
@@ -122,10 +122,11 @@ if __name__ == '__main__':
     seed1 = np.zeros(6)
     seed1[3] = -math.pi / 2
     manipulator_instance = TBMArm(enable_cc=True)
+    manipulator_instance.fk(np.radians([60,60,60,60,30,30]))
     manipulator_meshmodel = manipulator_instance.gen_meshmodel(toggle_jntscs=True)
     manipulator_meshmodel.attach_to(base)
     manipulator_instance.gen_stickmodel(toggle_tcpcs=True, toggle_jntscs=True).attach_to(base)
-    # base.run()
+    base.run()
     seed_jnt_values = manipulator_instance.get_jnt_values()
     for x in np.linspace(1, 3, 7).tolist():
         for y in np.linspace(-2, 2, 14).tolist():

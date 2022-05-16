@@ -41,6 +41,7 @@ class FR5(mi.ManipulatorInterface):
         # links
         arm_color1 = [.65, .65, .65, 1.0]
         arm_color2 = [1.0, .27, 0, 1.0]
+        arm_color2 = [0.6, 0.5, 0.3, 1.0]
         self.jlc.lnks[0]['name'] = "base"
         self.jlc.lnks[0]['loc_pos'] = np.zeros(3)
         self.jlc.lnks[0]['mass'] = 2.0

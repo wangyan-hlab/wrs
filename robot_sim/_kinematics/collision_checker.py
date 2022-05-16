@@ -89,7 +89,7 @@ class CollisionChecker(object):
                  key to hold into_list to easily toggle off the bitmasks.
         """
         cdobj_info = {}
-        cdobj_info['collisionmodel'] = objcm  # for reversed lookup
+        cdobj_info['collision_model'] = objcm  # for reversed lookup
         cdobj_info['gl_pos'] = objcm.get_pos()
         cdobj_info['gl_rotmat'] = objcm.get_rotmat()
         cdobj_info['rel_pos'] = rel_pos

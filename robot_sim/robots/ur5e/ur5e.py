@@ -5,7 +5,7 @@ import basis.robot_math as rm
 import modeling.model_collection as mc
 import robot_sim._kinematics.jlchain as jl
 import robot_sim.manipulators.ur5e.ur5e as ur5e
-import robot_sim.end_effectors.grippers.robotiq85.robotiq85 as rtq
+import robot_sim.end_effectors.gripper.robotiq85.robotiq85 as rtq
 import robot_sim.robots.robot_interface as ri
 
 class UR5E_robot(ri.RobotInterface):
@@ -77,7 +77,7 @@ class UR5E_robot(ri.RobotInterface):
             raise ValueError("The given component name is not available!")
 
     def gen_meshmodel(self,
-                      tcp_jntid=None,
+                      tcp_jnt_id=None,
                       tcp_loc_pos=None,
                       tcp_loc_rotmat=None,
                       toggle_tcpcs=False,
@@ -85,7 +85,7 @@ class UR5E_robot(ri.RobotInterface):
                       rgba=None,
                       name='ur5e_meshmodel'):
         meshmodel = mc.ModelCollection(name=name)
-        self.arm.gen_meshmodel(tcp_jntid=tcp_jntid,
+        self.arm.gen_meshmodel(tcp_jnt_id=tcp_jnt_id,
                                tcp_loc_pos=tcp_loc_pos,
                                tcp_loc_rotmat=tcp_loc_rotmat,
                                toggle_tcpcs=toggle_tcpcs,
@@ -94,7 +94,7 @@ class UR5E_robot(ri.RobotInterface):
         return meshmodel
 
     def gen_stickmodel(self,
-                       tcp_jntid=None,
+                       tcp_jnt_id=None,
                        tcp_loc_pos=None,
                        tcp_loc_rotmat=None,
                        toggle_tcpcs=False,
@@ -102,7 +102,7 @@ class UR5E_robot(ri.RobotInterface):
                        toggle_connjnt=False,
                        name='ur5e_stickmodel'):
         stickmodel = mc.ModelCollection(name=name)
-        self.arm.gen_stickmodel(tcp_jntid=tcp_jntid,
+        self.arm.gen_stickmodel(tcp_jnt_id=tcp_jnt_id,
                                 tcp_loc_pos=tcp_loc_pos,
                                 tcp_loc_rotmat=tcp_loc_rotmat,
                                 toggle_tcpcs=toggle_tcpcs,

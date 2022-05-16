@@ -1,7 +1,4 @@
-import math
 import numpy as np
-# import sys
-# sys.path.append(".")
 from visualization.panda import world as wd
 from modeling import geometric_model as gm
 from modeling import collision_model as cm
@@ -23,7 +20,7 @@ if __name__ == '__main__':
     gm.gen_frame().attach_to(base)
     component_name = 'arm'
     robot_s = fr5.FR5_robot(enable_cc=True)
-    seed_jnt_values = np.array([34, -85, 55.5, -61.65, -87.776, 116.7]) * math.pi / 180
+    seed_jnt_values = np.radians([34, -68, 55.5, -30, -56, 116.7])
     print("seed_jnt_values = ", seed_jnt_values)
     robot_s.fk(component_name=component_name, jnt_values=seed_jnt_values)
     if not robot_s.is_collided():

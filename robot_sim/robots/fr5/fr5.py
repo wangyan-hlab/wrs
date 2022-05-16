@@ -203,6 +203,13 @@ class FR5_robot(ri.RobotInterface):
         if component_name in self.manipulator_dict:
             return self.manipulator_dict[component_name].get_jnt_values()
 
+    def align_axis_down(self):
+        seed_jnt_values = self.arm.get_jnt_values()
+        position = self.arm.get_gl_tcp()[0]
+        orientation_new = np.array([[-1, 0, 0], [0, 1, 0], [0, 0, -1]])
+        jnt_values = self.arm.ik(tgt_pos=position, tgt_rotmat=orientation_new, seed_jnt_values=seed_jnt_values)
+        return jnt_values
+
     def fix_to(self, pos, rotmat):
         super().fix_to(pos, rotmat)
         self.pos = pos
@@ -281,7 +288,7 @@ class FR5_robot(ri.RobotInterface):
         if jawwidth is not None:
             self.hnd_dict[hnd_name].jaw_to(jawwidth)
         for obj_info in self.oih_infos:
-            if obj_info['collisionmodel'] is objcm:
+            if obj_info['collision_model'] is objcm:
                 self.cc.delete_cdobj(obj_info)
                 self.oih_infos.remove(obj_info)
                 break

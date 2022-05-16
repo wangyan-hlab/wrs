@@ -22,10 +22,10 @@ class YumiGripper(gp.GripperInterface):
         self.lft.jnts[1]['loc_motionax'] = np.array([1, 0, 0])
         self.lft.lnks[0]['name'] = "base"
         self.lft.lnks[0]['loc_pos'] = np.zeros(3)
-        self.lft.lnks[0]['meshfile'] = os.path.join(this_dir, "meshes", "base.stl")
+        self.lft.lnks[0]['mesh_file'] = os.path.join(this_dir, "meshes", "base.stl")
         self.lft.lnks[0]['rgba'] = [.5, .5, .5, 1]
         self.lft.lnks[1]['name'] = "finger1"
-        self.lft.lnks[1]['meshfile'] = os.path.join(this_dir, "meshes", "finger.stl")
+        self.lft.lnks[1]['mesh_file'] = os.path.join(this_dir, "meshes", "finger.stl")
         self.lft.lnks[1]['rgba'] = [.2, .2, .2, 1]
         # - rgt
         self.rgt = jl.JLChain(pos=cpl_end_pos, rotmat=cpl_end_rotmat, homeconf=np.zeros(1), name='rgt_finger')
@@ -33,7 +33,7 @@ class YumiGripper(gp.GripperInterface):
         self.rgt.jnts[1]['type'] = 'prismatic'
         self.rgt.jnts[1]['loc_motionax'] = np.array([1, 0, 0])
         self.rgt.lnks[1]['name'] = "finger2"
-        self.rgt.lnks[1]['meshfile'] = os.path.join(this_dir, "meshes", "finger.stl")
+        self.rgt.lnks[1]['mesh_file'] = os.path.join(this_dir, "meshes", "finger.stl")
         self.rgt.lnks[1]['rgba'] = [.2, .2, .2, 1]
         # reinitialize
         self.lft.reinitialize(cdmesh_type=cdmesh_type)
@@ -63,7 +63,7 @@ class YumiGripper(gp.GripperInterface):
                                    self.rgt.lnks[1]]
         # cdmesh
         for cdelement in self.all_cdelements:
-            cdmesh = cdelement['collisionmodel'].copy()
+            cdmesh = cdelement['collision_model'].copy()
             self.cdmesh_collection.add_cm(cdmesh)
 
     def fix_to(self, pos, rotmat):
@@ -88,16 +88,16 @@ class YumiGripper(gp.GripperInterface):
         else:
             raise ValueError("The motion_val parameter is out of range!")
 
-    def jaw_to(self, jawwidth):
-        if jawwidth > .05:
+    def jaw_to(self, jaw_width):
+        if jaw_width > .05:
             raise ValueError("The jaw_width parameter is out of range!")
-        self.fk(motion_val=-jawwidth / 2.0)
+        self.fk(motion_val=-jaw_width / 2.0)
 
     def get_jawwidth(self):
         return -self.lft.jnts[1]['motion_val']*2
 
     def gen_stickmodel(self,
-                       tcp_jntid=None,
+                       tcp_jnt_id=None,
                        tcp_loc_pos=None,
                        tcp_loc_rotmat=None,
                        toggle_tcpcs=False,
@@ -109,7 +109,7 @@ class YumiGripper(gp.GripperInterface):
                                      tcp_loc_rotmat=None,
                                      toggle_tcpcs=False,
                                      toggle_jntscs=toggle_jntscs).attach_to(stickmodel)
-        self.lft.gen_stickmodel(tcp_jntid=tcp_jntid,
+        self.lft.gen_stickmodel(tcp_jnt_id=tcp_jnt_id,
                                 tcp_loc_pos=tcp_loc_pos,
                                 tcp_loc_rotmat=tcp_loc_rotmat,
                                 toggle_tcpcs=toggle_tcpcs,
@@ -123,7 +123,7 @@ class YumiGripper(gp.GripperInterface):
         return stickmodel
 
     def gen_meshmodel(self,
-                      tcp_jntid=None,
+                      tcp_jnt_id=None,
                       tcp_loc_pos=None,
                       tcp_loc_rotmat=None,
                       toggle_tcpcs=False,
@@ -136,7 +136,7 @@ class YumiGripper(gp.GripperInterface):
                                     toggle_tcpcs=False,
                                     toggle_jntscs=toggle_jntscs,
                                     rgba=rgba).attach_to(meshmodel)
-        self.lft.gen_meshmodel(tcp_jntid=tcp_jntid,
+        self.lft.gen_meshmodel(tcp_jnt_id=tcp_jnt_id,
                                tcp_loc_pos=tcp_loc_pos,
                                tcp_loc_rotmat=tcp_loc_rotmat,
                                toggle_tcpcs=toggle_tcpcs,
@@ -168,7 +168,7 @@ if __name__ == '__main__':
     grpr.gen_meshmodel().attach_to(base)
 
     grpr2 = grpr.copy()
-    grpr2.fix_to(pos=np.array([.3,.3,.2]), rotmat=rm.rotmat_from_axangle([0,1,0],.01))
+    grpr2.fix_to(pos=np.array([.3, .3, .2]), rotmat=rm.rotmat_from_axangle([0, 1, 0], .01))
     model = grpr2.gen_meshmodel(rgba=[0.5, .5, 0, .5])
     model.attach_to(base)
     grpr2.show_cdprimit()
