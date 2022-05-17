@@ -26,7 +26,7 @@ grasp_info_list = gau.define_grasp_with_rotation(gripper_s,
                                                  gl_jaw_center_pos=np.array([0,0,0.005]),
                                                  gl_jaw_center_z=np.array([0,0,-1]),
                                                  gl_jaw_center_y=np.array([0,1,0]),
-                                                 jaw_width=0.01,
+                                                 jaw_width=0.015,
                                                  gl_rotation_ax=np.array([0,0,1]),
                                                  rotation_interval=np.radians(5))
 gpa.write_pickle_file(obj_name, grasp_info_list, './', 'fr5_'+obj_name+'.pickle')
