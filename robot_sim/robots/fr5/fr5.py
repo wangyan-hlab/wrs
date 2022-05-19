@@ -18,7 +18,7 @@ class FR5_robot(ri.RobotInterface):
     """
     
     def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name='fr5', homeconf=np.zeros(6),
-                 enable_cc=True, arm_jacobian_offset=np.zeros(3), hnd_attached=False, zrot_to_gndbase=math.pi*135/180):
+                 enable_cc=True, arm_jacobian_offset=np.zeros(3), hnd_attached=False, zrot_to_gndbase=np.radians(135)):
         super().__init__(pos=pos, rotmat=rotmat, name=name)
         this_dir, this_filename = os.path.split(__file__)
         self.ground_base = jl.JLChain(pos=pos, rotmat=rotmat, homeconf=np.zeros(0), name="fr5_to_ground_base")
@@ -217,7 +217,7 @@ class FR5_robot(ri.RobotInterface):
         self.ground_base.fix_to(self.pos, self.rotmat)
         self.arm.fix_to(pos=self.ground_base.jnts[0]['gl_posq'],
                         rotmat=np.dot(self.ground_base.jnts[0]['gl_rotmatq'],
-                                      rm.rotmat_from_euler(0,0,math.pi*135/180)))
+                                      rm.rotmat_from_euler(0,0,0)))
         if self.hnd_attached:
             self.hnd.fix_to(pos=np.dot(self.arm.jnts[-1]['gl_rotmatq'],
                                        self.hnd_offset) + self.arm.jnts[-1]['gl_posq'],
@@ -327,7 +327,7 @@ class FR5_robot(ri.RobotInterface):
             self.ground_base.fk(jnt_values)
             self.arm.fix_to(pos=self.ground_base.jnts[0]['gl_posq'],
                             rotmat=np.dot(self.ground_base.jnts[0]['gl_rotmatq'],
-                                          rm.rotmat_from_euler(0,0,math.pi*135/180)))
+                                          rm.rotmat_from_euler(0,0,0)))
         else:
             raise ValueError("The given component name is not available!")
 

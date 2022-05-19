@@ -40,7 +40,6 @@ class FR5(mi.ManipulatorInterface):
         self.jlc.jnts[7]['motion_rng'] = np.array([-175, 175]) * math.pi / 180
         # links
         arm_color1 = [.65, .65, .65, 1.0]
-        arm_color2 = [1.0, .27, 0, 1.0]
         arm_color2 = [0.6, 0.5, 0.3, 1.0]
         self.jlc.lnks[0]['name'] = "base"
         self.jlc.lnks[0]['loc_pos'] = np.zeros(3)
