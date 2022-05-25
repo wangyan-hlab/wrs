@@ -19,7 +19,7 @@ def get_mesh(_relative_path):
 if __name__ == '__main__':
 
     base = wd.World(cam_pos=[-1, 1, 1], lookat_pos=[-0.4, 0.15, 0.5])
-    # gm.gen_frame().attach_to(base)
+    gm.gen_frame().attach_to(base)
 
     robot_s = fr5.FR5_robot(zrot_to_gndbase=0, arm_jacobian_offset=np.array([0, 0, .145]), hnd_attached=True)
     tgt_pos = np.array([-0.4, 0, 0.6])
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     gm.gen_frame().attach_to(obj)
 
     # object start pose
-    obj_gl_start_pos = np.array([-0.4, -0.25, 0.45])
+    obj_gl_start_pos = np.array([-0.5, -0.25, 0.45])
     obj_gl_start_rotmat = rm.rotmat_from_euler(np.pi/2, 0, 0)
     obgl_start_homomat = rm.homomat_from_posrot(obj_gl_start_pos, obj_gl_start_rotmat)
     obj_start_copy = obj.copy()
@@ -59,7 +59,7 @@ if __name__ == '__main__':
     obj_start_copy.attach_to(base)
 
     # object goal pose
-    obj_gl_goal_pos = np.array([-0.4, 0.25, 0.45])
+    obj_gl_goal_pos = np.array([-0.5, 0.25, 0.45])
     obj_gl_goal_rotmat = rm.rotmat_from_euler(np.pi/2, 0, 0)
     obgl_goal_homomat = rm.homomat_from_posrot(obj_gl_goal_pos, obj_gl_goal_rotmat)
     obj_goal_copy = obj.copy()
