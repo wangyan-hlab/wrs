@@ -10,7 +10,7 @@ import math
 
 def get_lnk_bdmodel(robot_s, component_name, lnk_id):
     lnk = robot_s.manipulator_dict[component_name].lnks[lnk_id]
-    bd_lnk = bdm.BDModel(lnk["collisionmodel"], mass=0, type="box", dynamic=False)
+    bd_lnk = bdm.BDModel(lnk["collision_model"], mass=0, type="box", dynamic=False)
     bd_lnk.set_homomat(rm.homomat_from_posrot(lnk["gl_pos"], lnk["gl_rotmat"]))
     return bd_lnk
 

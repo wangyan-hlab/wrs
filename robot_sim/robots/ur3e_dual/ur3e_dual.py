@@ -23,7 +23,7 @@ class UR3EDual(ri.RobotInterface):
                                                                    math.pi / 2.0)  # left from robot_s view
         self.lft_body.lnks[0]['name'] = "ur3e_dual_base"
         self.lft_body.lnks[0]['loc_pos'] = np.array([0, 0, 0])
-        self.lft_body.lnks[0]['collisionmodel'] = cm.CollisionModel(
+        self.lft_body.lnks[0]['collision_model'] = cm.CollisionModel(
             os.path.join(this_dir, "meshes", "ur3e_dual_base.stl"),
             cdprimit_type="user_defined", expand_radius=.005,
             userdefined_cdprimitive_fn=self._base_combined_cdnp)
@@ -357,12 +357,12 @@ class UR3EDual(ri.RobotInterface):
                                    toggle_jntscs=toggle_jntscs,
                                    rgba=rgba).attach_to(mm_collection)
         for obj_info in self.lft_oih_infos:
-            objcm = obj_info['collisionmodel']
+            objcm = obj_info['collision_model']
             objcm.set_pos(obj_info['gl_pos'])
             objcm.set_rotmat(obj_info['gl_rotmat'])
             objcm.copy().attach_to(mm_collection)
         for obj_info in self.rgt_oih_infos:
-            objcm = obj_info['collisionmodel']
+            objcm = obj_info['collision_model']
             objcm.set_pos(obj_info['gl_pos'])
             objcm.set_rotmat(obj_info['gl_rotmat'])
             objcm.copy().attach_to(mm_collection)
