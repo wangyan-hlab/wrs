@@ -2577,9 +2577,6 @@ def _unit_vector(data, axis=None, out=None):
     if out is None:
         return data
 
-def null_space(matrix):
-    return scipy.linalg.null_space(matrix)
-
 if __name__ == '__main__':
     start_pos = np.array([1, 0, 0])
     start_rotmat = np.eye(3)
