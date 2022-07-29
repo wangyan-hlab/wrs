@@ -1,3 +1,4 @@
+import pickle
 import visualization.panda.world as wd
 import modeling.geometric_model as gm
 import modeling.collision_model as cm
@@ -109,7 +110,6 @@ if __name__ == '__main__':
     conf_list = conf_list[:contact_id]
     objpose_list = objpose_list[:contact_id]
     jawwidth_list = jawwidth_list[:contact_id]
-    print("jjjjjjjjjjjj", jawwidth_list[-5:])
     obj_contact_pos = objpose_list[-1][:3, -1]
     obj_contact_orn = objpose_list[-1][:3, :3]
     robot_s.fk(component_name='arm', jnt_values=conf_list[-1])
@@ -166,9 +166,12 @@ if __name__ == '__main__':
         objpose_list.append(rm.homomat_from_posrot(obj_pos, obj_contact_orn))
         jawwidth_list.append(obj_diam)
 
-    plt.plot(np.linspace(0, len(error_list), len(error_list)), error_list)
-    plt.title('Error')
-    plt.show()
+    dict1 = {'conf_list': conf_list, 'objpose_list': objpose_list, 'jawwidth_list': jawwidth_list}
+    pickle.dump(dict1, open('./spiral_search_motion_list.pickle', 'wb'))
+
+    # plt.plot(np.linspace(0, len(error_list), len(error_list)), error_list)
+    # plt.title('Error')
+    # plt.show()
 
     robot_attached_list = []
     object_attached_list = []
