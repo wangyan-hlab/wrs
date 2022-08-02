@@ -33,7 +33,6 @@ if __name__ == '__main__':
     tgt_rotmat = np.array([[-1, 0, 0], [0, 1, 0], [0, 0, -1]])
     jnt_values = robot_s.ik(component_name='arm', tgt_pos=tgt_pos, tgt_rotmat=tgt_rotmat,
                             seed_jnt_values=np.radians([-15,-60,20,0,-90,-90]))
-    print(np.degrees(jnt_values))
     robot_s.fk(component_name="arm", jnt_values=jnt_values)
     robot_s.gen_meshmodel(toggle_tcpcs=True, rgba=[1, 0, 1, .3]).attach_to(base)
     # base.run()
@@ -94,10 +93,7 @@ if __name__ == '__main__':
                                         obstacle_list=[])
     contact_id = 0
     for index, pose in enumerate(objpose_list):
-        # print("obj_pos = ", pose)
-        # print(">> Calculate obj height!")
         distance_to_contact = (pose[2, -1]-obj_height) - (obstacle_pos[2]+obstacle_height)
-        print("distance_to_contact = ", distance_to_contact)
         if abs(distance_to_contact) <= 1e-3:
             if np.linalg.norm(pose[:2, -1] - obj_gl_goal_pos[:2]) == 0:
                 contact_id = index
@@ -109,7 +105,6 @@ if __name__ == '__main__':
     conf_list = conf_list[:contact_id]
     objpose_list = objpose_list[:contact_id]
     jawwidth_list = jawwidth_list[:contact_id]
-    print("jjjjjjjjjjjj", jawwidth_list[-5:])
     obj_contact_pos = objpose_list[-1][:3, -1]
     obj_contact_orn = objpose_list[-1][:3, :3]
     robot_s.fk(component_name='arm', jnt_values=conf_list[-1])
@@ -117,7 +112,6 @@ if __name__ == '__main__':
     pos, orn = robot_pos, robot_orn
     delta_pos_obj_hand = obj_contact_pos - pos
     jnt_values = robot_s.get_jnt_values()
-    # print(">> jnt_values = ", np.degrees(robot_s.get_jnt_values()))
     spiral_x, spiral_y = spiral(start_angle=0, start_radius=1e-4, linear_vel=5e-3,
                                 radius_per_turn=2e-4, max_radius=5e-3, granularity=0.05)
 
@@ -149,9 +143,9 @@ if __name__ == '__main__':
     # adding a subsequent linear path
     linear_start_pos = pos
     linear_goal_pos = linear_start_pos + np.array([0, 0, -0.025])
-    print("obstacle_pos = ", obstacle_pos)
-    print("linear_start_pos = ", linear_start_pos)
-    print("linear_goal_pos = ", linear_goal_pos)
+    # print("obstacle_pos = ", obstacle_pos)
+    # print("linear_start_pos = ", linear_start_pos)
+    # print("linear_goal_pos = ", linear_goal_pos)
     robot_inik_solver = inik.IncrementalNIK(robot_s)
     linear_path = robot_inik_solver.gen_linear_motion(component_name='arm',
                                                       start_tcp_pos=linear_start_pos,
@@ -173,16 +167,9 @@ if __name__ == '__main__':
     robot_attached_list = []
     object_attached_list = []
     counter = [0]
-    def update(robot_s,
-               hnd_name,
-               obj,
-               robot_path,
-               jawwidth_path,
-               obj_path,
-               robot_attached_list,
-               object_attached_list,
-               counter,
-               task):
+
+    def update(robot_s, hnd_name, obj, robot_path, jawwidth_path, obj_path, robot_attached_list, object_attached_list, counter, task):
+
         if counter[0] >= len(robot_path):
             counter[0] = 0
         if len(robot_attached_list) != 0:
@@ -206,15 +193,9 @@ if __name__ == '__main__':
         counter[0] += 1
         return task.again
     taskMgr.doMethodLater(0.02, update, "update",
-                          extraArgs=[robot_s,
-                                     hnd_name,
-                                     obj,
-                                     conf_list,
-                                     jawwidth_list,
-                                     objpose_list,
-                                     robot_attached_list,
-                                     object_attached_list,
-                                     counter],
+                          extraArgs=[robot_s, hnd_name, obj,
+                                     conf_list, jawwidth_list, objpose_list,
+                                     robot_attached_list, object_attached_list, counter],
                           appendTask=True)
     base.setFrameRateMeter(True)
     base.run()
