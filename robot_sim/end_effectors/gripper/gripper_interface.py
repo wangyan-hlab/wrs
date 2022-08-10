@@ -41,7 +41,7 @@ class GripperInterface(object):
         author: weiwei
         date: 20201223
         """
-        return_val =  self.cc.is_collided(obstacle_list=obstacle_list, otherrobot_list=otherrobot_list)
+        return_val = self.cc.is_collided(obstacle_list=obstacle_list, otherrobot_list=otherrobot_list)
         return return_val
 
     def is_mesh_collided(self, objcm_list=[], toggle_debug=False):
