@@ -9,6 +9,11 @@ import modeling.geometric_model as gm
 
 class PegLink(extl.ExtlinkInterface):
 
+    """
+        author: wangyan
+        date: 2022/08/12, Suzhou
+    """
+
     def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), cdmesh_type='box', name='peg_link', enable_cc=True):
         super().__init__(pos=pos, rotmat=rotmat, cdmesh_type=cdmesh_type, name=name)
         this_dir, this_filename = os.path.split(__file__)
@@ -23,9 +28,9 @@ class PegLink(extl.ExtlinkInterface):
         self.jlc.lnks[0]['rgba'] = [.7, .3, .1, 1]
         # reinitialize
         self.jlc.reinitialize()
-        # extlink center relative to the origin
-        self.center_pos = np.array([.0, -.05, .0])
-        self.center_rotmat = np.array([[1, 0, 0], [0, 0, -1], [0, 1, 0]])
+        # tcp pose relative to the arm end
+        self.center_pos = np.array([.0, 0, .05])
+        self.center_rotmat = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
         # collision detection
         self.all_cdelements = []
         self.enable_cc(toggle_cdprimit=enable_cc)

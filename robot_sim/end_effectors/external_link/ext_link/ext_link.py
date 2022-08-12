@@ -9,6 +9,11 @@ import modeling.geometric_model as gm
 
 class ExtLink(extl.ExtlinkInterface):
 
+    """
+        author: wangyan
+        date: 2022/03/14, Suzhou
+    """
+
     def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), cdmesh_type='box', name='ext_link', enable_cc=True):
         super().__init__(pos=pos, rotmat=rotmat, cdmesh_type=cdmesh_type, name=name)
         this_dir, this_filename = os.path.split(__file__)
@@ -32,7 +37,7 @@ class ExtLink(extl.ExtlinkInterface):
         # extlink origin pose relative to the arm end
         self.origin_pos = np.array([0, 0, 0])
         self.origin_rotmat = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
-        # extlink center relative to the origin
+        # extlink center point pose relative to the arm end
         self.center_pos = np.array([.0, .102, .04])
         self.center_rotmat = np.array([[1, 0, 0], [0, 0, 1], [0, -1, 0]])
         # collision detection

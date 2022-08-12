@@ -10,6 +10,12 @@ import robot_sim.end_effectors.gripper.robotiq85.robotiq85 as rtq
 import robot_sim.robots.robot_interface as ri
 
 class UR5EBallPeg(ri.RobotInterface):
+
+    """
+        author: wangyan
+        date: 2022/08/12, Suzhou
+    """
+
     def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name='ur5e',
                  enable_cc=True, peg_attached=True):
         super().__init__(pos=pos, rotmat=rotmat, name=name)
@@ -25,6 +31,8 @@ class UR5EBallPeg(ri.RobotInterface):
                                    rotmat=np.dot(self.arm.jnts[-1]['gl_rotmatq'], self.peg_rotmat),
                                    enable_cc=False)
             self.arm.tcp_jnt_id = -1
+            self.arm.tcp_loc_pos = self.hnd.center_pos
+            self.arm.tcp_loc_rotmat = self.hnd.center_rotmat
             self.hnd_dict['arm'] = self.hnd
             self.hnd_dict['hnd'] = self.hnd
         if enable_cc:
