@@ -65,9 +65,13 @@ if __name__ == '__main__':
     # DMP
     dmp = CartesianDMP(execution_time=execution_time, dt=dt, n_weights_per_dim=10)
     dmp.imitate(T, Y)
+    new_start_pos = Y[0][:3] + np.array(([0.08, 0, 0]))
+    new_start_rotq = Y[0][3:]
+    new_start = np.concatenate((new_start_pos, new_start_rotq))
     new_goal_pos = Y[-1][:3] + np.array(([0.05, 0, 0]))
     new_goal_rotq = Y[-1][3:]
     new_goal = np.concatenate((new_goal_pos, new_goal_rotq))
+    dmp.start_y = new_start
     dmp.goal_y = new_goal
     _, Y = dmp.open_loop()
 
