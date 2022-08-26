@@ -6,6 +6,7 @@ import modeling.model_collection as mc
 import modeling.collision_model as cm
 import robot_sim._kinematics.jlchain as jl
 import robot_sim.manipulators.fr5.fr5 as fr
+import robot_sim.end_effectors.external_link.peg.peg as peg
 import robot_sim.end_effectors.gripper.robotiq85.robotiq85 as rtq
 from panda3d.core import CollisionNode, CollisionBox, Point3
 import robot_sim.robots.robot_interface as ri
@@ -18,7 +19,7 @@ class FR5_robot(ri.RobotInterface):
     """
     
     def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name='fr5', homeconf=np.zeros(6),
-                 enable_cc=True, arm_jacobian_offset=np.zeros(3), hnd_attached=False, zrot_to_gndbase=np.radians(135)):
+                 enable_cc=True, peg_attached=True, zrot_to_gndbase=np.radians(135)):
         super().__init__(pos=pos, rotmat=rotmat, name=name)
         this_dir, this_filename = os.path.split(__file__)
         self.ground_base = jl.JLChain(pos=pos, rotmat=rotmat, homeconf=np.zeros(0), name="fr5_to_ground_base")
@@ -36,25 +37,20 @@ class FR5_robot(ri.RobotInterface):
                           rotmat=np.dot(self.ground_base.jnts[0]['gl_rotmatq'],
                                         rm.rotmat_from_euler(0, 0, zrot_to_gndbase)),
                           homeconf=homeconf,
-                          enable_cc=False,
-                          arm_offset=arm_jacobian_offset)
+                          enable_cc=False)
         self.manipulator_dict['arm'] = self.arm
         self.manipulator_dict['hnd'] = self.arm
-        self.hnd_attached = hnd_attached
-        if hnd_attached:
-            self.hnd_offset = -arm_jacobian_offset
-            self.hnd_jaw_center_pos = arm_jacobian_offset + self.hnd_offset
-            self.hnd = rtq.Robotiq85(pos=np.dot(self.arm.jnts[-1]['gl_rotmatq'],
-                                                self.hnd_offset) + self.arm.jnts[-1]['gl_posq'],
-                                     rotmat=self.arm.jnts[-1]['gl_rotmatq'],
-                                     enable_cc=False,
-                                     jaw_center_pos=self.hnd_jaw_center_pos)
+        self.peg_attached = peg_attached
+        if peg_attached:
+            self.peg_rotmat = np.array([[1, 0, 0], [0, 0, 1], [0, -1, 0]])
+            self.hnd = peg.PegLink(pos=self.arm.jnts[-1]['gl_posq'],
+                                   rotmat=np.dot(self.arm.jnts[-1]['gl_rotmatq'], self.peg_rotmat),
+                                   enable_cc=False)
             # tool center point
             self.arm.tcp_jntid = -1
-            self.arm.tcp_loc_pos = self.hnd.jaw_center_pos
-            self.arm.tcp_loc_rotmat = self.hnd.jaw_center_rotmat
+            self.arm.tcp_loc_pos = self.hnd.center_pos
+            self.arm.tcp_loc_rotmat = self.hnd.center_rotmat
             # a list of detailed information about objects in hand, see CollisionChecker.add_objinhnd
-            self.oih_infos = []
             self.hnd_dict['arm'] = self.hnd
             self.hnd_dict['hnd'] = self.hnd
         # collision detection
@@ -91,9 +87,8 @@ class FR5_robot(ri.RobotInterface):
         super().enable_cc()
         self.cc.add_cdlnks(self.ground_base, [0])
         self.cc.add_cdlnks(self.arm, [0, 1, 2, 3, 4, 5, 6])
-        if self.hnd_attached:
-            self.cc.add_cdlnks(self.hnd.lft_outer, [0, 1, 2, 3, 4])
-            self.cc.add_cdlnks(self.hnd.rgt_outer, [1, 2, 3, 4])
+        if self.peg_attached:
+            self.cc.add_cdlnks(self.hnd.jlc, [0])
         # lnks used for cd with external stationary objects
         activelist_arm = [self.arm.lnks[0],
                           self.arm.lnks[1],
@@ -102,90 +97,41 @@ class FR5_robot(ri.RobotInterface):
                           self.arm.lnks[4],
                           self.arm.lnks[5],
                           self.arm.lnks[6]]
-        if self.hnd_attached:
-            activelist_hnd = [self.hnd.lft_outer.lnks[0],
-                              self.hnd.lft_outer.lnks[1],
-                              self.hnd.lft_outer.lnks[2],
-                              self.hnd.lft_outer.lnks[3],
-                              self.hnd.lft_outer.lnks[4],
-                              self.hnd.rgt_outer.lnks[1],
-                              self.hnd.rgt_outer.lnks[2],
-                              self.hnd.rgt_outer.lnks[3],
-                              self.hnd.rgt_outer.lnks[4]]
-            activelist = activelist_arm + activelist_hnd
+        if self.peg_attached:
+            activelist_peg = [self.hnd.jlc.lnks[0]]
+            activelist = activelist_arm + activelist_peg
         else:
             activelist = activelist_arm
         self.cc.set_active_cdlnks(activelist)
         # lnks used for arm-body collision detection
-        fromlist = [self.ground_base.lnks[0]]
+        fromlist = [self.ground_base.lnks[0],
+                    self.arm.lnks[0],
+                    self.arm.lnks[1]]
         intolist_arm = [self.arm.lnks[3],
                         self.arm.lnks[4],
                         self.arm.lnks[5],
                         self.arm.lnks[6]]
-        if self.hnd_attached:
-            intolist_hnd = [self.hnd.lft_outer.lnks[0],
-                            self.hnd.lft_outer.lnks[1],
-                            self.hnd.lft_outer.lnks[2],
-                            self.hnd.lft_outer.lnks[3],
-                            self.hnd.lft_outer.lnks[4],
-                            self.hnd.rgt_outer.lnks[1],
-                            self.hnd.rgt_outer.lnks[2],
-                            self.hnd.rgt_outer.lnks[3],
-                            self.hnd.rgt_outer.lnks[4]]
-            intolist = intolist_arm + intolist_hnd
-        else:
-            intolist = intolist_arm
-        self.cc.set_cdpair(fromlist, intolist)
-        fromlist = [self.arm.lnks[0],
-                    self.arm.lnks[1]]
-        intolist_arm = [self.arm.lnks[3],
-                        self.arm.lnks[5],
-                        self.arm.lnks[6]]
-        if self.hnd_attached:
-            intolist_hnd = [self.hnd.lft_outer.lnks[0],
-                            self.hnd.lft_outer.lnks[1],
-                            self.hnd.lft_outer.lnks[2],
-                            self.hnd.lft_outer.lnks[3],
-                            self.hnd.lft_outer.lnks[4],
-                            self.hnd.rgt_outer.lnks[1],
-                            self.hnd.rgt_outer.lnks[2],
-                            self.hnd.rgt_outer.lnks[3],
-                            self.hnd.rgt_outer.lnks[4]]
-            intolist = intolist_arm + intolist_hnd
+        if self.peg_attached:
+            intolist_peg = [self.hnd.jlc.lnks[0]]
+            intolist = intolist_arm + intolist_peg
         else:
             intolist = intolist_arm
         self.cc.set_cdpair(fromlist, intolist)
         fromlist = [self.arm.lnks[2]]
-        intolist_arm = [self.arm.lnks[4],
-                        self.arm.lnks[5],
-                        self.arm.lnks[6]]
-        if self.hnd_attached:
-            intolist_hnd = [self.hnd.lft_outer.lnks[0],
-                            self.hnd.lft_outer.lnks[1],
-                            self.hnd.lft_outer.lnks[2],
-                            self.hnd.lft_outer.lnks[3],
-                            self.hnd.lft_outer.lnks[4],
-                            self.hnd.rgt_outer.lnks[1],
-                            self.hnd.rgt_outer.lnks[2],
-                            self.hnd.rgt_outer.lnks[3],
-                            self.hnd.rgt_outer.lnks[4]]
-            intolist = intolist_arm + intolist_hnd
+        intolist = [self.arm.lnks[4],
+                    self.arm.lnks[5],
+                    self.arm.lnks[6]]
+        if self.peg_attached:
+            intolist_peg = [self.hnd.jlc.lnks[0]]
+            intolist = intolist_arm + intolist_peg
         else:
             intolist = intolist_arm
         self.cc.set_cdpair(fromlist, intolist)
         fromlist = [self.arm.lnks[3]]
-        intolist_arm = [self.arm.lnks[6]]
-        if self.hnd_attached:
-            intolist_hnd = [self.hnd.lft_outer.lnks[0],
-                            self.hnd.lft_outer.lnks[1],
-                            self.hnd.lft_outer.lnks[2],
-                            self.hnd.lft_outer.lnks[3],
-                            self.hnd.lft_outer.lnks[4],
-                            self.hnd.rgt_outer.lnks[1],
-                            self.hnd.rgt_outer.lnks[2],
-                            self.hnd.rgt_outer.lnks[3],
-                            self.hnd.rgt_outer.lnks[4]]
-            intolist = intolist_arm + intolist_hnd
+        intolist = [self.arm.lnks[6]]
+        if self.peg_attached:
+            intolist_peg = [self.hnd.jlc.lnks[0]]
+            intolist = intolist_arm + intolist_peg
         else:
             intolist = intolist_arm
         self.cc.set_cdpair(fromlist, intolist)
@@ -218,80 +164,9 @@ class FR5_robot(ri.RobotInterface):
         self.arm.fix_to(pos=self.ground_base.jnts[0]['gl_posq'],
                         rotmat=np.dot(self.ground_base.jnts[0]['gl_rotmatq'],
                                       rm.rotmat_from_euler(0,0,0)))
-        if self.hnd_attached:
-            self.hnd.fix_to(pos=np.dot(self.arm.jnts[-1]['gl_rotmatq'],
-                                       self.hnd_offset) + self.arm.jnts[-1]['gl_posq'],
-                            rotmat=self.arm.jnts[-1]['gl_rotmatq'])
-
-    def jaw_to(self, hnd_name='hnd', jawwidth=0.0):
-        self.hnd_dict[hnd_name].jaw_to(jawwidth)
-
-    def hold(self, hnd_name, objcm, jawwidth=None):
-        """
-        the objcm is added as a part of the robot_s to the cd checker
-        :param jawwidth:
-        :param objcm:
-        :return:
-        """
-        if hnd_name not in self.hnd_dict:
-            raise ValueError("Hand name does not exist!")
-        if jawwidth is not None:
-            self.hnd_dict[hnd_name].jaw_to(jawwidth)
-        rel_pos, rel_rotmat = self.manipulator_dict[hnd_name].cvt_gl_to_loc_tcp(objcm.get_pos(), objcm.get_rotmat())
-        intolist = [self.arm.lnks[0],
-                    self.arm.lnks[1],
-                    self.arm.lnks[2],
-                    self.arm.lnks[3],
-                    self.arm.lnks[4],
-                    self.arm.lnks[5],
-                    self.arm.lnks[6]]
-        self.oih_infos.append(self.cc.add_cdobj(objcm, rel_pos, rel_rotmat, intolist))
-        return rel_pos, rel_rotmat
-
-    def get_oih_list(self):
-        return_list = []
-        for obj_info in self.oih_infos:
-            objcm = obj_info['collisionmodel']
-            objcm.set_pos(obj_info['gl_pos'])
-            objcm.set_rotmat(obj_info['gl_rotmat'])
-            return_list.append(objcm)
-        return return_list
-
-    def get_gl_pose_from_hio(self, component_name, hio_pos, hio_rotmat):
-        """
-        get the global pose of an object from a grasp pose described in an object's local frame
-        :param hio_pos: a grasp pose described in an object's local frame -- pos
-        :param hio_rotmat: a grasp pose described in an object's local frame -- rotmat
-        :return:
-        author: weiwei
-        date: 20210302
-        """
-        if component_name != 'arm':
-            raise ValueError("Component name for Fr5_Robot must be \'arm\'!")
-        hnd_pos = self.arm.jnts[-1]['gl_posq']
-        hnd_rotmat = self.arm.jnts[-1]['gl_rotmatq']
-        hnd_homomat = rm.homomat_from_posrot(hnd_pos, hnd_rotmat)
-        hio_homomat = rm.homomat_from_posrot(hio_pos, hio_rotmat)
-        oih_homomat = rm.homomat_inverse(hio_homomat)
-        gl_obj_homomat = hnd_homomat.dot(oih_homomat)
-        return gl_obj_homomat[:3, 3], gl_obj_homomat[:3, :3]
-
-    def release(self, hnd_name, objcm, jawwidth=None):
-        """
-        the objcm is added as a part of the robot_s to the cd checker
-        :param jawwidth:
-        :param objcm:
-        :return:
-        """
-        if hnd_name not in self.hnd_dict:
-            raise ValueError("Hand name does not exist!")
-        if jawwidth is not None:
-            self.hnd_dict[hnd_name].jaw_to(jawwidth)
-        for obj_info in self.oih_infos:
-            if obj_info['collision_model'] is objcm:
-                self.cc.delete_cdobj(obj_info)
-                self.oih_infos.remove(obj_info)
-                break
+        if self.peg_attached:
+            self.hnd.fix_to(pos=self.arm.jnts[-1]['gl_posq'],
+                            rotmat=np.dot(self.arm.jnts[-1]['gl_rotmatq'], self.peg_rotmat))
 
     def fk(self, component_name, jnt_values):
         """
@@ -302,20 +177,12 @@ class FR5_robot(ri.RobotInterface):
         date: 20201208toyonaka, 20210403osaka
         """
 
-        def update_oih(component_name='arm'):
-            for obj_info in self.oih_infos:
-                gl_pos, gl_rotmat = self.cvt_loc_tcp_to_gl(component_name, obj_info['rel_pos'], obj_info['rel_rotmat'])
-                obj_info['gl_pos'] = gl_pos
-                obj_info['gl_rotmat'] = gl_rotmat
-
         def update_component(component_name='arm', jnt_values=np.zeros(6)):
             self.manipulator_dict[component_name].fk(jnt_values=jnt_values)
-            if self.hnd_attached:
+            if self.peg_attached:
                 self.hnd_dict[component_name].fix_to(
-                    pos=np.dot(self.manipulator_dict[component_name].jnts[-1]['gl_rotmatq'],
-                               self.hnd_offset)+self.manipulator_dict[component_name].jnts[-1]['gl_posq'],
-                    rotmat=self.manipulator_dict[component_name].jnts[-1]['gl_rotmatq'])
-                update_oih(component_name=component_name)
+                    pos=self.manipulator_dict[component_name].jnts[-1]['gl_posq'],
+                    rotmat=np.dot(self.manipulator_dict[component_name].jnts[-1]['gl_rotmatq'], self.peg_rotmat))
 
         super().fk(component_name, jnt_values)
         # examine length
@@ -351,7 +218,7 @@ class FR5_robot(ri.RobotInterface):
                                toggle_tcpcs=toggle_tcpcs,
                                toggle_jntscs=toggle_jntscs,
                                rgba=rgba).attach_to(meshmodel)
-        if self.hnd_attached:
+        if self.peg_attached:
             self.hnd.gen_meshmodel(toggle_tcpcs=False,
                                    toggle_jntscs=toggle_jntscs,
                                    rgba=rgba).attach_to(meshmodel)
@@ -376,7 +243,7 @@ class FR5_robot(ri.RobotInterface):
                                 toggle_tcpcs=toggle_tcpcs,
                                 toggle_jntscs=toggle_jntscs,
                                 toggle_connjnt=toggle_connjnt).attach_to(stickmodel)
-        if self.hnd_attached:
+        if self.peg_attached:
             self.hnd.gen_stickmodel(toggle_tcpcs=False,
                                     toggle_jntscs=toggle_jntscs,
                                     toggle_connjnt=toggle_connjnt).attach_to(stickmodel)
@@ -396,7 +263,7 @@ if __name__ == '__main__':
     fr5.gen_meshmodel(toggle_tcpcs=True).attach_to(base)
 
     arm_jacobian_offset = np.array([0, 0, .145])
-    fr5 = FR5_robot(arm_jacobian_offset=arm_jacobian_offset, hnd_attached=True)
+    fr5 = FR5_robot(peg_attached=True)
     conf2 = np.radians([-93, -98, -73, -97, 90, 91])
     fr5.fk(component_name="arm", jnt_values=conf2)
     print("global_tcp=", fr5.get_gl_tcp())
